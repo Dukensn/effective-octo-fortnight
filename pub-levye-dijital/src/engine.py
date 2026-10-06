@@ -25,7 +25,7 @@ def make_bg():
     for y in range(60, H, 54):
         for x in range(30, W, 54):
             d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(222, 222, 220))
-    draw_center(d, W / 2, H - 120, "atelye digital", font(34, "SemiBold"), (205, 205, 203))
+    draw_center(d, W / 2, H - 120, "levye dijital", font(34, "SemiBold"), (205, 205, 203))
     return im
 
 

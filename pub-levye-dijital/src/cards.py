@@ -48,7 +48,7 @@ def phone_status():
     for i in range(4):
         d.rounded_rectangle([20 + i * 102, 34, 112 + i * 102, 40], 3, fill=(60, 60, 60) if i < 2 else (200, 200, 200))
     d.ellipse([22, 60, 92, 130], fill=ORANGE)
-    d.text((108, 72), "Atelye Digital", font=font(30, "Bold"), fill=INK)
+    d.text((108, 72), "Levye Dijital", font=font(30, "Bold"), fill=INK)
     d.text((108, 108), "Kounye a", font=font(22), fill=GREY)
     st = claude_star(220)
     scr.alpha_composite(st, (int((w - 30) / 2 - 110), 270))
@@ -136,8 +136,8 @@ def brand_card():
     im = rrect((w, h), 40, (20, 20, 22, 255))
     d = ImageDraw.Draw(im)
     im.alpha_composite(claude_star(150), (60, 135))
-    d.text((240, 120), "ATELYE", font=font(96, "Black"), fill="white")
-    d.text((240, 218), "DIGITAL", font=font(96, "Black"), fill=ORANGE)
+    d.text((240, 120), "LEVYE", font=font(96, "Black"), fill="white")
+    d.text((240, 218), "DIJITAL", font=font(96, "Black"), fill=ORANGE)
     d.text((244, 330), "Fòmasyon · Pratik · Pwojè", font=font(30, "Medium"), fill=(170, 170, 170))
     return shadowed(im, alpha=90)
 
@@ -156,6 +156,7 @@ def date_card(day, month="OKT", year="2026", label=""):
 
 
 def info_row(icon_text, title, sub, icon_bg=ORANGE, w=860):
+    w = max(w, text_w(title, font(56, "Bold")) + 220)
     h = 170
     im = rrect((w, h), 34, (255, 255, 255, 255))
     d = ImageDraw.Draw(im)
@@ -214,7 +215,7 @@ def certificate_card():
     d = ImageDraw.Draw(im)
     d.rounded_rectangle([20, 20, w - 20, h - 20], 12, outline=(210, 180, 120), width=5)
     draw_center(d, w / 2, 70, "SÈTIFIKA", font(64, "Black"), INK)
-    draw_center(d, w / 2, 160, "Atelye Digital · 2026", font(30, "Medium"), GREY)
+    draw_center(d, w / 2, 160, "Levye Dijital · 2026", font(30, "Medium"), GREY)
     for i, ln in enumerate([440, 380, 300]):
         d.rounded_rectangle([w / 2 - ln / 2, 240 + i * 40, w / 2 + ln / 2, 256 + i * 40], 8, fill=(230, 225, 215))
     d.ellipse([w / 2 - 55, 370, w / 2 + 55, 480], fill=ORANGE)

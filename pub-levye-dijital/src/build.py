@@ -23,7 +23,7 @@ SEGS = [
     ("N", 37.53, 41.57, "Oubyen ou ta vle vin yon **kreyatè **kontni k ap pibliye videyo ki **serye,"),
     ("O", 42.04, 43.88, "ki pa sanble ak videyo ki jenere avèk **IA."),
     ("P", 44.82, 46.63, "Ebyen, se yon **konpetans"),
-    ("Q", 47.35, 49.25, "se sa n ap montre w nan *Atelye *Digital."),
+    ("Q", 47.35, 49.25, "se sa n ap montre w nan *Levye *Dijital."),
     ("R", 49.50, 52.61, "**De **jou fòmasyon ak pratik pou metrize *Facebook *Ads,"),
     ("S", 53.40, 58.47, "pou w ka fè yon piblisite ki ateyn petèt **plizyè **santèn **milye moun, tout pandan w ap depanse yon **ti **kòb."),
     ("T", 59.32, 64.77, "N ap montre w kòman pou itilize **ajan tankou *Claude ak lòt ankò pou kreye **kontni, jere **kliyan,"),
@@ -35,12 +35,12 @@ SEGS = [
     ("Z", 83.35, 89.25, "Anplis de sa, w ap resevwa tout **resous **gratis ki nesesè. E n ap mete w nan yon gwoup *WhatsApp pou kontinye"),
     ("Z2", 90.49, 93.89, "kote n ap kontinye asiste patisipan yo pandan **yon **mwa."),
     ("AA", 94.74, 97.80, "Dat la se *17 ak *24 *oktòb 2026."),
-    ("AB", 98.42, 103.14, "**10è nan maten pou rive **4è nan apremidi. Lokal la se *La *Madone *Club,"),
-    ("AC", 103.45, 104.74, "anfas **Plas **Anakaona."),
+    ("AB", 98.42, 103.14, "**10è nan maten pou rive **4è nan apremidi. Lokal la se *Sassou's *Lamadone *Club,"),
+    ("AC", 103.45, 104.74, "anfas **Plas **Anacaona."),
     ("AD", 108.06, 112.26, "N ap fè nou konnen plas yo limite a *30 *moun sèlman, kidonk si w rive an reta,"),
     ("AE", 112.60, 113.80, "n ap dezole pou ou."),
-    ("AF", 114.17, 122.50, "Pou rezève plas ou, tanpri kontakte nou kounye a sou *WhatsApp, oswa klike sou lyen WhatsApp ki anba videyo sa a, oubyen ekri nou sou *3143 *3938."),
-    ("AG", 122.84, 127.08, "Ou ka ranpli fòmilè enskripsyon an tou, lè w ale sou **levierdigital.vercel.app"),
+    ("AF", 114.17, 122.50, "Pou rezève plas ou, tanpri kontakte nou kounye a sou *WhatsApp, oswa klike sou lyen WhatsApp ki anba videyo sa a, oubyen ekri nou sou *31 43 3938."),
+    ("AG", 122.84, 127.08, "Ou ka ranpli fòmilè enskripsyon an tou, lè w ale sou **levyedijital.vercel.app"),
 ]
 
 LEAD = 1.0      # seconds of intro before the voice
@@ -76,7 +76,7 @@ def M(t):
 BOLD, ORNG = "b", "o"
 seg_words = {}
 for sid, a, b, txt in SEGS:
-    toks = txt.split()
+    toks = txt.split(" ")
     words, styles = [], []
     for tk in toks:
         st = "n"
@@ -189,10 +189,10 @@ scene(St("N"), St("P"), [
 ])
 # 6 brand reveal
 cue("riser", St("P") - 0.6, -12)
-cue("impact", Tw("Q", "Atelye"), -4)
+cue("impact", Tw("Q", "Levye"), -4)
 scene(St("P"), St("R"), [
     El(chip("Yon konpetans", glyph="!", f=font(56, "Bold")), CX, 520, St("P") + .1, "pop"),
-    El(brand_card(), CX, 860, Tw("Q", "Atelye") - 0.05, "zoom"),
+    El(brand_card(), CX, 860, Tw("Q", "Levye") - 0.05, "zoom"),
 ])
 # 7 facebook ads
 scene(St("R"), St("T"), [
@@ -235,13 +235,13 @@ scene(St("Z"), St("AA"), [
 # 12 dates
 cue("ding", Tw("AA", "17"), -12)
 scene(St("AA"), St("AB"), [
-    El(date_card(17), 330, 800, Tw("AA", "17"), "pop", scale=1.05),
-    El(date_card(24), 750, 800, Tw("AA", "24"), "pop", scale=1.05),
+    El(date_card(17, label="Samdi"), 330, 800, Tw("AA", "17"), "pop", scale=1.05),
+    El(date_card(24, label="Samdi"), 750, 800, Tw("AA", "24"), "pop", scale=1.05),
 ])
 # 13 time + place
 scene(St("AB"), St("AD"), [
-    El(info_row("10", "10è – 4è", "Nan maten rive apremidi"), CX, 600, Tw("AB", "10è"), "left"),
-    El(info_row("★", "La Madone Club", "Anfas Plas Anakaona", icon_bg=INK), CX, 900, Tw("AB", "La"), "right"),
+    El(info_row("10", "10:00 AM – 4:00 PM", "Samdi 17 & 24 oktòb 2026"), CX, 600, Tw("AB", "10è"), "left"),
+    El(info_row("★", "Sassou's Lamadone Club", "Anfas Plas Anacaona", icon_bg=INK), CX, 900, Tw("AB", "Sassou"), "right"),
 ])
 # 14 seats limited
 t0, t1 = St("AD"), St("AF")
@@ -257,16 +257,16 @@ for k in range(steps):
         cue("tick", a, -10)
 scene(t0, t1, els)
 # 15 CTA whatsapp
-cue("ding", Tw("AF", "3143"), -8)
+cue("ding", Tw("AF", "31"), -8)
 scene(St("AF"), St("AG"), [
     El(whatsapp_icon(260), CX, 520, Tw("AF", "WhatsApp"), "pop"),
-    El(cta_button("3143-3938"), CX, 900, Tw("AF", "3143") - 0.1, "pop"),
+    El(cta_button("31 43 3938"), CX, 900, Tw("AF", "31") - 0.1, "pop"),
 ])
 # 16 form link + end card
 scene(St("AG"), TOTAL + 1, [
     El(brand_card(), CX, 560, St("AG"), "pop", scale=0.85),
-    El(link_card("levierdigital.vercel.app"), CX, 900, Tw("AG", "fòmilè"), "up"),
-    El(cta_button("3143-3938"), CX, 1150, Tw("AG", "levierdigital") + 0.4, "pop", scale=0.85),
+    El(link_card("levyedijital.vercel.app"), CX, 900, Tw("AG", "fòmilè"), "up"),
+    El(cta_button("31 43 3938"), CX, 1150, Tw("AG", "levyedijital") + 0.4, "pop", scale=0.85),
 ], cap_y=1500)
 cue("impact", VOICE_END + 0.2, -10)
 
