@@ -1,0 +1,13 @@
+# Third-party installs, reinstallable, not committed:
+#   npx skills add heygen-com/hyperframes            -> .agents/ agent/ .claude/skills/ skills-lock.json
+#   git clone https://github.com/cblain100-prog/motion-design-claude-code studio-base, copy over studio/
+.agents/
+agent/
+.claude/skills/
+skills-lock.json
+studio/*
+!studio/levye-dijital/
+# generated audio (rebuild with prep-voice.py + build-audio.sh)
+studio/levye-dijital/assets/audio/*.wav
+studio/levye-dijital/renders/
+studio/levye-dijital/snapshots/
