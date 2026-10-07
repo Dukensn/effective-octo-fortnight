@@ -1,0 +1,27 @@
+@font-face{font-family:Inter;font-weight:400;src:url(../assets/fonts/Inter-Regular.otf)}
+@font-face{font-family:Inter;font-weight:500;src:url(../assets/fonts/Inter-Medium.otf)}
+@font-face{font-family:Inter;font-weight:600;src:url(../assets/fonts/Inter-SemiBold.otf)}
+@font-face{font-family:Inter;font-weight:700;src:url(../assets/fonts/Inter-Bold.otf)}
+@font-face{font-family:Inter;font-weight:800;src:url(../assets/fonts/Inter-ExtraBold.otf)}
+@font-face{font-family:InterD;font-weight:900;src:url(../assets/fonts/InterDisplay-Black.otf)}
+:root{--bg:#0D0B0A;--ink:#F4EEE6;--mute:#8E857B;--acc:#FF7A45;--acc2:#FFB36B;--glass:rgba(255,255,255,.06);--line:rgba(255,255,255,.10)}
+*{box-sizing:border-box}html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:var(--bg);font-family:Inter;color:var(--ink)}
+.abs{position:absolute}
+.bg{position:absolute;inset:0;background:
+ radial-gradient(900px 700px at 70% 18%,rgba(255,122,69,.30),transparent 60%),
+ radial-gradient(800px 900px at 10% 85%,rgba(120,70,255,.16),transparent 60%),
+ radial-gradient(600px 600px at 50% 55%,rgba(255,179,107,.10),transparent 70%),#0D0B0A}
+.grid{position:absolute;inset:-200px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:90px 90px;transform:perspective(900px) rotateX(58deg) translateY(520px);transform-origin:50% 100%;opacity:.55;-webkit-mask-image:linear-gradient(transparent 30%,#000 70%)}
+.grain{position:absolute;inset:0;opacity:.09;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>")}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 50% 45%,transparent 55%,rgba(0,0,0,.65))}
+.glass{position:absolute;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);border-radius:34px;box-shadow:0 40px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.18)}
+.glow{box-shadow:0 0 60px rgba(255,122,69,.55),0 30px 60px rgba(0,0,0,.5)}
+.bokeh{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,170,110,.9),rgba(255,122,69,0) 70%);filter:blur(2px)}
+.sub{position:absolute;left:60px;right:60px;top:1460px;text-align:center;font:600 62px/1.25 Inter;letter-spacing:-.5px;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.9)}
+.sub .k{background:var(--acc);color:#140A05;border-radius:12px;padding:0 14px;font-weight:800}
+.sub .p{position:relative;font-weight:800;color:var(--acc2)}
+.sub .p::after{content:"";position:absolute;left:-4px;right:-4px;bottom:-10px;height:10px;background:var(--acc);clip-path:polygon(0 70%,100% 0,100% 45%,0 100%)}
+.sub .g{color:rgba(255,255,255,.35)}
+.lbl{font:700 24px Inter;letter-spacing:3px;text-transform:uppercase;color:var(--mute)}
+.wm{position:absolute;left:0;right:0;top:1800px;text-align:center;font:800 26px Inter;letter-spacing:6px;color:rgba(255,255,255,.28)}
+.clip{position:absolute;border-radius:18px;display:flex;align-items:center;justify-content:center;font:800 28px Inter;color:#fff;box-shadow:0 0 14px currentColor}
