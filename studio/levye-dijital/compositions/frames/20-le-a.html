@@ -1,0 +1,189 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f20-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f20-band { position: absolute; left: 110px; top: 230px; width: 860px; height: 1150px; border-radius: 40px;
+      background: linear-gradient(165deg, #fff, #F6F3EE); box-shadow: 0 50px 90px rgba(60,45,30,.14), 0 8px 18px rgba(60,45,30,.07), inset 0 1px 0 #fff; }
+    .f20-lane { position: absolute; top: 70px; width: 128px; height: 1010px; border-radius: 18px; background: #EDE9E2; opacity: .55; }
+    .f20-rt { position: absolute; left: 14px; width: 22px; height: 3px; border-radius: 2px; background: #D9D4CC; }
+    #f20-clock { position: absolute; left: 120px; top: 200px; width: 620px; height: 620px; border-radius: 50%;
+      background: radial-gradient(circle at 40% 30%, #FFFFFF 0%, #FBFAF7 55%, #F2EEE8 100%);
+      border: 1px solid rgba(255,255,255,.95);
+      box-shadow: 0 50px 90px rgba(60,45,30,.18), 0 10px 22px rgba(60,45,30,.09), inset 0 2px 0 #fff, inset 0 -10px 30px rgba(60,45,30,.06); }
+    #f20-clock svg { position: absolute; left: 0; top: 0; }
+    .f20-lab { position: absolute; top: 880px; width: 330px; text-align: center; }
+    .f20-cap { font: 700 28px "Inter"; letter-spacing: 5px; color: #77726B; }
+    .f20-big { font: 800 76px/1.1 "Inter"; letter-spacing: -1.5px; color: #1B1A18; margin-top: 6px; }
+    #f20-arrow { position: absolute; left: 385px; top: 960px; width: 90px; height: 6px; border-radius: 3px; background: #B9B3A9; transform-origin: 0 50%; }
+    #f20-arrowh { position: absolute; left: 455px; top: 947px; width: 0; height: 0; border-left: 26px solid #B9B3A9; border-top: 16px solid transparent; border-bottom: 16px solid transparent; }
+  </style>
+
+  <div id="root" data-composition-id="20-le-a" data-width="1080" data-height="1920" data-duration="2.40">
+    <div id="f20-bg" class="clip" data-start="0" data-duration="2.40" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f20-floor" class="lv-floor"></div>
+        <div id="f20-giant" class="lv-giant" style="left:420px; top:1080px;">LÈ A</div>
+      </div>
+    </div>
+
+    <div id="f20-stage" class="clip" data-start="0" data-duration="2.40" data-track-index="1">
+      <div id="f20-cam">
+        <div id="f20-band">
+          <div class="f20-lane" style="left:60px"></div><div class="f20-lane" style="left:212px"></div><div class="f20-lane" style="left:364px"></div>
+          <div class="f20-lane" style="left:516px"></div><div class="f20-lane" style="left:668px"></div>
+          <div id="f20-ruler"></div>
+
+          <div id="f20-clock" style="opacity:0;">
+            <svg viewBox="0 0 620 620" width="620" height="620">
+              <g id="f20-ticks"></g>
+              <circle cx="310" cy="310" r="230" fill="none" stroke="#F1EDE7" stroke-width="22"/>
+              <path id="f20-arc" d="M110.81 195 A230 230 0 1 1 509.19 425" fill="none" stroke="#D97757" stroke-width="22" stroke-linecap="round"
+                stroke-dasharray="722.57" stroke-dashoffset="722.57"/>
+              <line id="f20-mh" x1="310" y1="330" x2="310" y2="104" stroke="#5A554E" stroke-width="9" stroke-linecap="round" opacity="0"/>
+              <line id="f20-hh" x1="310" y1="330" x2="310" y2="160" stroke="#1B1A18" stroke-width="18" stroke-linecap="round" opacity="0"/>
+              <circle id="f20-cap" cx="310" cy="310" r="18" fill="#1B1A18" opacity="0"/>
+              <circle id="f20-cap2" cx="310" cy="310" r="6" fill="#fff" opacity="0"/>
+            </svg>
+          </div>
+
+          <div id="f20-am" class="f20-lab" style="left:40px; opacity:0;"><div class="f20-cap">MATEN</div><div class="f20-big">10:00 AM</div></div>
+          <div id="f20-arrow" style="opacity:0;"></div><div id="f20-arrowh" style="opacity:0;"></div>
+          <div id="f20-pm" class="f20-lab" style="left:490px; opacity:0;"><div class="f20-cap">APREMIDI</div><div class="f20-big">4:00 PM</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f20-text" class="clip" data-start="0" data-duration="2.40" data-track-index="2">
+      <div id="f20-s1" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f20-grainc" class="clip" data-start="0" data-duration="2.40" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "20-le-a", T = 2.40;
+      var $ = function (id) { return document.getElementById(id); };
+      var NS = "http://www.w3.org/2000/svg";
+
+      /* cadran : 60 graduations, 12 heures en encre */
+      for (var k = 0; k < 60; k++) {
+        var a = k * 6 * Math.PI / 180, major = k % 5 === 0, r1 = major ? 258 : 276, r2 = 292;
+        var ln = document.createElementNS(NS, "line");
+        ln.setAttribute("x1", (310 + r1 * Math.sin(a)).toFixed(2)); ln.setAttribute("y1", (310 - r1 * Math.cos(a)).toFixed(2));
+        ln.setAttribute("x2", (310 + r2 * Math.sin(a)).toFixed(2)); ln.setAttribute("y2", (310 - r2 * Math.cos(a)).toFixed(2));
+        ln.setAttribute("stroke", major ? "#1B1A18" : "#B9B3A9"); ln.setAttribute("stroke-width", major ? "8" : "3");
+        ln.setAttribute("stroke-linecap", "round"); ln.setAttribute("class", major ? "f20-tk f20-tkM" : "f20-tk");
+        $("f20-ticks").appendChild(ln);
+      }
+      /* règle de la bande (graduations grises) */
+      for (var j = 0; j < 22; j++) {
+        var rt = document.createElement("div"); rt.className = "f20-rt"; rt.style.top = (70 + j * 48) + "px";
+        if (j % 4 === 0) rt.style.width = "32px";
+        $("f20-ruler").appendChild(rt);
+      }
+
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      function brk(list, i) { list[i].el.parentNode.insertBefore(document.createElement("br"), list[i].el); }
+      var S1 = sub($("f20-s1"), [["10è", 0.17, "box"], ["nan", 0.37], ["maten", 0.59], ["pou", 0.94], ["rive", 1.24], ["4è", 1.50], ["nan", 1.82], ["apremidi.", 2.04]]);
+      brk(S1, 5);
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : arrive en descente floue (handoff_in), dérive, léger recul final --- */
+      tl.fromTo("#f20-cam", { y: 90, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.26, ease: "expo.out" }, 0);
+      tl.fromTo("#f20-cam", { scale: 1 }, { scale: 1.035, y: -24, duration: 2.1, ease: "none", immediateRender: false }, 0.26);
+      tl.to("#f20-cam", { scale: 0.97, y: -10, duration: 0.3, ease: "power2.in" }, 2.10);
+      tl.fromTo("#f20-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f20-giant", { x: 0 }, { x: -80, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f20-ruler", { y: 60 }, { y: -40, duration: T, ease: "none" }, 0);
+
+      /* --- 0.05 l'horloge arrive trop grande et floue, se pose --- */
+      tl.fromTo("#f20-clock", { opacity: 0, scale: 1.18, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 0.05);
+      tl.fromTo(".f20-tkM", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none", stagger: 0.012 }, 0.10);
+      /* --- 0.17 « 10è » : les aiguilles se posent sur 10:00 --- */
+      tl.fromTo("#f20-hh", { opacity: 0, rotation: 300, svgOrigin: "310 310", scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 0.17);
+      tl.fromTo("#f20-mh", { opacity: 0, rotation: 0, svgOrigin: "310 310", scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 0.17);
+      tl.fromTo(["#f20-cap", "#f20-cap2"], { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "none" }, 0.20);
+      tl.fromTo("#f20-am", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 0.24);
+      /* --- 0.59 « maten » : petit tic de l'aiguille --- */
+      tl.to("#f20-hh", { rotation: 304, svgOrigin: "310 310", duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 0.59);
+      /* --- 0.94 « pou » : la flèche se trace vers la droite --- */
+      tl.fromTo("#f20-arrow", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.94);
+      tl.fromTo("#f20-arrowh", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.24, ease: "expo.out" }, 1.06);
+      /* --- 1.24 « rive » : l'aiguille prend son élan --- */
+      tl.to("#f20-hh", { rotation: 294, svgOrigin: "310 310", duration: 0.24, ease: "power2.out" }, 1.24);
+      /* --- 1.50 « 4è » : l'aiguille tourne jusqu'à 4, l'arc accent se remplit --- */
+      tl.to("#f20-hh", { rotation: 480, svgOrigin: "310 310", duration: 0.5, ease: "power3.inOut" }, 1.50);
+      tl.to("#f20-mh", { rotation: 720, svgOrigin: "310 310", duration: 0.5, ease: "power3.inOut" }, 1.50);
+      tl.fromTo("#f20-arc", { strokeDashoffset: 722.57 }, { strokeDashoffset: 0, duration: 0.5, ease: "power3.inOut" }, 1.50);
+      tl.fromTo("#f20-pm", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.58);
+      tl.to("#f20-am", { opacity: 0.55, duration: 0.3, ease: "power2.out" }, 1.70);
+      tl.to("#f20-clock", { scale: 1.03, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, 2.00);
+      /* --- 2.10 la bande commence à se replier (handoff_out) --- */
+      tl.fromTo("#f20-band", { rotationX: 0, transformPerspective: 1600, transformOrigin: "50% 100%" }, { rotationX: 38, duration: 0.3, ease: "power2.in" }, 2.10);
+
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 2.28);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

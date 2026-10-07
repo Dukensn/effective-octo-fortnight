@@ -1,0 +1,262 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f23-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* carte + épingle de la frame 21, floues derrière (handoff_in) */
+    #f23-map { left: 60px; top: 220px; width: 960px; height: 1120px; overflow: hidden; opacity: .5; filter: blur(10px); }
+    .f23-road { position: absolute; height: 26px; border-radius: 13px; background: #E3DED6; }
+    #f23-pin { position: absolute; left: 700px; top: 300px; width: 44px; height: 44px; border-radius: 50%; background: #1B1A18; }
+    #f23-pinring { position: absolute; left: 676px; top: 276px; width: 80px; height: 80px; border-radius: 50%; border: 6px solid #D97757; box-sizing: border-box; }
+    /* grille des 30 places */
+    #f23-grid { left: 180px; top: 440px; width: 720px; height: 640px; transform-origin: 50% 50%; }
+    #f23-glab { position: absolute; left: 54px; top: 40px; font: 600 26px "Inter"; letter-spacing: 2px; color: #8C877F; }
+    .f23-slot { position: absolute; width: 84px; height: 84px; border-radius: 22px; background: #EDE9E2; }
+    .f23-seat { position: absolute; width: 84px; height: 84px; border-radius: 22px; background: #1B1A18;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 10px 18px rgba(27,26,24,.18); }
+    /* bouton WhatsApp (cta-wa) */
+    #f23-btn { position: absolute; left: 110px; top: 600px; width: 860px; height: 160px; border-radius: 80px; background: #25D366; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 26px; opacity: 0;
+      box-shadow: 0 40px 70px rgba(37,140,80,.28), 0 8px 18px rgba(60,45,30,.10), inset 0 2px 0 rgba(255,255,255,.35); }
+    #f23-btn-tx { font: 700 46px "Inter"; letter-spacing: -0.4px; color: #FFFFFF; white-space: nowrap; }
+    #f23-sheen { position: absolute; left: 0; top: 0; width: 220px; height: 160px; transform: translateX(-300px) skewX(-18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.38), rgba(255,255,255,0)); }
+    /* pilule « Lyen WhatsApp » + flèche vers le bas */
+    #f23-chip { position: absolute; left: 300px; top: 800px; width: 480px; height: 96px; border-radius: 48px; background: #FFFFFF; opacity: 0;
+      display: flex; align-items: center; justify-content: center; gap: 18px; font: 700 40px "Inter"; color: #1B1A18;
+      box-shadow: 0 24px 44px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    #f23-arrow { position: absolute; left: 510px; top: 915px; width: 60px; height: 80px; opacity: 0; }
+    /* numéro */
+    #f23-num { position: absolute; left: 0; width: 1080px; top: 810px; height: 144px; display: flex; justify-content: center;
+      font: 900 120px/1 "InterD"; font-variant-numeric: tabular-nums; color: #1B1A18; }
+    .f23-cell { position: relative; width: 82px; height: 144px; text-align: center; }
+    .f23-gap { width: 40px; }
+    .f23-d { display: inline-block; opacity: 0; }
+    .f23-sl { position: absolute; left: 8px; right: 8px; top: 134px; height: 8px; border-radius: 4px; background: #D9D4CC; opacity: 0; transform-origin: 50% 50%; }
+    /* curseur + anneaux du clic */
+    #f23-cur { position: absolute; left: 798px; top: 688px; width: 48px; height: 64px; opacity: 0; transform-origin: 2px 2px; }
+    .f23-ring { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 6px solid #D97757; box-sizing: border-box; opacity: 0; }
+  </style>
+
+  <div id="root" data-composition-id="23-whatsapp" data-width="1080" data-height="1920" data-duration="8.55">
+    <div id="f23-bg" class="clip" data-start="0" data-duration="8.55" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f23-floor" class="lv-floor"></div>
+        <div id="f23-giant" class="lv-giant" style="left:-60px; top:1080px;">WHATSAPP</div>
+      </div>
+    </div>
+
+    <div id="f23-stage" class="clip" data-start="0" data-duration="8.55" data-track-index="1">
+      <div id="f23-cam">
+        <div id="f23-map" class="lv-glass">
+          <div class="f23-road" style="left:-100px; top:360px; width:1200px; transform:rotate(-14deg);"></div>
+          <div class="f23-road" style="left:-100px; top:760px; width:1200px; transform:rotate(9deg);"></div>
+          <div class="f23-road" style="left:380px; top:-100px; width:1400px; transform:rotate(72deg); transform-origin:0 0;"></div>
+          <div id="f23-pinring"></div><div id="f23-pin"></div>
+        </div>
+
+        <div id="f23-grid" class="lv-glass">
+          <div id="f23-glab">30 PLAS</div>
+          <div id="f23-seats"></div>
+        </div>
+
+        <div id="f23-btn">
+          <div id="f23-sheen"></div>
+          <svg id="f23-logo" viewBox="0 0 24 24" width="84" height="84"><path id="f23-wa" fill="#FFFFFF" d=""/></svg>
+          <div id="f23-btn-tx">Kontakte nou sou <span id="f23-wword">WhatsApp</span></div>
+        </div>
+
+        <div id="f23-chip">
+          <svg viewBox="0 0 24 24" width="44" height="44"><path d="M10 14a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5M14 10a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" stroke="#1B1A18" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Lyen WhatsApp
+        </div>
+        <svg id="f23-arrow" viewBox="0 0 60 80"><path d="M30 6V66M10 46l20 22 20-22" stroke="#1B1A18" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+        <div id="f23-num"></div>
+
+        <div id="f23-ring1" class="f23-ring" style="left:800px; top:690px;"></div>
+        <div id="f23-ring2" class="f23-ring" style="left:560px; top:848px;"></div>
+        <svg id="f23-cur" viewBox="0 0 44 60"><path d="M2 2L2 50L14 38L22 56L30 52L22 35L39 35Z" fill="#1B1A18" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div id="f23-text" class="clip" data-start="0" data-duration="8.55" data-track-index="2">
+      <div id="f23-s1" class="lv-sub"></div>
+      <div id="f23-s2" class="lv-sub"></div>
+      <div id="f23-s3" class="lv-sub"></div>
+      <div id="f23-s4" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f23-grainc" class="clip" data-start="0" data-duration="8.55" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "23-whatsapp", T = 8.55;
+      var $ = function (id) { return document.getElementById(id); };
+      /* logo WhatsApp officiel (assets/icons/whatsapp.svg, Simple Icons CC0) */
+      var WA = "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z";
+      $("f23-wa").setAttribute("d", WA);
+
+      /* la grille 6 x 5 (30 places allumées = handoff_in) */
+      var seats = [], host = $("f23-seats");
+      for (var r = 0; r < 5; r++) for (var c = 0; c < 6; c++) {
+        var x = 53 + c * 106, y = 110 + r * 106;
+        var sl = document.createElement("div"); sl.className = "f23-slot"; sl.style.left = x + "px"; sl.style.top = y + "px"; host.appendChild(sl);
+        var st = document.createElement("div"); st.className = "f23-seat"; st.style.left = x + "px"; st.style.top = y + "px"; host.appendChild(st);
+        seats.push({ el: st, r: r, c: c });
+      }
+      var FLY = seats[5].el; /* la place en haut à droite */
+
+      /* le numéro, chiffre par chiffre */
+      var NUM = "31 43 3938", digits = [], dspan = [];
+      NUM.split("").forEach(function (ch) {
+        var cell = document.createElement("div");
+        if (ch === " ") { cell.className = "f23-gap"; $("f23-num").appendChild(cell); return; }
+        cell.className = "f23-cell";
+        var d = document.createElement("span"); d.className = "f23-d"; d.textContent = ch; cell.appendChild(d); digits.push(d);
+        var sl = document.createElement("div"); sl.className = "f23-sl"; cell.appendChild(sl); dspan.push(sl);
+        $("f23-num").appendChild(cell);
+      });
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f23-s1"), [["Pou", 0.13], ["rezève", 0.31], ["plas", 0.61], ["ou,", 0.83]]);
+      var S2 = sub($("f23-s2"), [["tanpri", 1.28], ["kontakte", 1.63], ["nou", 2.07], ["kounye", 2.28], ["a", 2.59], ["sou", 2.70], ["WhatsApp,", 2.91, "box"]]);
+      var S3 = sub($("f23-s3"), [["oswa", 3.47], ["klike", 3.70], ["sou", 4.06], ["lyen", 4.26], ["WhatsApp", 4.48], ["ki", 5.31], ["anba", 5.43], ["videyo", 5.67], ["sa", 5.97], ["a,", 6.11]]);
+      var S4 = sub($("f23-s4"), [["oubyen", 6.41], ["ekri", 6.73], ["nou", 6.95], ["sou", 7.15], ["31", 7.55], ["43", 7.70], ["3938.", 7.95]]);
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : dérive permanente (légère poussée), recul final vers cam(540, 900, 1.0) --- */
+      tl.fromTo("#f23-cam", { y: 0, scale: 1 }, { y: -30, scale: 1.03, duration: 8.15, ease: "none" }, 0);
+      tl.to("#f23-cam", { y: 0, scale: 1, duration: 0.40, ease: "power2.inOut" }, 8.15);
+      tl.fromTo("#f23-giant", { x: 0 }, { x: -110, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f23-map", { x: 0 }, { x: 24, duration: T, ease: "none" }, 0);
+
+      /* --- 0.31 « rezève » : une place se détache et s'envole --- */
+      tl.to(FLY, { scale: 1.25, duration: 0.10, ease: "power2.out" }, 0.28);
+      tl.to(FLY, { y: -640, x: 90, rotation: 14, duration: 0.60, ease: "power3.in" }, 0.38);
+      tl.to(FLY, { opacity: 0, filter: "blur(6px)", duration: 0.20, ease: "none" }, 0.78);
+      /* --- 0.83 « ou » : les autres places frémissent en vague --- */
+      seats.forEach(function (s, i) {
+        if (i === 5) return;
+        tl.to(s.el, { scale: 0.9, duration: 0.07, ease: "power2.out", yoyo: true, repeat: 1 }, 0.80 + (s.r + (5 - s.c)) * 0.025);
+      });
+      /* --- 1.20 la grille recule et se floute (place pour le bouton) --- */
+      tl.to("#f23-glab", { opacity: 0, duration: 0.12, ease: "none" }, 1.16);
+      tl.to("#f23-grid", { y: -250, scale: 0.72, opacity: 0.4, filter: "blur(8px)", duration: 0.40, ease: "expo.inOut" }, 1.20);
+
+      /* --- 1.63 « kontakte » : le bouton arrive trop grand et flou, se pose --- */
+      tl.fromTo("#f23-btn", { opacity: 0, scale: 1.5, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.60);
+      tl.fromTo("#f23-btn", { y: 0 }, { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.76);
+      /* 2.07 « nou » : le logo répond */
+      tl.to("#f23-logo", { scale: 1.16, rotation: -8, duration: 0.10, ease: "power2.out", yoyo: true, repeat: 1 }, 2.05);
+
+      /* --- 2.46 → 2.91 le curseur arrive en UNE courbe (x et y sur deux eases) et clique « WhatsApp » --- */
+      tl.fromTo("#f23-cur", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 2.46);
+      tl.fromTo("#f23-cur", { x: 280 }, { x: 0, duration: 0.45, ease: "power3.out" }, 2.46);
+      tl.fromTo("#f23-cur", { y: 560 }, { y: 0, duration: 0.45, ease: "power2.inOut" }, 2.46);
+      tl.to("#f23-cur", { scale: 0.85, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 2.91);
+      tl.to("#f23-btn", { scale: 0.97, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 2.91);
+      tl.fromTo("#f23-ring1", { opacity: 1, scale: 0.3 }, { opacity: 0, scale: 2.6, duration: 0.5, ease: "expo.out" }, 2.93);
+      /* 3.47 « oswa » : un reflet traverse le bouton */
+      tl.fromTo("#f23-sheen", { x: -300 }, { x: 1100, duration: 0.55, ease: "power2.inOut" }, 3.40);
+      /* 3.70 « klike » : le curseur se ramasse, prêt */
+      tl.to("#f23-cur", { x: -20, y: 14, duration: 0.25, ease: "power2.out" }, 3.70);
+
+      /* --- 4.26 « lyen » : la pilule du lien + la flèche vers le bas ; 4.48 deuxième clic --- */
+      tl.fromTo("#f23-chip", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.20);
+      tl.fromTo("#f23-arrow", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.28);
+      tl.to("#f23-cur", { x: -240, duration: 0.24, ease: "power3.out" }, 4.22);
+      tl.to("#f23-cur", { y: 158, duration: 0.24, ease: "power2.inOut" }, 4.22);
+      tl.to("#f23-cur", { scale: 0.85, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.48);
+      tl.to("#f23-chip", { scale: 0.96, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.48);
+      tl.fromTo("#f23-ring2", { opacity: 1, scale: 0.3 }, { opacity: 0, scale: 2.6, duration: 0.5, ease: "expo.out" }, 4.50);
+      /* 5.31 → 6.11 « ki anba videyo sa a » : la flèche pousse vers le bas (vie finie) */
+      tl.to("#f23-arrow", { y: 26, duration: 0.2, ease: "sine.inOut", yoyo: true, repeat: 3 }, 5.31);
+      tl.to("#f23-cur", { y: 172, duration: 0.6, ease: "sine.inOut" }, 5.40);
+
+      /* --- 6.41 « oubyen » : pilule et flèche s'effacent, le curseur se pose à côté du bouton --- */
+      tl.to(["#f23-chip", "#f23-arrow"], { opacity: 0, scale: 0.9, y: "+=20", filter: "blur(6px)", duration: 0.18, ease: "power2.in" }, 6.38);
+      tl.to("#f23-cur", { x: 176, duration: 0.40, ease: "power3.out" }, 6.45);
+      tl.to("#f23-cur", { y: 92, duration: 0.40, ease: "power2.inOut" }, 6.45);
+      /* 6.73 « ekri » : les emplacements des chiffres se tracent */
+      dspan.forEach(function (sl, i) {
+        tl.fromTo(sl, { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.16, ease: "expo.out" }, 6.73 + i * 0.04);
+      });
+      /* 7.55 → 8.20 « 31 43 3938 » s'imprime chiffre par chiffre */
+      var DT = [7.55, 7.62, 7.70, 7.77, 7.95, 8.03, 8.11, 8.19];
+      digits.forEach(function (d, i) {
+        tl.fromTo(d, { opacity: 0, scale: 1.5, y: -10, filter: "blur(8px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, DT[i] - 0.02);
+        tl.to(dspan[i], { backgroundColor: "#1B1A18", duration: 0.10, ease: "none" }, DT[i]);
+      });
+      tl.to("#f23-cur", { y: 104, duration: 0.25, ease: "power2.out" }, 8.20);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 1.14);
+      words(S2, 3.33);
+      words(S3, 6.27);
+      words(S4, 8.38);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

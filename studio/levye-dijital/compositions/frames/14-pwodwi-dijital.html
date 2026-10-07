@@ -1,0 +1,240 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f14-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    .f14-rail { position: absolute; left: 70px; top: -600px; width: 3px; height: 3200px; background: rgba(27,26,24,.13); }
+    .f14-ticks { position: absolute; left: 58px; top: -600px; width: 27px; height: 3200px;
+      background: repeating-linear-gradient(to bottom, rgba(27,26,24,.16) 0 2px, transparent 2px 80px); }
+    .f14-mod { position: absolute; left: 120px; display: flex; align-items: center; gap: 16px; font: 700 30px "Inter"; letter-spacing: 6px; color: #1B1A18; }
+    .f14-mdot { width: 14px; height: 14px; border-radius: 50%; background: #D97757; display: inline-block; }
+    .f14-ph { position: absolute; left: 60px; width: 60px; height: 24px; }
+    .f14-ph-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: #D97757; box-shadow: 0 0 0 6px rgba(217,119,87,.18); }
+    .f14-ph-ln { position: absolute; left: 24px; top: 11px; width: 36px; height: 2px; background: #D97757; }
+    .f14-open { position: absolute; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 12px rgba(217,119,87,.5); }
+    .f14-hd { position: absolute; left: 56px; top: 42px; font: 800 52px/1.1 "Inter"; letter-spacing: -1px; color: #1B1A18; }
+    .f14-hr { position: absolute; left: 56px; right: 56px; top: 132px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+
+    #f14-card { left: 120px; top: 270px; width: 880px; height: 1110px; }
+    #f14-bookg { position: absolute; left: 230px; top: 150px; width: 420px; height: 860px; }
+    #f14-starw { position: absolute; left: 150px; top: 0; width: 120px; height: 120px; transform-origin: 50% 50%; }
+    #f14-shadow { position: absolute; left: 10px; top: 760px; width: 420px; height: 60px; border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(60,45,30,.34), rgba(60,45,30,0)); }
+    #f14-pages { position: absolute; left: 0; top: 160px; width: 420px; height: 600px; border-radius: 14px;
+      background: linear-gradient(90deg, #E4DED5, #FFFFFF 40%, #EDE9E2); box-shadow: 0 30px 60px rgba(60,45,30,.18); }
+    #f14-cover { position: absolute; left: 0; top: 160px; width: 420px; height: 600px; border-radius: 14px; overflow: hidden;
+      background: #1B1A18; box-shadow: 0 18px 40px rgba(27,26,24,.22), inset 6px 0 0 rgba(255,255,255,.06); }
+    #f14-band { position: absolute; left: 0; top: 56px; width: 420px; height: 64px; background: #D97757; transform-origin: 0 50%; }
+    #f14-title { position: absolute; left: 40px; top: 162px; width: 340px; font: 800 50px/1.08 "Inter"; letter-spacing: -1px; color: #FFFFFF; }
+    #f14-img { position: absolute; left: 40px; top: 352px; width: 340px; height: 150px; border-radius: 12px; overflow: hidden; }
+    #f14-btn { position: absolute; left: 40px; top: 526px; height: 50px; padding: 0 32px; border-radius: 25px; background: #FFFFFF;
+      font: 700 28px/50px "Inter"; color: #1B1A18; }
+    #f14-shine { position: absolute; left: -160px; top: -60px; width: 110px; height: 720px; transform: rotate(18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.16), rgba(255,255,255,0)); }
+
+    #f14-card { opacity: 0; clip-path: inset(555px 0px 555px 0px); }
+    #f14-ghost { left: 120px; top: -930px; width: 880px; height: 1110px; }
+    .f14-gt { position: absolute; top: 930px; width: 150px; height: 150px; border-radius: 36px; background: #EDE9E2; }
+    #f14-empty { position: absolute; left: 0; top: 160px; width: 420px; height: 600px; border-radius: 14px; border: 3px dashed #B9B3A9; opacity: 0; }
+    .f14-sk { position: absolute; left: 44px; height: 22px; border-radius: 11px; background: #EDE9E2; transform-origin: 0 50%; transform: scaleX(0); }
+
+  </style>
+
+  <div id="root" data-composition-id="14-pwodwi-dijital" data-width="1080" data-height="1920" data-duration="5.65">
+    <div id="f14-bg" class="clip" data-start="0" data-duration="5.65" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f14-floor" class="lv-floor"></div>
+        <div id="f14-giant" class="lv-giant" style="left:-60px; top:1080px;">PWODWI</div>
+      </div>
+    </div>
+
+    <div id="f14-stage" class="clip" data-start="0" data-duration="5.65" data-track-index="1">
+      <div id="f14-cam">
+        <div class="f14-rail"></div><div class="f14-ticks"></div>
+        <div id="f14-ghost" class="lv-glass"><div class="f14-gt" style="left:110px"></div><div class="f14-gt" style="left:365px"></div><div class="f14-gt" style="left:620px"></div></div>
+        <div id="f14-mod" class="f14-mod" style="top:200px; opacity:0;"><span class="f14-mdot"></span>MODIL 3</div>
+        <div id="f14-ph" class="f14-ph" style="top:813px;"><div class="f14-ph-dot"></div><div class="f14-ph-ln"></div></div>
+        <div id="f14-card" class="lv-glass">
+          <div id="f14-hd" class="f14-hd" style="opacity:0;">Pwodwi dijital</div>
+          <div id="f14-hr" class="f14-hr" style="transform:scaleX(0);"></div>
+
+          <div id="f14-bookg">
+            <div id="f14-starw" style="opacity:0;"><svg viewBox="0 0 24 24" width="120" height="120"><path class="f14-claude" fill="#D97757" d=""/></svg></div>
+            <div id="f14-empty"><div class="f14-sk" style="top:70px; width:332px; height:56px; border-radius:12px;"></div><div class="f14-sk" style="top:180px; width:300px;"></div><div class="f14-sk" style="top:224px; width:250px;"></div><div class="f14-sk" style="top:268px; width:280px;"></div></div>
+            <div id="f14-shadow" style="opacity:0;"></div>
+            <div id="f14-pages" style="opacity:0;"></div>
+            <div id="f14-cover" style="opacity:0;">
+              <div id="f14-band" style="opacity:0;"></div>
+              <div id="f14-title" style="opacity:0;">Premye pwodwi dijital ou</div>
+              <div id="f14-img" style="opacity:0;"><svg viewBox="0 0 340 150" width="340" height="150"><rect width="340" height="150" fill="#2E2C29"/><circle cx="262" cy="46" r="22" fill="#8C877F"/><path d="M0 150 L92 62 L160 120 L214 82 L340 150 Z" fill="#5A554E"/><path d="M0 150 L60 108 L120 150 Z" fill="#77726B"/></svg></div>
+              <div id="f14-btn" style="opacity:0;">Achte</div>
+              <div id="f14-shine"></div>
+            </div>
+            
+          </div>
+
+        </div>
+        <div id="f14-open" class="f14-open" style="left:120px; top:824px; width:880px;"></div>
+      </div>
+    </div>
+
+    <div id="f14-text" class="clip" data-start="0" data-duration="5.65" data-track-index="2">
+      <div id="f14-s1" class="lv-sub"></div>
+      <div id="f14-s2" class="lv-sub"></div>
+      <div id="f14-s3" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f14-grainc" class="clip" data-start="0" data-duration="5.65" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "14-pwodwi-dijital", T = 5.65;
+      var $ = function (id) { return document.getElementById(id); };
+      /* logo Claude officiel (assets/icons/claude.svg, Simple Icons CC0) */
+      var CLAUDE = "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z";
+      document.querySelectorAll(".f14-claude").forEach(function (p) { p.setAttribute("d", CLAUDE); });
+
+      /* sous-titres mot à mot (sub()/words() du pilote ; "group" = une boîte sur plusieurs mots, chacun sur son repère) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          if (w[2] === "group") {
+            var bx = document.createElement("span"); bx.className = "lv-box";
+            bx.innerHTML = '<span class="lv-box-bg"></span><span class="lv-box-tx"></span>';
+            var tx = bx.querySelector(".lv-box-tx");
+            w[0].forEach(function (g, j) {
+              var gs = document.createElement("span"); gs.className = "lv-sw"; gs.textContent = g[0];
+              tx.appendChild(gs); if (j < w[0].length - 1) tx.appendChild(document.createTextNode(" "));
+              out.push({ el: gs, t: g[1], bg: j === 0 ? bx.querySelector(".lv-box-bg") : null });
+            });
+            host.appendChild(bx);
+          } else {
+            var sp = document.createElement("span"); sp.className = "lv-sw";
+            if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+            else sp.textContent = w[0];
+            host.appendChild(sp);
+            out.push({ el: sp, t: w[1], box: w[2] === "box" });
+          }
+          if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+        });
+        return out;
+      }
+
+      var tl = gsap.timeline({ paused: true });
+
+      var IN = { opacity: 0, scale: 1.4, filter: "blur(8px)" }, SET = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" };
+
+      /* --- caméra : arrive en descente floue (handoff_in), se pose, puis dérive --- */
+      tl.fromTo("#f14-cam", { y: 125, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 0);
+      tl.to("#f14-cam", { y: -30, scale: 1.03, duration: T - 0.45, ease: "none" }, 0.45);
+      tl.fromTo("#f14-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f14-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
+      /* M2 remonte et sort */
+      tl.fromTo("#f14-ghost", { y: 0, opacity: 1 }, { y: -300, opacity: 0, duration: 0.55, ease: "power2.out" }, 0);
+
+      /* --- 0.10 règle MODIL 3, 0.25 la station s'ouvre : trait accent 2 px → carte de verre --- */
+      tl.fromTo("#f14-mod", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 0.10);
+      tl.fromTo("#f14-ph", { scale: 0.4 }, { scale: 1, duration: 0.18, ease: "expo.out", transformOrigin: "12px 12px" }, 0.20);
+      tl.fromTo("#f14-open", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.2, ease: "expo.out" }, 0.25);
+      tl.fromTo("#f14-card", { opacity: 0, clipPath: "inset(555px 0px 555px 0px)" }, { opacity: 1, clipPath: "inset(-120px -120px -200px -120px)", duration: 0.36, ease: "expo.out" }, 0.43);
+      tl.to("#f14-open", { opacity: 0, duration: 0.14, ease: "power2.out" }, 0.52);
+      tl.fromTo("#f14-hd", IN, SET, 0.62);
+      tl.fromTo("#f14-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.78);
+
+      /* --- 1.25 « kòman » : un cadre vide ; 1.77 des lignes fantômes s'esquissent --- */
+      tl.fromTo("#f14-empty", { opacity: 0, scale: 1.12, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 1.25);
+      document.querySelectorAll(".f14-sk").forEach(function (b, i) {
+        tl.fromTo(b, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 1.77 + i * 0.09);
+      });
+      /* --- 2.36 « entèlijans » : l'étoile Claude au-dessus du cadre vide ; 2.87 elle pulse --- */
+      tl.fromTo("#f14-starw", { opacity: 0, scale: 1.6, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 2.36);
+      tl.fromTo("#f14-starw", { rotation: 0 }, { rotation: 180, duration: T - 2.36, ease: "power1.out" }, 2.36);
+      tl.to("#f14-starw", { scale: 1.16, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 2.87);
+      tl.to(".f14-sk", { backgroundColor: "#D9D4CC", duration: 0.12, ease: "none", yoyo: true, repeat: 1, stagger: 0.05 }, 2.90);
+
+      /* --- 3.45 « kreye » : la couverture se compose en cascade (0,06 s) --- */
+      tl.to("#f14-empty", { opacity: 0, duration: 0.12, ease: "power2.out" }, 3.45);
+      tl.fromTo("#f14-cover", { opacity: 0, scale: 1.12, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 3.45);
+      tl.fromTo("#f14-band", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.18, ease: "expo.out" }, 3.51);
+      tl.fromTo("#f14-title", { opacity: 0, scale: 1.2, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 3.57);
+      tl.fromTo("#f14-img", { opacity: 0, scale: 1.2, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 3.63);
+      tl.fromTo("#f14-btn", { opacity: 0, scale: 1.4, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 3.69);
+      /* 3.89 « premye » : un reflet traverse la couverture */
+      tl.fromTo("#f14-shine", { x: 0 }, { x: 680, duration: 0.5, ease: "power2.inOut" }, 3.89);
+      /* --- 4.43 « pwodwi » : l'e-book prend son épaisseur --- */
+      tl.fromTo("#f14-pages", { opacity: 0, x: 0, y: 0 }, { opacity: 1, x: 14, y: 12, duration: 0.3, ease: "expo.out" }, 4.43);
+      tl.fromTo("#f14-shadow", { opacity: 0, scaleX: 0.6 }, { opacity: 1, scaleX: 1, duration: 0.3, ease: "expo.out" }, 4.43);
+      tl.to("#f14-cover", { y: -10, duration: 0.3, ease: "expo.out" }, 4.43);
+      /* 4.78 « dijital » : le bouton Achte se presse */
+      tl.to("#f14-btn", { scale: 0.9, duration: 0.07, ease: "power2.out", yoyo: true, repeat: 1, transformOrigin: "50% 50%" }, 4.78);
+      /* --- 5.13 « ou » : l'e-book se pose, la règle s'efface (handoff_out) --- */
+      tl.to("#f14-cover", { y: 0, duration: 0.25, ease: "expo.out" }, 5.13);
+      tl.to("#f14-mod", { opacity: 0, duration: 0.3, ease: "power2.out" }, 5.13);
+
+      function SUBS() {
+        var S1 = sub($("f14-s1"), [["Epi", 0.22], ["n", 0.46], ["ap", 0.69], ["montre", 0.83], ["w", 1.13], ["kòman", 1.25], ["tou", 1.53]]);
+        var S2 = sub($("f14-s2"), [["pou", 1.77], ["itilize", 2.04], ["entèlijans", 2.36], ["atifisyèl", 2.87]]);
+        var S3 = sub($("f14-s3"), [["pou", 3.27], ["kreye", 3.45], ["premye", 3.89], [[["pwodwi", 4.43], ["dijital", 4.78]], 0, "group"], ["ou.", 5.13]]);
+        words(S1, 1.63); words(S2, 3.13); words(S3, 5.50);
+      }
+
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        var els = [];
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          var bg = w.bg || (w.box ? w.el.querySelector(".lv-box-bg") : null);
+          if (bg) tl.fromTo(bg, { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+          els.push(w.el); if (w.bg) els.push(w.bg);
+        });
+        tl.to(els, { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+
+      SUBS();
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

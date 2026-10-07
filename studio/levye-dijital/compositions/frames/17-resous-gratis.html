@@ -1,0 +1,260 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f17-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* la bande du programme + sa règle */
+    #f17-strip { position: absolute; left: 250px; top: 120px; width: 740px; height: 1260px; border-radius: 40px; background: #F8F6F2;
+      box-shadow: 0 20px 50px rgba(40,30,20,.10), 0 0 0 1px rgba(27,26,24,.04);
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0px, #000 90px, #000 1080px, rgba(0,0,0,0) 1260px); }
+    #f17-ruler { position: absolute; left: 214px; top: 120px; width: 22px; height: 1260px;
+      background: repeating-linear-gradient(to bottom, #B9B3A9 0 3px, transparent 3px 240px) 0 0 / 22px 100% no-repeat,
+                  repeating-linear-gradient(to bottom, #D9D3C9 0 3px, transparent 3px 60px) 8px 0 / 14px 100% no-repeat;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0px, #000 90px, #000 1080px, rgba(0,0,0,0) 1260px); }
+    .f17-rlab { position: absolute; left: 20px; width: 180px; text-align: right; font: 600 26px/1 "Inter"; letter-spacing: 2px;
+      text-transform: uppercase; color: #77726B; white-space: nowrap; }
+    #f17-m5lab { color: #C4613F; font-weight: 800; }
+    #f17-dot { position: absolute; left: 221px; top: 25px; width: 30px; height: 30px; border-radius: 50%; background: #D97757;
+      box-shadow: 0 0 0 8px rgba(217,119,87,.18); }
+    #f17-team { position: absolute; left: 330px; top: 40px; width: 480px; height: 242px; border-radius: 26px; overflow: hidden;
+      border: 8px solid #fff; box-shadow: 0 30px 60px rgba(60,45,30,.18); background: #fff; }
+    #f17-team img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #f17-line { position: absolute; left: 250px; top: 779px; width: 740px; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); }
+
+    /* station MODIL 5 */
+    #f17-card { left: 280px; top: 250px; width: 680px; height: 1060px; overflow: hidden; clip-path: inset(49.5% 0% 49.5% 0% round 40px); }
+    #f17-cc { position: absolute; left: 0; top: 0; width: 680px; height: 1060px; transform-origin: 340px 530px; }
+    #f17-lab { position: absolute; left: 56px; top: 56px; font: 600 26px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    #f17-title { position: absolute; left: 56px; top: 96px; font: 800 64px/1 "Inter"; letter-spacing: -1px; color: #1B1A18; }
+    #f17-hr { position: absolute; left: 56px; right: 56px; top: 196px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+    #f17-slot { position: absolute; left: 80px; top: 560px; width: 520px; height: 380px; border-radius: 30px; border: 3px dashed #D9D4CC; }
+
+    #f17-folder { position: absolute; left: 80px; top: 520px; width: 520px; height: 420px; transform-origin: 260px 420px; }
+    #f17-back { position: absolute; left: 0; top: 40px; width: 520px; height: 380px; border-radius: 28px;
+      background: linear-gradient(170deg, #8C877F, #77726B); box-shadow: 0 30px 60px rgba(60,45,30,.20); }
+    #f17-tab { position: absolute; left: 0; top: 0; width: 210px; height: 70px; border-radius: 24px 24px 0 0; background: #8C877F; }
+    .f17-doc { position: absolute; top: -150px; width: 170px; height: 262px; border-radius: 20px; background: #fff;
+      box-shadow: 0 20px 40px rgba(60,45,30,.18), 0 0 0 1px rgba(27,26,24,.05); transform-origin: 50% 100%;
+      clip-path: polygon(0 0, 74% 0, 100% 17%, 100% 100%, 0 100%); }
+    .f17-ear { position: absolute; right: 0; top: 0; width: 44px; height: 44px; background: #E4DFD7; border-bottom-left-radius: 10px; }
+    .f17-badge { position: absolute; left: 18px; top: 24px; height: 44px; padding: 0 12px; border-radius: 12px; font: 800 24px/44px "Inter"; letter-spacing: 1px; }
+    .f17-bar { position: absolute; left: 18px; height: 12px; border-radius: 6px; background: #EDE9E2; }
+    #f17-play { position: absolute; left: 47px; top: 92px; width: 76px; height: 76px; border-radius: 50%; background: #1B1A18;
+      display: flex; align-items: center; justify-content: center; }
+    #f17-front { position: absolute; left: 0; top: 110px; width: 520px; height: 310px; border-radius: 26px;
+      background: linear-gradient(165deg, #FFFFFF, #EDE9E2); border: 1px solid rgba(27,26,24,.06);
+      box-shadow: 0 -8px 24px rgba(60,45,30,.12), inset 0 1px 0 #fff; transform-origin: 50% 100%; }
+    #f17-fname { position: absolute; left: 40px; top: 40px; font: 800 56px/1 "Inter"; letter-spacing: -1px; color: #1B1A18; }
+    #f17-fsub { position: absolute; left: 42px; top: 110px; font: 500 28px/1 "Inter"; color: #77726B; }
+    #f17-stamp { position: absolute; left: 176px; top: 172px; padding: 2px 20px; border: 6px solid #D97757; border-radius: 18px;
+      font: 900 70px/1.1 "InterD"; letter-spacing: 4px; color: #C4613F; transform: rotate(-10deg); opacity: 0; }
+  </style>
+
+  <div id="root" data-composition-id="17-resous-gratis" data-width="1080" data-height="1920" data-duration="3.50">
+    <div id="f17-bg" class="clip" data-start="0" data-duration="3.50" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f17-floor" class="lv-floor"></div>
+        <div id="f17-giant" class="lv-giant" style="left:-40px; top:1080px;">RESOUS</div>
+      </div>
+    </div>
+
+    <div id="f17-stage" class="clip" data-start="0" data-duration="3.50" data-track-index="1">
+      <div id="f17-cam">
+        <div id="f17-strip"></div>
+        <div id="f17-ruler"></div>
+        <div id="f17-m4lab" class="f17-rlab" style="top:27px;">Modil 4</div>
+        <div id="f17-m5lab" class="f17-rlab" style="top:767px; opacity:0;">Modil 5</div>
+        <div id="f17-dot"></div>
+
+        <!-- handoff_in : la photo du groupe (MODIL 4) remonte et sort -->
+        <div id="f17-team"><img src="assets/img/team.png" alt=""></div>
+
+        <!-- tuiles de profondeur -->
+        <div id="f17-t1" class="lv-tile" style="left:880px; top:150px; width:120px; height:120px; opacity:0;">
+          <svg viewBox="0 0 24 24" width="62" height="62"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" fill="#5A554E"/></svg></div>
+        <div id="f17-tfg" class="lv-tile" style="left:900px; top:1160px; width:220px; height:220px; border-radius:52px; opacity:0; filter:blur(9px);">
+          <svg viewBox="0 0 24 24" width="110" height="110"><path d="M6 3h8l4 4v14H6z" fill="#B9B3A9"/><path d="M14 3v4h4" fill="#D9D4CC"/></svg></div>
+
+        <div id="f17-line"></div>
+
+        <div id="f17-card" class="lv-glass" style="opacity:0;">
+          <div id="f17-cc">
+            <div id="f17-lab">Modil 5</div>
+            <div id="f17-title">Resous</div>
+            <div id="f17-hr"></div>
+            <div id="f17-slot" style="opacity:0;"></div>
+            <div id="f17-folder" style="opacity:0;">
+              <div id="f17-tab"></div>
+              <div id="f17-back"></div>
+              <div id="f17-d1" class="f17-doc" style="left:30px; opacity:0;">
+                <div class="f17-ear"></div>
+                <div class="f17-badge" style="background:#1B1A18; color:#fff;">PDF</div>
+                <div class="f17-bar" style="top:96px; width:124px;"></div>
+                <div class="f17-bar" style="top:122px; width:100px;"></div>
+                <div class="f17-bar" style="top:148px; width:116px;"></div>
+                <div class="f17-bar" style="top:174px; width:80px;"></div>
+              </div>
+              <div id="f17-d2" class="f17-doc" style="left:175px; opacity:0;">
+                <div class="f17-ear"></div>
+                <div class="f17-badge" style="background:#5A554E; color:#fff;">DOC</div>
+                <div class="f17-bar" style="top:96px; width:110px;"></div>
+                <div class="f17-bar" style="top:122px; width:126px;"></div>
+                <div class="f17-bar" style="top:148px; width:92px;"></div>
+                <div class="f17-bar" style="top:174px; width:118px;"></div>
+              </div>
+              <div id="f17-d3" class="f17-doc" style="left:320px; opacity:0;">
+                <div class="f17-ear"></div>
+                <div class="f17-badge" style="background:#EDE9E2; color:#1B1A18;">VIDEYO</div>
+                <div id="f17-play"><svg viewBox="0 0 24 24" width="34" height="34"><path d="M8 5v14l11-7z" fill="#fff"/></svg></div>
+                <div class="f17-bar" style="top:190px; width:130px;"></div>
+              </div>
+              <div id="f17-front">
+                <div id="f17-fname">Resous</div>
+                <div id="f17-fsub">Levye Dijital</div>
+                <div id="f17-stamp">GRATIS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f17-text" class="clip" data-start="0" data-duration="3.50" data-track-index="2">
+      <div id="f17-s1" class="lv-sub"></div>
+      <div id="f17-s2" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f17-grainc" class="clip" data-start="0" data-duration="3.50" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "17-resous-gratis", T = 3.50;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f17-s1"), [["Anplis", 0.23], ["de", 0.54], ["sa,", 0.70], ["w", 1.13], ["ap", 1.26], ["resevwa", 1.41]]);
+      var S2 = sub($("f17-s2"), [["tout", 1.85], ["resous", 2.12], ["gratis", 2.43, "box"], ["ki", 2.80], ["nesesè.", 2.95]]);
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : fin de descente (handoff_in, flou 6 px) puis dérive permanente --- */
+      tl.fromTo("#f17-cam", { y: 90, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 0);
+      tl.fromTo("#f17-cam", { y: 0, scale: 1 }, { y: -36, scale: 1.03, duration: 3.1, ease: "none", immediateRender: false }, 0.4);
+      tl.fromTo("#f17-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f17-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
+
+      /* --- 0.00 la photo du groupe remonte et sort ; MODIL 4 s'efface --- */
+      tl.fromTo("#f17-team", { y: 0, opacity: 1, filter: "blur(6px)" }, { y: -340, opacity: 0, filter: "blur(12px)", duration: 0.35, ease: "power2.in" }, 0);
+      tl.fromTo("#f17-m4lab", { opacity: 1, y: 0 }, { opacity: 0, y: -40, duration: 0.3, ease: "power2.in" }, 0);
+      /* la tête de lecture descend jusqu'à MODIL 5 */
+      tl.fromTo("#f17-dot", { y: 0 }, { y: 742, duration: 0.45, ease: "expo.inOut" }, 0.02);
+      tl.fromTo("#f17-m5lab", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.16, ease: "expo.out" }, 0.38);
+
+      /* --- 0.15 station MODIL 5 : le trait accent s'ouvre en carte --- */
+      tl.fromTo("#f17-line", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.14, ease: "power3.out" }, 0.15);
+      tl.fromTo("#f17-card", { opacity: 0, clipPath: "inset(49.5% 0% 49.5% 0% round 40px)" },
+        { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 40px)", duration: 0.22, ease: "power3.out" }, 0.28);
+      tl.to("#f17-line", { opacity: 0, duration: 0.1, ease: "none" }, 0.42);
+      tl.fromTo("#f17-cc", { scale: 1.06 }, { scale: 1, duration: 0.3, ease: "expo.out" }, 0.28);
+      tl.fromTo("#f17-lab", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 0.48);
+      tl.fromTo("#f17-title", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 0.56);
+      tl.fromTo("#f17-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.64);
+
+      /* tuiles de profondeur + vies finies */
+      tl.fromTo("#f17-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 0.72);
+      tl.fromTo("#f17-tfg", { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 0.86);
+      tl.to("#f17-t1", { y: -14, rotation: -5, duration: 1.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0.9);
+      tl.to("#f17-tfg", { y: -40, rotation: -6, duration: 2.6, ease: "none" }, 0.9);
+
+      /* --- 0.95 l'emplacement pointillé attend le dossier --- */
+      tl.fromTo("#f17-slot", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 0.95);
+      tl.to("#f17-slot", { opacity: 0, duration: 0.1, ease: "none" }, 1.44);
+
+      /* --- 1.41 « resevwa » : le dossier arrive trop grand et flou, se pose --- */
+      tl.fromTo("#f17-folder", { opacity: 0, scale: 1.5, y: -40, filter: "blur(10px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 1.38);
+      tl.to("#f17-folder", { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.56);
+      /* 1.95 le rabat s'entrouvre */
+      tl.fromTo("#f17-front", { rotationX: 0, transformPerspective: 900 }, { rotationX: -24, duration: 0.2, ease: "expo.out" }, 1.95);
+
+      /* --- 2.12 « resous » : trois fiches jaillissent --- */
+      [["#f17-d1", -12, -18], ["#f17-d2", 0, -40], ["#f17-d3", 12, -18]].forEach(function (d, i) {
+        tl.fromTo(d[0], { opacity: 0, y: 230, scale: 1.25, rotation: 0, filter: "blur(8px)" },
+          { opacity: 1, y: d[2], scale: 1, rotation: d[1], filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 2.08 + i * 0.07);
+        tl.to(d[0], { y: d[2] - 12, duration: 0.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.75 + i * 0.08);
+      });
+      tl.to("#f17-front", { rotationX: -8, duration: 0.25, ease: "expo.out" }, 2.36);
+
+      /* --- 2.43 « gratis » : le tampon frappe --- */
+      tl.fromTo("#f17-stamp", { opacity: 0, scale: 2.2, rotation: -2, filter: "blur(8px)" }, { opacity: 1, scale: 1, rotation: -10, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.40);
+      tl.to("#f17-folder", { scale: 0.97, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 2.55);
+      tl.to("#f17-stamp", { scale: 1.04, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.85);
+      /* 3.20 dérive : la tête de lecture respire */
+      tl.to("#f17-dot", { scale: 1.2, duration: 0.15, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.15);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 1.70);
+      words(S2, 3.36);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

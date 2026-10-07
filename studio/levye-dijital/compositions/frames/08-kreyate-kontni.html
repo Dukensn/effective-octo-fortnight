@@ -1,0 +1,283 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f08-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f08-dolly { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f08-kcard { left: 240px; top: 40px; width: 600px; height: 300px; display: flex; align-items: center; justify-content: center;
+      font: 800 72px "Inter"; letter-spacing: 2px; color: #1B1A18; }
+    #f08-ghost { left: 140px; top: 300px; width: 800px; height: 980px; }
+    #f08-line { position: absolute; left: 140px; top: 789px; width: 800px; height: 2px; background: #D97757; transform-origin: 50% 50%; }
+    #f08-card { left: 140px; top: 300px; width: 800px; height: 980px; transform-origin: 50% 50%; }
+    #f08-inner { position: absolute; left: 0; top: 0; width: 800px; height: 980px; transform-origin: 50% 50%; }
+    #f08-av { position: absolute; left: 40px; top: 40px; width: 112px; height: 112px; border-radius: 50%;
+      background: linear-gradient(150deg, #5A554E, #1B1A18); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 14px 28px rgba(60,45,30,.18); }
+    #f08-hd { position: absolute; left: 180px; top: 46px; font: 700 46px "Inter"; color: #1B1A18; letter-spacing: -0.5px; }
+    #f08-role { position: absolute; left: 180px; top: 108px; font: 500 30px "Inter"; color: #77726B; }
+    #f08-tab { position: absolute; left: 40px; top: 182px; font: 600 26px "Inter"; text-transform: uppercase; letter-spacing: 2px; color: #5A554E; }
+    #f08-tabl { position: absolute; left: 40px; top: 222px; width: 112px; height: 4px; border-radius: 2px; background: #1B1A18; transform-origin: 0 50%; }
+    #f08-hr { position: absolute; left: 40px; right: 40px; top: 225px; height: 1px; background: rgba(27,26,24,.08); }
+    .f08-th { position: absolute; width: 220px; height: 330px; }
+    .f08-in { position: absolute; left: 0; top: 0; width: 220px; height: 330px; border-radius: 22px; overflow: hidden;
+      box-shadow: 0 16px 30px rgba(60,45,30,.12), inset 0 0 0 1px rgba(27,26,24,.05); }
+    .f08-sun { position: absolute; border-radius: 50%; }
+    .f08-hill { position: absolute; left: -40px; width: 300px; height: 180px; border-radius: 50% 50% 0 0; }
+    .f08-bar { position: absolute; left: 22px; height: 12px; border-radius: 6px; background: #1B1A18; opacity: .78; }
+    .f08-play { position: absolute; left: 78px; top: 133px; width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.94);
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(60,45,30,.18); opacity: 0; }
+    .f08-ol { position: absolute; left: -8px; top: -8px; width: 226px; height: 336px; border: 5px solid #D97757; border-radius: 28px;
+      box-shadow: 0 0 24px rgba(217,119,87,.35); opacity: 0; }
+    .f08-veil { position: absolute; left: 0; top: 0; width: 220px; height: 330px; opacity: 0;
+      background: radial-gradient(120px 140px at 50% 38%, #F4F3F1 0%, rgba(244,243,241,0) 70%), linear-gradient(160deg, #E6E4E0 0%, #D2CFCA 60%, #C6C2BC 100%); }
+    .f08-sheen { position: absolute; left: -140px; top: -40px; width: 90px; height: 420px; transform: rotate(18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0)); opacity: 0; }
+    .f08-stc { position: absolute; left: 0; top: 0; width: 220px; height: 330px; display: flex; align-items: center; justify-content: center; }
+    .f08-stamp { font: 800 58px/1 "Inter"; color: #5A554E; border: 5px solid #5A554E; border-radius: 14px; padding: 8px 20px 6px;
+      background: rgba(255,255,255,.72); letter-spacing: 2px; opacity: 0; }
+  </style>
+
+  <div id="root" data-composition-id="08-kreyate-kontni" data-width="1080" data-height="1920" data-duration="7.05">
+    <div id="f08-bg" class="clip" data-start="0" data-duration="7.05" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f08-floor" class="lv-floor"></div>
+        <div id="f08-giant" class="lv-giant" style="left:-60px; top:1080px;">KREYATÈ</div>
+      </div>
+    </div>
+
+    <div id="f08-stage" class="clip" data-start="0" data-duration="7.05" data-track-index="1">
+      <div id="f08-cam">
+        <div id="f08-dolly">
+          <!-- tuiles de profondeur -->
+          <div id="f08-t1" class="lv-tile" style="left:36px; top:196px; opacity:0;">
+            <svg viewBox="0 0 24 24" width="70" height="70"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+          <div id="f08-t2" class="lv-tile" style="left:906px; top:1170px; opacity:0;">
+            <svg viewBox="0 0 24 24" width="70" height="70"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="#1B1A18" stroke-width="2"/><path d="M7 5v14M17 5v14M3 9.5h4M3 14.5h4M17 9.5h4M17 14.5h4" stroke="#1B1A18" stroke-width="1.6"/></svg></div>
+
+          <!-- la carte « Konpetans » sort par le haut (handoff_in) -->
+          <div id="f08-kcard" class="lv-glass">KONPETANS</div>
+          <!-- la station Kreyatè à venir, floue en bas (handoff_in) -->
+          <div id="f08-ghost" class="lv-glass"></div>
+          <div id="f08-line"></div>
+
+          <!-- la carte profil du créateur -->
+          <div id="f08-card" class="lv-glass" style="opacity:0;">
+            <div id="f08-inner">
+              <div id="f08-av"><svg viewBox="0 0 24 24" width="52" height="52"><path d="M8.5 6v12l9.5-6z" fill="#fff"/></svg></div>
+              <div id="f08-hd">@kreyatè</div>
+              <div id="f08-role">Kreyatè kontni</div>
+              <div id="f08-hr"></div>
+              <div id="f08-tab">Videyo</div>
+              <div id="f08-tabl"></div>
+
+              <!-- 6 vignettes abstraites : 0,2,3,5 = serye ; 1,4 = IA -->
+              <div class="f08-th" id="f08-th0" style="left:40px; top:250px;">
+                <div class="f08-in" style="background:linear-gradient(170deg,#FBFAF7,#E4DFD7);">
+                  <div class="f08-sun" style="left:120px; top:44px; width:64px; height:64px; background:#CFC9BF;"></div>
+                  <div class="f08-hill" style="top:200px; background:#D9D4CC;"></div>
+                  <div class="f08-bar" style="top:276px; width:150px;"></div><div class="f08-bar" style="top:298px; width:96px; opacity:.45;"></div>
+                </div>
+                <div class="f08-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+                <div class="f08-ol"></div>
+              </div>
+              <div class="f08-th f08-ia" id="f08-th1" style="left:290px; top:250px;">
+                <div class="f08-in" style="background:linear-gradient(170deg,#F5F2EC,#DCD6CD);">
+                  <div class="f08-sun" style="left:60px; top:70px; width:100px; height:100px; background:#B9B3A9;"></div>
+                  <div class="f08-hill" style="top:220px; background:#EDE9E2;"></div>
+                  <div class="f08-bar" style="top:276px; width:120px;"></div>
+                  <div class="f08-veil"></div><div class="f08-sheen"></div>
+                </div>
+                <div class="f08-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+                <div class="f08-stc"><div class="f08-stamp">IA</div></div>
+              </div>
+              <div class="f08-th" id="f08-th2" style="left:540px; top:250px;">
+                <div class="f08-in" style="background:linear-gradient(170deg,#EFEBE5,#D9D4CC);">
+                  <div class="f08-sun" style="left:-30px; top:-20px; width:160px; height:160px; background:#F8F6F2;"></div>
+                  <div class="f08-hill" style="top:170px; left:20px; background:#B9B3A9;"></div>
+                  <div class="f08-bar" style="top:256px; width:130px; background:#fff; opacity:.9;"></div><div class="f08-bar" style="top:278px; width:80px; background:#fff; opacity:.7;"></div>
+                </div>
+                <div class="f08-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+                <div class="f08-ol"></div>
+              </div>
+              <div class="f08-th" id="f08-th3" style="left:40px; top:610px;">
+                <div class="f08-in" style="background:linear-gradient(170deg,#E9E4DC,#F7F4EF);">
+                  <div class="f08-sun" style="left:36px; top:60px; width:148px; height:148px; background:#D9D4CC;"></div>
+                  <div class="f08-sun" style="left:76px; top:100px; width:68px; height:68px; background:#5A554E;"></div>
+                  <div class="f08-bar" style="top:270px; width:140px;"></div><div class="f08-bar" style="top:292px; width:70px; opacity:.45;"></div>
+                </div>
+                <div class="f08-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+                <div class="f08-ol"></div>
+              </div>
+              <div class="f08-th f08-ia" id="f08-th4" style="left:290px; top:610px;">
+                <div class="f08-in" style="background:linear-gradient(170deg,#F2EFEA,#D9D4CC);">
+                  <div class="f08-hill" style="top:150px; background:#CFC9BF;"></div>
+                  <div class="f08-sun" style="left:130px; top:40px; width:56px; height:56px; background:#EDE9E2;"></div>
+                  <div class="f08-bar" style="top:280px; width:110px;"></div>
+                  <div class="f08-veil"></div><div class="f08-sheen"></div>
+                </div>
+                <div class="f08-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+                <div class="f08-stc"><div class="f08-stamp">IA</div></div>
+              </div>
+              <div class="f08-th" id="f08-th5" style="left:540px; top:610px;">
+                <div class="f08-in" style="background:linear-gradient(170deg,#F8F6F2,#E2DDD5);">
+                  <div class="f08-hill" style="top:130px; left:-120px; background:#EDE9E2;"></div>
+                  <div class="f08-hill" style="top:190px; left:60px; background:#B9B3A9;"></div>
+                  <div class="f08-bar" style="top:270px; width:156px;"></div><div class="f08-bar" style="top:292px; width:100px; opacity:.45;"></div>
+                </div>
+                <div class="f08-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+                <div class="f08-ol"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f08-text" class="clip" data-start="0" data-duration="7.05" data-track-index="2">
+      <div id="f08-s1" class="lv-sub"></div>
+      <div id="f08-s2" class="lv-sub"></div>
+      <div id="f08-s3" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f08-grainc" class="clip" data-start="0" data-duration="7.05" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "08-kreyate-kontni", T = 7.05;
+      var $ = function (id) { return document.getElementById(id); };
+      var Q = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f08-s1"), [["Oubyen", 0.11], ["ou", 0.40], ["ta", 0.60], ["vle", 0.88], ["vin", 1.08], ["yon", 1.27], ["kreyatè", 1.61], ["kontni", 2.14]]);
+      var S2 = sub($("f08-s2"), [["k", 2.56], ["ap", 2.68], ["pibliye", 2.84], ["videyo", 3.24], ["ki", 3.62], ["serye,", 3.77, "box"]]);
+      var S3 = sub($("f08-s3"), [["ki", 4.47], ["pa", 4.73], ["sanble", 4.88], ["ak", 5.14], ["videyo", 5.27], ["ki", 5.60], ["jenere", 5.73], ["avèk", 6.00], ["IA.", 6.22]]);
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : dérive permanente ; le chariot fait la fin de descente puis le recul final --- */
+      tl.fromTo("#f08-cam", { y: 0, scale: 1 }, { y: -35, scale: 1.02, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f08-dolly", { y: 110, filter: "blur(5px)" }, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, 0);
+      tl.to("#f08-dolly", { scale: 0.83, y: -20, duration: 0.45, ease: "power2.inOut" }, 6.60);
+      tl.fromTo("#f08-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
+
+      /* --- 0.00 la carte « Konpetans » finit de sortir par le haut ; la station Kreyatè monte, floue --- */
+      tl.fromTo("#f08-kcard", { y: 0, opacity: 0.9, filter: "blur(4px)" }, { y: -420, opacity: 0, filter: "blur(10px)", duration: 0.3, ease: "power2.in" }, 0);
+      tl.fromTo("#f08-ghost", { y: 560, opacity: 0.55, filter: "blur(12px)" }, { y: 0, opacity: 0.35, filter: "blur(4px)", duration: 0.45, ease: "power2.out" }, 0);
+      /* tuiles de profondeur */
+      tl.fromTo("#f08-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 0.55);
+      tl.fromTo("#f08-t2", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 1.00);
+      tl.to("#f08-t1", { y: -16, rotation: -4, duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0.7);
+      tl.to("#f08-t2", { y: 14, rotation: 5, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 1.2);
+
+      /* --- 1.45 → 1.61 « kreyatè » : le trait accent s'ouvre en carte (signature 2) --- */
+      tl.fromTo("#f08-line", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.16, ease: "expo.out" }, 1.45);
+      tl.fromTo("#f08-card", { opacity: 0, scaleY: 0.01 }, { opacity: 1, scaleY: 1, duration: 0.22, ease: "power3.out" }, 1.61);
+      tl.fromTo("#f08-inner", { scale: 1.06 }, { scale: 1, duration: 0.3, ease: "expo.out" }, 1.61);
+      tl.to("#f08-line", { opacity: 0, duration: 0.12, ease: "none" }, 1.70);
+      tl.to("#f08-ghost", { opacity: 0, duration: 0.15, ease: "none" }, 1.65);
+
+      /* --- 2.14 avatar + @kreyatè --- */
+      tl.fromTo("#f08-av", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.12);
+      tl.fromTo("#f08-hd", { opacity: 0, x: 30, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.20);
+      tl.fromTo("#f08-role", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.16, ease: "expo.out" }, 2.30);
+      tl.fromTo(["#f08-tab", "#f08-hr"], { opacity: 0 }, { opacity: 1, duration: 0.14, ease: "none" }, 2.45);
+      tl.fromTo("#f08-tabl", { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "expo.out" }, 2.50);
+
+      /* --- 2.84 « pibliye » : les 6 vignettes tombent (0,05 s d'écart) --- */
+      var TH = Q(".f08-th");
+      TH.forEach(function (th, i) {
+        tl.fromTo(th, { opacity: 0, scale: 1.4, y: -40, filter: "blur(8px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.84 + i * 0.05);
+      });
+      /* 3.24 « videyo » : les boutons lecture apparaissent */
+      Q(".f08-play").forEach(function (p, i) {
+        tl.fromTo(p, { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.14, ease: "expo.out" }, 3.22 + i * 0.03);
+      });
+      /* 3.77 « serye » : 4 vignettes s'allument d'un liseré accent */
+      Q(".f08-ol").forEach(function (o, i) {
+        tl.fromTo(o, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 3.75 + i * 0.05);
+      });
+      /* 4.08 → 4.47 silence : la grille respire */
+      tl.to("#f08-inner", { scale: 1.02, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 4.05);
+      /* 4.73 « pa » : les deux vignettes à part se soulèvent */
+      tl.to(".f08-ia", { y: -10, duration: 0.3, ease: "power2.out" }, 4.73);
+      /* 5.27 « videyo » : elles deviennent grises et lisses */
+      tl.fromTo(".f08-ia .f08-veil", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, 5.25);
+      tl.to(".f08-ia .f08-play", { opacity: 0.45, duration: 0.2, ease: "none" }, 5.25);
+      /* 5.60 reflet plastique */
+      tl.fromTo(".f08-ia .f08-sheen", { x: 0, opacity: 0 }, { x: 380, opacity: 1, duration: 0.45, ease: "power1.inOut" }, 5.60);
+      /* 6.22 « IA » : tampon gris, puis elles glissent hors de la grille */
+      Q(".f08-stamp").forEach(function (s, i) {
+        tl.fromTo(s, { opacity: 0, scale: 1.8, rotation: -4, filter: "blur(8px)" }, { opacity: 1, scale: 1, rotation: -12, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 6.20 + i * 0.04);
+      });
+      tl.to("#f08-th1", { x: 640, rotation: 8, opacity: 0, duration: 0.25, ease: "power2.in" }, 6.36);
+      tl.to("#f08-th4", { x: 640, rotation: -6, opacity: 0, duration: 0.25, ease: "power2.in" }, 6.42);
+      /* 6.75 la bande commence à se tendre (vibration 1 px, finie) */
+      tl.fromTo("#f08-card", { x: 0 }, { x: 1.5, duration: 0.05, ease: "none", yoyo: true, repeat: 5 }, 6.75);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 2.44);
+      words(S2, 4.35);
+      words(S3, 6.88);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

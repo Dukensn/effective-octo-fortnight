@@ -1,0 +1,336 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    /* ===== la bande (monde, coordonnées de STORYBOARD.md, acte I) ===== */
+    #f05-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f05-world { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; transform-origin: 0 0; }
+    .f05-strip { position: absolute; left: 250px; top: 740px; width: 740px; height: 3300px; border-radius: 30px;
+      background: linear-gradient(165deg, #FFFFFF, #F8F6F2); box-shadow: 0 30px 70px rgba(60,45,30,.13), 0 0 0 1px rgba(27,26,24,.04); }
+    .f05-tick { position: absolute; height: 3px; background: #D9D4CC; }
+    .f05-tick.big { background: #B9B3A9; }
+    .f05-rlab { position: absolute; left: 20px; width: 170px; text-align: right; font: 700 28px/1 "Inter"; letter-spacing: 1.5px; color: #77726B; }
+    .f05-lhead { position: absolute; top: 780px; width: 120px; text-align: center; font: 600 22px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    .f05-lane { position: absolute; top: 830px; width: 120px; height: 900px; border-radius: 18px; background: #EDE9E2; }
+    .f05-clip { position: absolute; width: 120px; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      font: 800 26px/1 "Inter"; color: #fff; box-shadow: 0 14px 30px rgba(40,30,20,.16); }
+    #f05-vwa { position: absolute; left: 290px; top: 1770px; width: 664px; height: 120px; border-radius: 18px; background: #EDE9E2; overflow: hidden; }
+    #f05-vwal { position: absolute; left: 18px; top: 14px; font: 700 20px/1 "Inter"; letter-spacing: 2px; color: #5A554E; }
+    .f05-wv { position: absolute; width: 6px; border-radius: 3px; background: #1B1A18; }
+    #f05-ph { position: absolute; left: 222px; top: 858px; width: 768px; height: 5px; background: #D97757; box-shadow: 0 0 18px rgba(217,119,87,.45); }
+    #f05-ph::before { content: ""; position: absolute; left: -12px; top: -13px; width: 30px; height: 30px; border-radius: 50%; background: #D97757; }
+
+    /* moniteur 9:16 (world x 360, y 60) */
+    #f05-mon { position: absolute; left: 360px; top: 60px; width: 360px; height: 640px; border-radius: 28px; background: #1B1A18; overflow: hidden;
+      transform-origin: 50% 50%; box-shadow: 0 40px 80px rgba(40,30,20,.26), 0 6px 14px rgba(40,30,20,.12); }
+    #f05-rec { position: absolute; left: 20px; top: 40px; font: 700 22px "Inter"; color: #fff; background: rgba(255,255,255,.14); padding: 6px 14px; border-radius: 20px; }
+    #f05-bars { position: absolute; left: 16px; right: 16px; top: 14px; height: 5px; display: flex; gap: 6px; opacity: 0; }
+    .f05-bar { position: relative; flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.32); overflow: hidden; }
+    .f05-barf { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #fff; transform-origin: 0 50%; transform: scaleX(0); }
+    #f05-wahd { position: absolute; left: 16px; top: 32px; display: flex; align-items: center; gap: 12px; font: 700 22px "Inter"; color: #fff; opacity: 0; }
+    #f05-walogo { width: 44px; height: 44px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; }
+    .f05-scene { position: absolute; left: 0; top: 0; width: 360px; height: 640px; }
+    #f05-img { position: absolute; left: 30px; top: 110px; width: 300px; height: 220px; border-radius: 18px; background: linear-gradient(160deg, #4A4540, #2C2926); overflow: hidden; }
+    #f05-sun { position: absolute; left: 196px; top: 40px; width: 60px; height: 60px; border-radius: 50%; background: #8C877F; }
+    #f05-hill { position: absolute; left: -40px; top: 130px; width: 260px; height: 200px; border-radius: 50%; background: #5A554E; }
+    .f05-tl { position: absolute; left: 30px; height: 16px; border-radius: 8px; background: #fff; transform-origin: 0 50%; }
+    .f05-mw { position: absolute; bottom: 60px; width: 5px; border-radius: 3px; background: rgba(255,255,255,.7); }
+    #f05-ad { opacity: 0; }
+    #f05-wm1 { position: absolute; left: 0; width: 360px; top: 200px; text-align: center; font: 900 72px/0.95 "InterD"; letter-spacing: -2px; color: #fff; }
+    #f05-wm2 { color: #E08A6C; }
+    #f05-adl { position: absolute; left: 0; width: 360px; top: 380px; text-align: center; font: 600 24px "Inter"; letter-spacing: 3px; color: #D9D4CC; text-transform: uppercase; }
+    #f05-ad2 { opacity: 0; }
+    #f05-ad2 svg { position: absolute; left: 140px; top: 170px; }
+    #f05-ad2t { position: absolute; left: 0; width: 360px; top: 280px; text-align: center; font: 800 48px/1.1 "Inter"; letter-spacing: -1px; color: #fff; }
+    #f05-play { position: absolute; left: 130px; top: 270px; width: 100px; height: 100px; border-radius: 50%; background: #fff; opacity: 0;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    #f05-ring { position: absolute; left: 130px; top: 270px; width: 100px; height: 100px; border-radius: 50%; border: 5px solid #D97757; opacity: 0; box-sizing: border-box; }
+    #f05-pare { position: absolute; left: 640px; top: 20px; display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 40px;
+      padding: 10px 26px 10px 10px; font: 800 30px/1 "Inter"; color: #1B1A18; opacity: 0; box-shadow: 0 20px 40px rgba(40,30,20,.18); }
+    #f05-chk { width: 52px; height: 52px; border-radius: 50%; background: #C4613F; display: flex; align-items: center; justify-content: center; }
+
+    /* sous-titre : trait de pointe sous « piblisite m. » */
+    .f05-peak { position: relative; display: inline-block; }
+    .f05-peak-st { position: absolute; left: -4px; right: -4px; bottom: -8px; height: 11px; background: #D97757;
+      clip-path: polygon(0 70%, 100% 0, 100% 45%, 0 100%); transform-origin: 0 50%; transform: scaleX(0); }
+  </style>
+
+  <div id="root" data-composition-id="05-piblisite-m" data-width="1080" data-height="1920" data-duration="5.50">
+    <div id="f05-bg" class="clip" data-start="0" data-duration="5.50" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f05-floorw" style="position:absolute; left:0; top:0; width:1080px; height:1920px;"><div class="lv-floor"></div></div>
+        <div id="f05-giant" class="lv-giant" style="left:-40px; top:1110px;">PIBLISITE</div>
+      </div>
+    </div>
+
+    <div id="f05-stage" class="clip" data-start="0" data-duration="5.50" data-track-index="1">
+      <div id="f05-cam">
+        <!-- tuiles de profondeur (arrière) -->
+        <div id="f05-t1" class="lv-tile" style="left:870px; top:200px; opacity:0;">
+          <svg viewBox="0 0 24 24" width="70" height="70"><path d="M9 18V5l11-2v13" fill="none" stroke="#1B1A18" stroke-width="2.2" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.7" fill="#1B1A18"/><circle cx="17.5" cy="16" r="2.7" fill="#1B1A18"/></svg></div>
+        <div id="f05-t2" class="lv-tile" style="left:80px; top:220px; opacity:0;">
+          <svg viewBox="0 0 24 24" width="70" height="70"><path id="f05-p1" fill="#1B1A18" d=""/></svg></div>
+
+        <div id="f05-world">
+          <div class="f05-strip"></div>
+          <div id="f05-ruler"></div>
+          <div class="f05-rlab" style="top:846px">00:00</div>
+          <div class="f05-rlab" style="top:1086px">00:04</div>
+          <div class="f05-rlab" style="top:1326px">00:08</div>
+          <div class="f05-rlab" style="top:1566px">00:12</div>
+          <div class="f05-rlab" style="top:1806px">00:16</div>
+
+          <div class="f05-lhead" style="left:290px">Tèks</div><div class="f05-lhead" style="left:426px">Imaj</div>
+          <div class="f05-lhead" style="left:562px">Tranz.</div><div class="f05-lhead" style="left:698px">Son</div>
+          <div class="f05-lhead" style="left:834px">Mizik</div>
+          <div class="f05-lane" style="left:290px"></div><div class="f05-lane" style="left:426px"></div>
+          <div class="f05-lane" style="left:562px"></div><div class="f05-lane" style="left:698px"></div>
+          <div class="f05-lane" style="left:834px"></div>
+
+          <div id="f05-c1" class="f05-clip" style="left:290px; top:850px; height:200px; background:#1B1A18;">Tèks</div>
+          <div id="f05-c2" class="f05-clip" style="left:426px; top:850px; height:180px; background:#5A554E;">Zouti</div>
+          <div id="f05-c3" class="f05-clip" style="left:426px; top:1060px; height:220px; background:#5A554E;">Imaj</div>
+          <div id="f05-c4" class="f05-clip" style="left:562px; top:870px; height:200px; background:#77726B; font-size:22px;">Lojisyèl</div>
+          <div id="f05-c5" class="f05-clip" style="left:562px; top:1110px; height:170px; background:#77726B;">Tranz.</div>
+          <div id="f05-c6" class="f05-clip" style="left:698px; top:1280px; height:240px; background:#5A554E;">Son</div>
+          <div id="f05-mz" class="f05-clip" style="left:834px; top:850px; height:880px; background:#C4613F; opacity:0;">Mizik</div>
+          <div id="f05-vwa"><div id="f05-vwal">VWA</div></div>
+
+          <div id="f05-ph"></div>
+
+          <div id="f05-mon">
+            <div id="f05-draft" class="f05-scene">
+              <div id="f05-img"><div id="f05-sun"></div><div id="f05-hill"></div></div>
+              <div class="f05-tl" style="top:370px; width:300px;"></div>
+              <div class="f05-tl" style="top:402px; width:210px; opacity:.6;"></div>
+              <div id="f05-mwave"></div>
+            </div>
+            <div id="f05-ad" class="f05-scene">
+              <div id="f05-wm1">LEVYE<br><span id="f05-wm2">DIJITAL</span></div>
+              <div id="f05-adl">Fòmasyon</div>
+            </div>
+            <div id="f05-ad2" class="f05-scene">
+              <svg viewBox="0 0 24 24" width="80" height="80"><path id="f05-star" fill="#E08A6C" d=""/></svg>
+              <div id="f05-ad2t">Fè l<br>ou menm</div>
+            </div>
+            <div id="f05-rec">● REC</div>
+            <div id="f05-bars"><div class="f05-bar"><div class="f05-barf"></div></div><div class="f05-bar"><div class="f05-barf"></div></div><div class="f05-bar"><div class="f05-barf"></div></div><div class="f05-bar"><div class="f05-barf"></div></div></div>
+            <div id="f05-wahd"><span id="f05-walogo"><svg viewBox="0 0 24 24" width="28" height="28"><path id="f05-wa" fill="#fff" d=""/></svg></span>Levye Dijital</div>
+            <div id="f05-play"><svg viewBox="0 0 24 24" width="46" height="46"><path d="M8 5v14l11-7z" fill="#1B1A18"/></svg></div>
+            <div id="f05-ring"></div>
+          </div>
+          <div id="f05-pare"><span id="f05-chk"><svg viewBox="0 0 24 24" width="32" height="32"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Pare</div>
+        </div>
+
+        <!-- tuile de premier plan, floue, coupée par le bord -->
+        <div id="f05-tfg" class="lv-tile" style="left:-70px; top:1180px; width:210px; height:210px; border-radius:50px; opacity:0; filter:blur(9px);">
+          <svg viewBox="0 0 24 24" width="110" height="110"><path id="f05-p2" fill="#1B1A18" d=""/></svg></div>
+      </div>
+    </div>
+
+    <div id="f05-text" class="clip" data-start="0" data-duration="5.50" data-track-index="2">
+      <div id="f05-s1" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f05-grainc" class="clip" data-start="0" data-duration="5.50" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "05-piblisite-m", T = 5.50;
+      var $ = function (id) { return document.getElementById(id); };
+      /* logos officiels (assets/icons/claude.svg et whatsapp.svg, Simple Icons CC0) */
+      var CLAUDE = "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z";
+      var WA = "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z";
+      ["f05-star", "f05-p1"].forEach(function (id) { $(id).setAttribute("d", CLAUDE); });
+      ["f05-wa", "f05-p2"].forEach(function (id) { $(id).setAttribute("d", WA); });
+
+      /* règle : un tick tous les 60 px, un long tous les 240 px */
+      var ru = $("f05-ruler"), i, y, d;
+      for (i = 0, y = 760; y < 4020; y += 60, i++) {
+        d = document.createElement("div"); d.className = "f05-tick" + (i % 4 === 0 ? " big" : "");
+        d.style.cssText = "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px";
+        ru.appendChild(d);
+      }
+      /* forme d'onde de la voix (déterministe) dans le couloir Vwa, mini-onde dans le moniteur */
+      var vw = $("f05-vwa"), wv = [];
+      for (i = 0; i < 70; i++) {
+        var h = 14 + Math.abs(Math.sin(i * 0.61) * 34 + Math.sin(i * 1.73) * 18 + Math.sin(i * 0.17) * 12);
+        d = document.createElement("div"); d.className = "f05-wv";
+        d.style.cssText = "left:" + (90 + i * 8.2).toFixed(1) + "px;top:" + (60 - h / 2).toFixed(1) + "px;height:" + h.toFixed(1) + "px";
+        vw.appendChild(d); wv.push(d);
+      }
+      var mw = $("f05-mwave");
+      for (i = 0; i < 24; i++) {
+        d = document.createElement("div"); d.className = "f05-mw";
+        d.style.cssText = "left:" + (40 + i * 12) + "px;height:" + (8 + Math.abs(Math.sin(i * 0.9) * 26 + Math.sin(i * 2.1) * 10)).toFixed(1) + "px";
+        mw.appendChild(d);
+      }
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f05-s1"), [["Apre", 0.25], ["sa,", 0.55], ["li", 0.76], ["ba", 1.20], ["m", 1.53], ["piblisite", 1.65], ["m.", 2.36]]);
+      /* [trait : piblisite m.] : on enveloppe les deux derniers mots, le trait effilé se dessine dessous */
+      var pk = document.createElement("span"); pk.className = "f05-peak";
+      $("f05-s1").insertBefore(pk, S1[5].el);
+      pk.appendChild(S1[5].el); pk.appendChild(document.createTextNode(" ")); pk.appendChild(S1[6].el);
+      var st = document.createElement("span"); st.className = "f05-peak-st"; pk.appendChild(st);
+      var spaceAfterPk = pk.nextSibling; if (spaceAfterPk && spaceAfterPk.nodeType === 3) spaceAfterPk.remove();
+
+      var tl = gsap.timeline({ paused: true });
+      /* caméra monde : amène le point (X, Y) au centre de scène (540, 760) à l'échelle s */
+      function C(X, Y, s, b) { return { x: 540 - X * s, y: 760 - Y * s, scale: s, filter: "blur(" + b + "px)" }; }
+
+      /* --- caméra : dérive permanente + parcours --- */
+      tl.fromTo("#f05-cam", { y: 0, scale: 1 }, { y: -26, scale: 1.03, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f05-floorw", { y: 0 }, { y: 70, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f05-giant", { x: 0 }, { x: -110, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f05-world", C(540, 1100, 0.72, 0), Object.assign(C(540, 880, 0.64, 0), { duration: 0.7, ease: "power2.out" }), 0);   /* fin du recul */
+      tl.to("#f05-world", Object.assign(C(540, 860, 0.63, 0), { duration: 1.9, ease: "none" }), 0.7);
+      tl.to("#f05-world", Object.assign(C(540, 905, 0.635, 0), { duration: 2.2, ease: "power1.inOut" }), 2.6);  /* suit la tête de lecture */
+      tl.to("#f05-world", Object.assign(C(540, 2700, 0.9, 8), { duration: 0.7, ease: "power2.in" }), 4.8);     /* descente (handoff_out) */
+
+      /* tuiles de profondeur */
+      tl.fromTo("#f05-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.85, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 0.30);
+      tl.fromTo("#f05-t2", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.85, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 0.95);
+      tl.fromTo("#f05-tfg", { opacity: 0, x: -80 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 1.40);
+      tl.to("#f05-t1", { y: -14, rotation: -4, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0.5);
+      tl.to("#f05-t2", { y: 12, rotation: 4, duration: 1.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.1);
+      tl.to("#f05-tfg", { y: -40, rotation: 6, duration: 3.4, ease: "none" }, 1.4);
+      tl.to(["#f05-t1", "#f05-t2", "#f05-tfg"], { opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power2.in" }, 4.95);
+
+      /* --- 0.50 le clip Mizik tombe (signature 1) puis rejoint l'encre --- */
+      tl.fromTo("#f05-mz", { opacity: 0, scale: 1.6, filter: "blur(8px)", y: 0 }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 0.50);
+      tl.to("#f05-mz", { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 0.64);
+      tl.fromTo("#f05-mz", { backgroundColor: "#C4613F" }, { backgroundColor: "#1B1A18", duration: 0.3, ease: "power1.out", immediateRender: false }, 1.05);
+      /* le moniteur prend vie au même rythme */
+      tl.fromTo("#f05-img", { scale: 1 }, { scale: 1.04, duration: 1.1, ease: "none" }, 0.5);
+      tl.fromTo("#f05-mwave", { scaleY: 0.4 }, { scaleY: 1, duration: 0.18, ease: "expo.out", transformOrigin: "50% 100%" }, 0.52);
+
+      /* --- 1.20 la tête de lecture part du haut --- */
+      tl.fromTo("#f05-ph", { y: 0 }, { y: 60, duration: 1.4, ease: "power1.in" }, 1.20);
+      tl.to("#f05-rec", { opacity: 0, duration: 0.12, ease: "power2.in" }, 1.20);
+      ["#f05-c1", "#f05-c2", "#f05-c4"].forEach(function (c, k) {
+        var base = ["#1B1A18", "#5A554E", "#77726B"][k];
+        tl.to(c, { backgroundColor: "#C4613F", duration: 0.06, ease: "none" }, 1.22 + k * 0.05);
+        tl.to(c, { backgroundColor: base, duration: 0.35, ease: "power1.out" }, 1.32 + k * 0.05);
+      });
+
+      /* --- 1.65 « piblisite » : le moniteur s'agrandit vers la caméra, la pub apparaît --- */
+      tl.fromTo("#f05-mon", { scale: 1 }, { scale: 1.25, duration: 0.45, ease: "expo.out" }, 1.65);
+      tl.to("#f05-draft", { opacity: 0, filter: "blur(6px)", duration: 0.16, ease: "power2.in" }, 1.65);
+      tl.fromTo("#f05-ad", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.70);
+      tl.fromTo("#f05-adl", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 1.95);
+
+      /* --- 2.36 « m. » : notification « Pare » au coin du moniteur --- */
+      tl.fromTo("#f05-pare", { opacity: 0, scale: 1.6, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.34);
+      tl.fromTo("#f05-chk", { rotation: -90 }, { rotation: 0, duration: 0.3, ease: "expo.out" }, 2.36);
+      tl.to("#f05-pare", { opacity: 0, y: -20, filter: "blur(4px)", duration: 0.2, ease: "power2.in" }, 3.20);
+
+      /* --- 2.60 gag muet : la tête de lecture accélère et parcourt toute la bande --- */
+      var P0 = 2.60, P1 = 5.20, Y0 = 920, Y1 = 1900;
+      tl.to("#f05-ph", { y: Y1 - 860, duration: P1 - P0, ease: "none" }, P0);
+      function cross(top) { return P0 + (top - Y0) / (Y1 - Y0) * (P1 - P0); }
+      [["#f05-c3", 1060, "#5A554E"], ["#f05-c5", 1110, "#77726B"], ["#f05-c6", 1280, "#5A554E"]].forEach(function (c) {
+        var t = cross(c[1]);
+        tl.to(c[0], { backgroundColor: "#C4613F", duration: 0.06, ease: "none" }, t);
+        tl.to(c[0], { backgroundColor: c[2], duration: 0.4, ease: "power1.out" }, t + 0.12);
+        tl.to(c[0], { scale: 1.06, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, t);
+      });
+      wv.forEach(function (b, k) {
+        var t = cross(1770) + k * 0.004;
+        tl.to(b, { backgroundColor: "#D97757", duration: 0.05, ease: "none" }, t);
+        tl.to(b, { backgroundColor: "#1B1A18", duration: 0.3, ease: "power1.out" }, t + 0.1);
+      });
+
+      /* 3.00 → 3.10 clic lecture dans le moniteur */
+      tl.fromTo("#f05-play", { opacity: 0, scale: 1.5, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 2.92);
+      tl.to("#f05-play", { scale: 0.85, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 3.10);
+      tl.fromTo("#f05-ring", { opacity: 1, scale: 1 }, { opacity: 0, scale: 2.2, duration: 0.4, ease: "expo.out" }, 3.12);
+      tl.to("#f05-play", { opacity: 0, scale: 0.6, duration: 0.14, ease: "power2.in" }, 3.30);
+
+      /* 3.10 barres de statut WhatsApp en haut du moniteur + logo en coin */
+      tl.fromTo("#f05-bars", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 3.10);
+      tl.fromTo("#f05-wahd", { opacity: 0, x: -20, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 3.20);
+      document.querySelectorAll("#f05-bars .f05-barf").forEach(function (f, k) {
+        tl.fromTo(f, { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "none" }, 3.15 + k * 0.62);
+      });
+      /* les « pages » du statut défilent avec les barres */
+      tl.to("#f05-ad", { opacity: 0, x: -40, duration: 0.14, ease: "power2.in" }, 3.75);
+      tl.fromTo("#f05-ad2", { opacity: 0, x: 60, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 3.78);
+      tl.fromTo("#f05-star", { rotation: 0 }, { rotation: 120, duration: 1.0, ease: "expo.out", transformOrigin: "50% 50%" }, 3.78);
+      tl.to("#f05-ad2", { opacity: 0, x: -40, duration: 0.14, ease: "power2.in" }, 4.37);
+      tl.fromTo("#f05-draft", { opacity: 0, x: 60, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out", immediateRender: false }, 4.40);
+
+      /* 4.40 le moniteur fait un petit salut */
+      tl.to("#f05-mon", { rotation: -6, duration: 0.14, ease: "power2.out" }, 4.40);
+      tl.to("#f05-mon", { rotation: 0, duration: 0.35, ease: "back.out(2)" }, 4.54);
+      /* 5.20 la tête de lecture sort de l'acte I */
+      tl.to("#f05-ph", { opacity: 0, duration: 0.2, ease: "power2.in" }, 5.15);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 2.76);
+      tl.fromTo(st, { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.35, ease: "power2.out" }, 2.36);
+      tl.to(st, { opacity: 0, duration: 0.12, ease: "power2.in" }, 2.76);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

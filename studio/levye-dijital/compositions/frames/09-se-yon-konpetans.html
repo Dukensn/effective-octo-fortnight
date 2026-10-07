@@ -1,0 +1,202 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f09-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f09-dolly { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; transform: translateY(-20px) scale(0.83); }
+    #f09-pale { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #F7F5F1; opacity: 0; }
+    .f09-half { position: absolute; top: 0; width: 540px; height: 1920px; overflow: hidden; }
+    .f09-shift { position: absolute; top: 0; width: 1080px; height: 1920px; }
+    .f09-card { left: 140px; top: 300px; width: 800px; height: 980px; }
+    .f09-av { position: absolute; left: 40px; top: 40px; width: 112px; height: 112px; border-radius: 50%;
+      background: linear-gradient(150deg, #5A554E, #1B1A18); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 14px 28px rgba(60,45,30,.18); }
+    .f09-hd { position: absolute; left: 180px; top: 46px; font: 700 46px "Inter"; color: #1B1A18; letter-spacing: -0.5px; }
+    .f09-role { position: absolute; left: 180px; top: 108px; font: 500 30px "Inter"; color: #77726B; }
+    .f09-tab { position: absolute; left: 40px; top: 182px; font: 600 26px "Inter"; text-transform: uppercase; letter-spacing: 2px; color: #5A554E; }
+    .f09-tabl { position: absolute; left: 40px; top: 222px; width: 112px; height: 4px; border-radius: 2px; background: #1B1A18; }
+    .f09-hr { position: absolute; left: 40px; right: 40px; top: 225px; height: 1px; background: rgba(27,26,24,.08); }
+    .f09-th { position: absolute; width: 220px; height: 330px; }
+    .f09-in { position: absolute; left: 0; top: 0; width: 220px; height: 330px; border-radius: 22px; overflow: hidden;
+      box-shadow: 0 16px 30px rgba(60,45,30,.12), inset 0 0 0 1px rgba(27,26,24,.05); }
+    .f09-sun { position: absolute; border-radius: 50%; }
+    .f09-hill { position: absolute; left: -40px; width: 300px; height: 180px; border-radius: 50% 50% 0 0; }
+    .f09-bar { position: absolute; left: 22px; height: 12px; border-radius: 6px; background: #1B1A18; opacity: .78; }
+    .f09-play { position: absolute; left: 78px; top: 133px; width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.94);
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(60,45,30,.18); }
+    .f09-ol { position: absolute; left: -8px; top: -8px; width: 226px; height: 336px; border: 5px solid #D97757; border-radius: 28px;
+      box-shadow: 0 0 24px rgba(217,119,87,.35); }
+    #f09-type { position: absolute; left: 70px; width: 940px; top: 760px; height: 200px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; font: 800 84px/1.16 "Inter"; letter-spacing: -1.5px; color: #1B1A18;
+      transform-origin: 470px 100px; }
+    .f09-ln { display: block; white-space: nowrap; }
+    .f09-w { display: inline-block; opacity: 0; }
+    .f09-w .lv-box { font: 900 84px/1.16 "InterD"; letter-spacing: -1px; }
+    .f09-w .lv-box-bg { left: -16px; right: -16px; top: 6px; bottom: 0px; border-radius: 16px; }
+    #f09-ring { position: absolute; left: 240px; top: 460px; width: 600px; height: 600px; border-radius: 50%;
+      border: 2px solid #D9D4CC; opacity: 0; }
+    #f09-halo { position: absolute; left: 420px; top: 640px; width: 240px; height: 240px; border-radius: 50%; opacity: 0;
+      background: radial-gradient(circle, rgba(217,119,87,.38) 0%, rgba(217,119,87,.12) 40%, rgba(217,119,87,0) 70%); }
+    #f09-pt { position: absolute; left: 525px; top: 745px; width: 30px; height: 30px; border-radius: 50%; opacity: 0;
+      background: radial-gradient(circle at 45% 40%, #F2B59C 0%, #D97757 55%, #C4613F 100%);
+      box-shadow: 0 0 22px rgba(217,119,87,.65), 0 0 60px rgba(217,119,87,.30); }
+  </style>
+
+  <div id="root" data-composition-id="09-se-yon-konpetans" data-width="1080" data-height="1920" data-duration="3.80">
+    <div id="f09-bg" class="clip" data-start="0" data-duration="3.80" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f09-floor" class="lv-floor"></div>
+        <div id="f09-giant" class="lv-giant" style="left:-60px; top:1080px;">KREYATÈ</div>
+      </div>
+      <div id="f09-pale"></div>
+    </div>
+
+    <div id="f09-stage" class="clip" data-start="0" data-duration="3.80" data-track-index="1">
+      <div id="f09-cam">
+        <div id="f09-dolly">
+          <div id="f09-t1" class="lv-tile" style="left:36px; top:196px; opacity:.9; filter:blur(2px);">
+            <svg viewBox="0 0 24 24" width="70" height="70"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+          <div id="f09-t2" class="lv-tile" style="left:906px; top:1170px; opacity:.9; filter:blur(2px);">
+            <svg viewBox="0 0 24 24" width="70" height="70"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="#1B1A18" stroke-width="2"/><path d="M7 5v14M17 5v14M3 9.5h4M3 14.5h4M17 9.5h4M17 14.5h4" stroke="#1B1A18" stroke-width="1.6"/></svg></div>
+          <!-- la grille du créateur (fin de la frame 8), coupée en deux moitiés pour la cassure -->
+          <div id="f09-grid">
+            <div id="f09-hl" class="f09-half" style="left:0;"><div class="f09-shift" style="left:0;"></div></div>
+            <div id="f09-hr2" class="f09-half" style="left:540px;"><div class="f09-shift" style="left:-540px;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="f09-ring"></div>
+      <div id="f09-halo"></div>
+      <div id="f09-pt"></div>
+      <!-- moment typographique centré, sur fond clair -->
+      <div id="f09-type">
+        <span class="f09-ln"><span class="f09-w">Ebyen,</span></span>
+        <span class="f09-ln"><span class="f09-w">se</span> <span class="f09-w">yon</span> <span class="f09-w"><span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">konpetans.</span></span></span></span>
+      </div>
+    </div>
+
+    <div id="f09-text" class="clip" data-start="0" data-duration="3.80" data-track-index="2">
+      <div id="f09-wm" class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f09-grainc" class="clip" data-start="0" data-duration="3.80" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "09-se-yon-konpetans", T = 3.80;
+      var $ = function (id) { return document.getElementById(id); };
+      var Q = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+      /* la carte profil telle que la frame 8 la laisse : 4 vignettes serye (liseré accent), les 2 IA sorties */
+      var PLAY = '<div class="f09-play"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div><div class="f09-ol"></div>';
+      var CARD =
+        '<div class="f09-card lv-glass">' +
+          '<div class="f09-av"><svg viewBox="0 0 24 24" width="52" height="52"><path d="M8.5 6v12l9.5-6z" fill="#fff"/></svg></div>' +
+          '<div class="f09-hd">@kreyatè</div><div class="f09-role">Kreyatè kontni</div><div class="f09-hr"></div>' +
+          '<div class="f09-tab">Videyo</div><div class="f09-tabl"></div>' +
+          '<div class="f09-th" style="left:40px; top:250px;"><div class="f09-in" style="background:linear-gradient(170deg,#FBFAF7,#E4DFD7);">' +
+            '<div class="f09-sun" style="left:120px; top:44px; width:64px; height:64px; background:#CFC9BF;"></div>' +
+            '<div class="f09-hill" style="top:200px; background:#D9D4CC;"></div>' +
+            '<div class="f09-bar" style="top:276px; width:150px;"></div><div class="f09-bar" style="top:298px; width:96px; opacity:.45;"></div></div>' + PLAY + '</div>' +
+          '<div class="f09-th" style="left:540px; top:250px;"><div class="f09-in" style="background:linear-gradient(170deg,#EFEBE5,#D9D4CC);">' +
+            '<div class="f09-sun" style="left:-30px; top:-20px; width:160px; height:160px; background:#F8F6F2;"></div>' +
+            '<div class="f09-hill" style="top:170px; left:20px; background:#B9B3A9;"></div>' +
+            '<div class="f09-bar" style="top:256px; width:130px; background:#fff; opacity:.9;"></div><div class="f09-bar" style="top:278px; width:80px; background:#fff; opacity:.7;"></div></div>' + PLAY + '</div>' +
+          '<div class="f09-th" style="left:40px; top:610px;"><div class="f09-in" style="background:linear-gradient(170deg,#E9E4DC,#F7F4EF);">' +
+            '<div class="f09-sun" style="left:36px; top:60px; width:148px; height:148px; background:#D9D4CC;"></div>' +
+            '<div class="f09-sun" style="left:76px; top:100px; width:68px; height:68px; background:#5A554E;"></div>' +
+            '<div class="f09-bar" style="top:270px; width:140px;"></div><div class="f09-bar" style="top:292px; width:70px; opacity:.45;"></div></div>' + PLAY + '</div>' +
+          '<div class="f09-th" style="left:540px; top:610px;"><div class="f09-in" style="background:linear-gradient(170deg,#F8F6F2,#E2DDD5);">' +
+            '<div class="f09-hill" style="top:130px; left:-120px; background:#EDE9E2;"></div>' +
+            '<div class="f09-hill" style="top:190px; left:60px; background:#B9B3A9;"></div>' +
+            '<div class="f09-bar" style="top:270px; width:156px;"></div><div class="f09-bar" style="top:292px; width:100px; opacity:.45;"></div></div>' + PLAY + '</div>' +
+        '</div>';
+      Q(".f09-shift").forEach(function (s) { s.innerHTML = CARD; });
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : continue la dérive de la frame 8 (y -35, ×1.02 au départ) --- */
+      tl.fromTo("#f09-cam", { y: -35, scale: 1.02 }, { y: -58, scale: 1.04, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f09-giant", { x: -90 }, { x: -130, duration: 2.1, ease: "none" }, 0);
+      /* la vibration de la bande s'achève */
+      tl.fromTo("#f09-grid", { x: 1.5 }, { x: 0, duration: 0.05, ease: "none", yoyo: true, repeat: 3 }, 0);
+
+      /* --- 0.27 « Ebyen, » : le décor pâlit, la phrase arrive --- */
+      tl.fromTo("#f09-grid", { opacity: 1, filter: "blur(0px) grayscale(0)" }, { opacity: 0.42, filter: "blur(3px) grayscale(0)", duration: 0.3, ease: "power2.out" }, 0.27);
+      tl.to(["#f09-t1", "#f09-t2"], { opacity: 0, scale: 0.9, filter: "blur(8px)", duration: 0.3, ease: "power2.out" }, 0.27);
+      tl.fromTo("#f09-pale", { opacity: 0 }, { opacity: 0.55, duration: 0.4, ease: "power2.out" }, 0.27);
+      var W = Q(".f09-w"), CUES = [0.27, 0.89, 1.13, 1.40];
+      W.forEach(function (w, i) {
+        tl.fromTo(w, { opacity: 0, scale: 1.5, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, CUES[i] - 0.03);
+      });
+      tl.fromTo("#f09-type .lv-box-bg", { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, 1.36);
+
+      /* --- 0.89 « se » : la bande se vide de ses couleurs --- */
+      tl.to(".f09-ol", { opacity: 0, duration: 0.25, ease: "power2.out" }, 0.89);
+      tl.to("#f09-grid", { opacity: 0.3, filter: "blur(4px) grayscale(1)", duration: 0.3, ease: "power2.out" }, 0.89);
+      tl.to("#f09-giant", { opacity: 0.4, duration: 0.3, ease: "none" }, 0.89);
+      /* la phrase respire */
+      tl.fromTo("#f09-type", { scale: 1 }, { scale: 1.04, duration: 0.6, ease: "none" }, 1.50);
+
+      /* --- 1.80 la bande se coupe en deux au milieu --- */
+      tl.to("#f09-hl", { x: -260, rotation: -3, opacity: 0, duration: 0.28, ease: "power2.in" }, 1.80);
+      tl.to("#f09-hr2", { x: 260, rotation: 3, opacity: 0, duration: 0.28, ease: "power2.in" }, 1.80);
+
+      /* --- 2.10 la scène se vide : papier pâle --- */
+      tl.to("#f09-type", { opacity: 0, scale: 1.1, filter: "blur(8px)", duration: 0.12, ease: "power2.in" }, 2.08);
+      tl.to("#f09-pale", { opacity: 1, duration: 0.15, ease: "power2.out" }, 2.10);
+      tl.to("#f09-wm", { opacity: 0, duration: 0.15, ease: "none" }, 2.10);
+      /* 2.30 → 2.95 un anneau se resserre vers le centre */
+      tl.fromTo("#f09-ring", { opacity: 0, scale: 1.6 }, { opacity: 0.8, scale: 0.6, duration: 0.4, ease: "power1.in" }, 2.30);
+      tl.to("#f09-ring", { opacity: 0, scale: 0.05, duration: 0.25, ease: "power2.in" }, 2.70);
+      /* --- 2.95 le point de lumière accent naît au centre (540, 760) --- */
+      tl.fromTo("#f09-pt", { opacity: 0, scale: 2.2, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.95);
+      tl.fromTo("#f09-halo", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 3.15);
+      /* 3.45 il commence à s'ouvrir */
+      tl.to("#f09-pt", { scale: 1.3, duration: 0.35, ease: "power2.in" }, 3.45);
+      tl.to("#f09-halo", { scale: 1.25, duration: 0.35, ease: "power2.in" }, 3.45);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

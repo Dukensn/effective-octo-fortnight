@@ -1,0 +1,253 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f22-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* la carte de la frame 21 (état handoff_in) */
+    #f22-mapg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #f22-map { position: absolute; left: -60px; top: 150px; width: 1200px; height: 1280px; background: #F0ECE5; overflow: hidden;
+      -webkit-mask-image: radial-gradient(ellipse 72% 66% at 50% 50%, #000 62%, rgba(0,0,0,0) 100%); }
+    .f22-st { position: absolute; background: #E2DDD4; border-radius: 10px; }
+    .f22-blk { position: absolute; border-radius: 22px; background: #E9E4DC; }
+    #f22-mid { position: absolute; left: 0; top: 715px; width: 1200px; height: 6px;
+      background: repeating-linear-gradient(90deg, #FFFFFF 0 40px, transparent 40px 80px); opacity: .9; }
+    #f22-park { position: absolute; left: 610px; top: 830px; width: 470px; height: 380px; border-radius: 30px; background: #DEDAD0; }
+    #f22-parkc { position: absolute; left: 165px; top: 120px; width: 140px; height: 140px; border-radius: 50%; border: 10px solid #D9D4CC; }
+    #f22-photo { left: 90px; top: 330px; width: 640px; height: 450px; border-radius: 34px; }
+    #f22-imgw { position: absolute; left: 18px; top: 18px; width: 604px; height: 323px; border-radius: 22px; overflow: hidden; background: #EDE9E2; }
+    #f22-img { display: block; width: 604px; height: 323px; }
+    #f22-title { position: absolute; left: 0; width: 640px; top: 362px; text-align: center; font: 800 46px/1.1 "Inter"; letter-spacing: -0.8px; color: #1B1A18; }
+    #f22-pinring { position: absolute; left: 376px; top: 484px; width: 68px; height: 32px; border-radius: 50%; border: 6px solid #D97757; }
+    #f22-wave { position: absolute; left: 350px; top: 440px; width: 120px; height: 120px; border-radius: 50%; border: 5px solid #D97757; opacity: 0; }
+    #f22-pin { position: absolute; left: 335px; top: 392px; width: 150px; height: 150px; transform-origin: 50% 72%; }
+    #f22-pathw { position: absolute; left: 380px; top: 760px; width: 400px; height: 300px; }
+    #f22-plas { left: 520px; top: 1040px; width: 470px; height: 150px; border-radius: 34px; display: flex; align-items: center; gap: 22px; padding-left: 34px; box-sizing: border-box; }
+    #f22-plasi { width: 64px; height: 64px; border-radius: 50%; border: 7px solid #1B1A18; box-sizing: border-box; flex: none; display: flex; align-items: center; justify-content: center; }
+    #f22-plasi div { width: 18px; height: 18px; border-radius: 50%; background: #1B1A18; }
+    #f22-plast { font: 800 46px "Inter"; letter-spacing: -0.8px; color: #1B1A18; white-space: nowrap; }
+
+    /* les 30 places */
+    #f22-panel { left: 100px; top: 290px; width: 880px; height: 1010px; }
+    #f22-head { position: absolute; left: 0; width: 880px; top: 34px; display: flex; align-items: baseline; justify-content: center; gap: 26px; }
+    #f22-n { font: 900 230px/1 "InterD"; letter-spacing: -8px; color: #1B1A18; }
+    #f22-nl { font: 800 64px "Inter"; letter-spacing: -1px; color: #5A554E; }
+    #f22-grid { position: absolute; left: 68px; top: 318px; width: 744px; height: 616px; }
+    .f22-seat { position: absolute; width: 104px; height: 104px; border-radius: 26px; background: #EDE9E2; box-shadow: inset 0 -4px 0 rgba(27,26,24,.05); }
+    #f22-limit { position: absolute; left: 44px; top: 294px; width: 792px; height: 664px; border-radius: 40px; border: 3px dashed #8C877F; box-sizing: border-box; opacity: 0; }
+    #f22-clk { left: 40px; top: 1236px; opacity: 0; }
+    #f22-door { left: 908px; top: 1236px; opacity: 0; }
+    #f22-doorf { position: absolute; left: 36px; top: 22px; width: 60px; height: 88px; border-radius: 8px 8px 2px 2px; border: 6px solid #1B1A18; box-sizing: border-box; background: #F3F0EA; }
+    #f22-leaf { position: absolute; left: 42px; top: 28px; width: 48px; height: 82px; border-radius: 4px 4px 0 0; background: #5A554E; transform-origin: 0 50%; }
+    #f22-knob { position: absolute; left: 78px; top: 66px; width: 8px; height: 8px; border-radius: 50%; background: #F3F0EA; opacity: 0; }
+  </style>
+
+  <div id="root" data-composition-id="22-30-plas" data-width="1080" data-height="1920" data-duration="6.10">
+    <div id="f22-bg" class="clip" data-start="0" data-duration="6.10" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f22-floor" class="lv-floor"></div>
+        <div id="f22-giant" class="lv-giant" style="left:-30px; top:1080px;">PLAS</div>
+      </div>
+    </div>
+
+    <div id="f22-stage" class="clip" data-start="0" data-duration="6.10" data-track-index="1">
+      <div id="f22-cam">
+        <div id="f22-mapg">
+          <div id="f22-map">
+            <div class="f22-st" style="left:150px; top:0; width:70px; height:670px;"></div>
+            <div class="f22-st" style="left:880px; top:0; width:70px; height:670px;"></div>
+            <div class="f22-st" style="left:470px; top:766px; width:70px; height:514px;"></div>
+            <div class="f22-st" style="left:0; top:250px; width:1200px; height:56px;"></div>
+            <div class="f22-st" style="left:0; top:1150px; width:1200px; height:56px;"></div>
+            <div class="f22-blk" style="left:250px; top:40px; width:600px; height:180px;"></div>
+            <div class="f22-blk" style="left:960px; top:340px; width:220px; height:300px;"></div>
+            <div class="f22-blk" style="left:30px; top:830px; width:410px; height:290px;"></div>
+            <div id="f22-park"><div id="f22-parkc"></div></div>
+            <div class="f22-st" style="left:0; top:670px; width:1200px; height:96px; background:#FFFFFF;"></div>
+            <div id="f22-mid"></div>
+          </div>
+          <div id="f22-photo" class="lv-glass">
+            <div id="f22-imgw"><img id="f22-img" src="assets/img/sassou.png" alt="Sassou's Lamadone Club"></div>
+            <div id="f22-title">Sassou's Lamadone Club</div>
+          </div>
+          <div id="f22-wave"></div>
+          <div id="f22-pinring"></div>
+          <img id="f22-pin" src="assets/img/pin.png" alt="">
+          <div id="f22-pathw">
+            <svg viewBox="0 0 400 300" width="400" height="300">
+              <path d="M60 30 C 60 150, 330 130, 320 272" fill="none" stroke="#D97757" stroke-width="9" stroke-linecap="round" stroke-dasharray="0.1 22"/>
+            </svg>
+          </div>
+          <div id="f22-plas" class="lv-glass">
+            <div id="f22-plasi"><div></div></div>
+            <div id="f22-plast">Plas Anacaona</div>
+          </div>
+        </div>
+
+        <div id="f22-panel" class="lv-glass" style="opacity:0;">
+          <div id="f22-head"><div id="f22-n" style="opacity:0;">30</div><div id="f22-nl" style="opacity:0;">plas</div></div>
+          <div id="f22-limit"></div>
+          <div id="f22-grid"></div>
+        </div>
+
+        <div id="f22-clk" class="lv-tile">
+          <svg viewBox="0 0 132 132" width="132" height="132">
+            <circle cx="66" cy="66" r="42" fill="#fff" stroke="#1B1A18" stroke-width="7"/>
+            <line x1="66" y1="66" x2="66" y2="42" stroke="#1B1A18" stroke-width="7" stroke-linecap="round" transform="rotate(120 66 66)"/>
+            <line id="f22-clkm" x1="66" y1="70" x2="66" y2="32" stroke="#5A554E" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="66" cy="66" r="6" fill="#1B1A18"/>
+          </svg>
+        </div>
+        <div id="f22-door" class="lv-tile">
+          <div id="f22-doorf"></div>
+          <div id="f22-leaf"></div>
+          <div id="f22-knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f22-text" class="clip" data-start="0" data-duration="6.10" data-track-index="2">
+      <div id="f22-s1" class="lv-sub"></div>
+      <div id="f22-s2" class="lv-sub"></div>
+      <div id="f22-s3" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f22-grainc" class="clip" data-start="0" data-duration="6.10" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "22-30-plas", T = 6.10;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* grille 6 x 5 = 30 places */
+      var seats = [];
+      for (var i = 0; i < 30; i++) {
+        var s = document.createElement("div"); s.className = "f22-seat";
+        s.style.left = ((i % 6) * 128) + "px"; s.style.top = (Math.floor(i / 6) * 128) + "px";
+        $("f22-grid").appendChild(s); seats.push(s);
+      }
+
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      function brk(list, i) { list[i].el.parentNode.insertBefore(document.createElement("br"), list[i].el); }
+      var S1 = sub($("f22-s1"), [["N", 0.14], ["ap", 0.22], ["fè", 0.35], ["nou", 0.48], ["konnen", 0.66], ["plas", 0.98], ["yo", 1.18], ["limite", 1.31]]);
+      brk(S1, 5);
+      /* « 30 moun » : deux boîtes jointives = une seule boîte */
+      var S2 = sub($("f22-s2"), [["a", 1.79], ["30", 1.89, "box"], ["moun", 2.02, "box"], ["sèlman,", 2.22]]);
+      var S3 = sub($("f22-s3"), [["kidonk", 2.75], ["si", 3.38], ["w", 3.52], ["rive", 3.61], ["an", 3.81], ["reta,", 3.94], ["n", 4.68], ["ap", 4.76], ["dezole", 4.90], ["pou", 5.18], ["ou.", 5.42]]);
+      brk(S3, 6);
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : reprend le recul de la frame 21, puis dérive --- */
+      tl.fromTo("#f22-cam", { scale: 0.95, y: -20 }, { scale: 0.92, y: -10, duration: 0.6, ease: "power2.out" }, 0);
+      tl.to("#f22-cam", { scale: 0.96, y: -40, duration: 5.5, ease: "none" }, 0.6);
+      tl.fromTo("#f22-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f22-giant", { x: 0 }, { x: -140, duration: T, ease: "none" }, 0);
+
+      /* --- 0.20 un dernier anneau sur l'épingle --- */
+      tl.fromTo("#f22-wave", { opacity: 0, scale: 0.2 }, { opacity: 0.9, duration: 0.02, ease: "none" }, 0.20);
+      tl.to("#f22-wave", { opacity: 0, scale: 2.2, duration: 0.6, ease: "power2.out" }, 0.22);
+      /* --- 0.66 « konnen » : la carte passe au second plan, floue --- */
+      tl.to(["#f22-title", "#f22-plast"], { opacity: 0, duration: 0.3, ease: "power2.out" }, 0.70);
+      tl.fromTo("#f22-mapg", { filter: "blur(0px)", opacity: 1, scale: 1 }, { filter: "blur(9px)", opacity: 0.6, scale: 0.97, duration: 0.5, ease: "power2.out" }, 0.66);
+
+      /* --- 0.98 « plas » : la grille vide arrive trop grande et floue --- */
+      tl.fromTo("#f22-panel", { opacity: 0, scale: 1.15, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 0.96);
+      tl.fromTo(seats, { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.14, ease: "expo.out", stagger: 0.008 }, 1.02);
+      /* --- 1.31 « limite » : le cadre pointillé se resserre sur la grille --- */
+      tl.fromTo("#f22-limit", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.18, ease: "expo.out" }, 1.31);
+
+      /* --- 1.89 « 30 » : le gros 30, les places s'allument une à une --- */
+      tl.fromTo("#f22-n", { opacity: 0, scale: 1.4, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.87);
+      tl.fromTo("#f22-nl", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.16, ease: "expo.out" }, 2.02);
+      seats.forEach(function (s, i) {
+        var t = 1.92 + i * 0.03;
+        tl.to(s, { backgroundColor: "#D97757", duration: 0.06, ease: "none" }, t);
+        tl.fromTo(s, { scale: 1 }, { scale: 1.14, duration: 0.05, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, t);
+      });
+      /* --- 2.22 « sèlman » : le 30 marque le coup --- */
+      tl.to("#f22-n", { scale: 1.06, duration: 0.09, ease: "power2.out", yoyo: true, repeat: 1 }, 2.22);
+      /* --- 2.80 grille pleine : le cadre se fixe en encre --- */
+      tl.to("#f22-limit", { scale: 1.02, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 2.82);
+      tl.to("#f22-panel", { y: -8, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 2.82);
+
+      /* --- 3.38 « si » : léger cran de caméra --- */
+      tl.to("#f22-grid", { scale: 0.985, duration: 0.2, ease: "power2.out", yoyo: true, repeat: 1 }, 3.38);
+      /* --- 3.61 « rive an reta » : petite horloge qui dépasse --- */
+      tl.fromTo("#f22-clk", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 3.58);
+      tl.fromTo("#f22-clkm", { rotation: 0, svgOrigin: "66 66" }, { rotation: 420, svgOrigin: "66 66", duration: 0.5, ease: "power3.out" }, 3.66);
+      tl.to("#f22-clk", { rotation: -6, duration: 0.07, ease: "power2.out", yoyo: true, repeat: 3 }, 3.94);
+
+      /* --- 4.68 la porte arrive, 4.90 « dezole » : elle se ferme doucement --- */
+      tl.fromTo("#f22-door", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.62);
+      tl.fromTo("#f22-leaf", { scaleX: 0.18 }, { scaleX: 1, duration: 0.5, ease: "power2.inOut" }, 4.90);
+      tl.fromTo("#f22-knob", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 5.34);
+      tl.to("#f22-door", { x: 4, duration: 0.05, ease: "power2.out", yoyo: true, repeat: 1 }, 5.40);
+      /* --- 5.42 « ou » : la grille pleine respire --- */
+      tl.to("#f22-panel", { scale: 1.015, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 5.42);
+
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 1.66);
+      words(S2, 2.62);
+      words(S3, 5.95);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>
