@@ -1,0 +1,249 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f16-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* la bande du programme + sa règle (mêmes x que la frame 17) */
+    #f16-strip { position: absolute; left: 250px; top: -300px; width: 740px; height: 2400px; border-radius: 40px; background: #F8F6F2;
+      box-shadow: 0 20px 50px rgba(40,30,20,.10), 0 0 0 1px rgba(27,26,24,.04); }
+    #f16-ruler { position: absolute; left: 214px; top: -300px; width: 22px; height: 2400px;
+      background: repeating-linear-gradient(to bottom, #B9B3A9 0 3px, transparent 3px 240px) 0 0 / 22px 100% no-repeat,
+                  repeating-linear-gradient(to bottom, #D9D3C9 0 3px, transparent 3px 60px) 8px 0 / 14px 100% no-repeat; }
+    .f16-rlab { position: absolute; left: 20px; width: 180px; text-align: right; font: 600 26px/1 "Inter"; letter-spacing: 2px;
+      text-transform: uppercase; color: #77726B; white-space: nowrap; }
+    #f16-m4on { color: #C4613F; font-weight: 800; }
+    #f16-dot { position: absolute; left: 221px; top: 345px; width: 30px; height: 30px; border-radius: 50%; background: #D97757;
+      box-shadow: 0 0 0 8px rgba(217,119,87,.18); }
+    #f16-line { position: absolute; left: 250px; top: 799px; width: 740px; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); }
+
+    /* station MODIL 4 */
+    #f16-card { left: 280px; top: 300px; width: 680px; height: 1000px; overflow: hidden; clip-path: inset(49.5% 0% 49.5% 0% round 40px); }
+    #f16-cc { position: absolute; left: 0; top: 0; width: 680px; height: 1000px; transform-origin: 340px 500px; }
+    #f16-lab { position: absolute; left: 56px; top: 56px; font: 600 26px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    #f16-title { position: absolute; left: 56px; top: 96px; font: 800 64px/1 "Inter"; letter-spacing: -1px; color: #1B1A18; }
+    #f16-hr { position: absolute; left: 56px; right: 56px; top: 196px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+    .f16-slot { position: absolute; left: 40px; width: 600px; height: 130px; border-radius: 28px; border: 3px dashed #D9D4CC; background-color: rgba(237,233,226,0); }
+    .f16-pl { position: absolute; left: 40px; width: 600px; height: 130px; border-radius: 28px;
+      background: linear-gradient(165deg, #FFFFFF, #F7F4EF); box-shadow: 0 22px 44px rgba(60,45,30,.14), 0 0 0 1px rgba(27,26,24,.05), inset 0 1px 0 #fff; }
+    .f16-ic { position: absolute; left: 24px; top: 24px; width: 82px; height: 82px; border-radius: 22px; background: #1B1A18;
+      display: flex; align-items: center; justify-content: center; }
+    .f16-pt { position: absolute; left: 132px; top: 0; font: 800 46px/130px "Inter"; letter-spacing: -0.5px; color: #1B1A18; white-space: nowrap; }
+
+    /* photo du groupe dans son cadre de verre (même gabarit que #f17-team) */
+    #f16-team { position: absolute; left: 380px; top: 830px; width: 480px; height: 242px; border-radius: 26px; overflow: hidden;
+      border: 8px solid #fff; box-shadow: 0 30px 60px rgba(60,45,30,.18), 0 8px 18px rgba(60,45,30,.08); background: #fff; }
+    #f16-team img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  </style>
+
+  <div id="root" data-composition-id="16-atelye-aprantisaj-prat" data-width="1080" data-height="1920" data-duration="5.00">
+    <div id="f16-bg" class="clip" data-start="0" data-duration="5.00" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f16-floor" class="lv-floor"></div>
+        <div id="f16-giant" class="lv-giant" style="left:-60px; top:1080px;">ATELYE</div>
+      </div>
+    </div>
+
+    <div id="f16-stage" class="clip" data-start="0" data-duration="5.00" data-track-index="1">
+      <div id="f16-cam">
+        <div id="f16-strip"></div>
+        <div id="f16-ruler"></div>
+        <div id="f16-m4on" class="f16-rlab" style="top:347px; opacity:0;">Modil 4</div>
+        <div id="f16-m4off" class="f16-rlab" style="top:347px; opacity:0;">Modil 4</div>
+        <div id="f16-dot" style="opacity:0;"></div>
+
+        <!-- tuiles de profondeur -->
+        <div id="f16-t1" class="lv-tile" style="left:870px; top:140px; width:120px; height:120px; opacity:0;">
+          <svg viewBox="0 0 24 24" width="62" height="62"><circle cx="8" cy="8" r="3.2" fill="#5A554E"/><circle cx="16" cy="8" r="3.2" fill="#5A554E"/><path d="M2.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5zM10.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5z" fill="#5A554E"/></svg></div>
+        <div id="f16-tfg" class="lv-tile" style="left:-80px; top:1120px; width:220px; height:220px; border-radius:52px; opacity:0; filter:blur(9px);">
+          <svg viewBox="0 0 24 24" width="110" height="110"><path d="M3 5.5C5.5 4.5 8.5 4.5 11 6v13c-2.5-1.5-5.5-1.5-8-.5zM13 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5z" fill="#B9B3A9"/></svg></div>
+
+        <div id="f16-line"></div>
+
+        <div id="f16-card" class="lv-glass" style="opacity:0;">
+          <div id="f16-cc">
+            <div id="f16-lab" style="opacity:0;">Modil 4</div>
+            <div id="f16-title" style="opacity:0;">Atelye</div>
+            <div id="f16-hr" style="transform:scaleX(0);"></div>
+            <div id="f16-sl1" class="f16-slot" style="top:230px; opacity:0;"></div>
+            <div id="f16-sl2" class="f16-slot" style="top:380px; opacity:0;"></div>
+            <div id="f16-sl3" class="f16-slot" style="top:530px; opacity:0;"></div>
+            <div id="f16-p1" class="f16-pl" style="top:230px; opacity:0;">
+              <div id="f16-i1" class="f16-ic"><svg viewBox="0 0 24 24" width="48" height="48"><path d="M3 5.5C5.5 4.5 8.5 4.5 11 6v13c-2.5-1.5-5.5-1.5-8-.5zM13 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5z" fill="#fff"/></svg></div>
+              <div class="f16-pt">Aprantisaj</div>
+            </div>
+            <div id="f16-p2" class="f16-pl" style="top:380px; opacity:0;">
+              <div id="f16-i2" class="f16-ic"><svg viewBox="0 0 24 24" width="48" height="48"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="f16-pt">Pratik</div>
+            </div>
+            <div id="f16-p3" class="f16-pl" style="top:530px; opacity:0;">
+              <div id="f16-i3" class="f16-ic"><svg viewBox="0 0 24 24" width="50" height="50"><circle cx="8" cy="8" r="3.2" fill="#fff"/><circle cx="16" cy="8" r="3.2" fill="#fff"/><path d="M2.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5zM10.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5z" fill="#fff"/></svg></div>
+              <div class="f16-pt">Pwojè an gwoup</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- sur « gwoup » : la photo s'ouvre entre Pratik et Pwojè an gwoup -->
+        <div id="f16-team" style="opacity:0;"><img src="assets/img/team.png" alt=""></div>
+      </div>
+    </div>
+
+    <div id="f16-text" class="clip" data-start="0" data-duration="5.00" data-track-index="2">
+      <div id="f16-s1" class="lv-sub"></div>
+      <div id="f16-s2" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f16-grainc" class="clip" data-start="0" data-duration="5.00" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "16-atelye-aprantisaj-prat", T = 5.00;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* sous-titres mot à mot (sub()/words() du pilote ; "group" = une boîte sur plusieurs mots, chacun sur son repère) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          if (w[2] === "group") {
+            var bx = document.createElement("span"); bx.className = "lv-box";
+            bx.innerHTML = '<span class="lv-box-bg"></span><span class="lv-box-tx"></span>';
+            var tx = bx.querySelector(".lv-box-tx");
+            w[0].forEach(function (g, j) {
+              var gs = document.createElement("span"); gs.className = "lv-sw"; gs.textContent = g[0];
+              tx.appendChild(gs); if (j < w[0].length - 1) tx.appendChild(document.createTextNode(" "));
+              out.push({ el: gs, t: g[1], bg: j === 0 ? bx.querySelector(".lv-box-bg") : null });
+            });
+            host.appendChild(bx);
+          } else {
+            var sp = document.createElement("span"); sp.className = "lv-sw";
+            if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+            else sp.textContent = w[0];
+            host.appendChild(sp);
+            out.push({ el: sp, t: w[1], box: w[2] === "box" });
+          }
+          if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+        });
+        return out;
+      }
+
+      var tl = gsap.timeline({ paused: true });
+      var IN = { opacity: 0, scale: 1.35, rotation: -3, filter: "blur(8px)" }, SET = { opacity: 1, scale: 1, rotation: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" };
+
+      /* --- caméra : fin de descente floue (handoff_in), dérive, puis descente floue vers la frame 17 (handoff_out) --- */
+      tl.fromTo("#f16-cam", { y: 125, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 0);
+      tl.fromTo("#f16-cam", { y: 0, scale: 1 }, { y: -30, scale: 1.03, duration: 4.3, ease: "none", immediateRender: false }, 0.4);
+      tl.to("#f16-cam", { y: -230, scale: 1, filter: "blur(6px)", duration: 0.3, ease: "power2.in" }, 4.70);
+      tl.fromTo("#f16-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f16-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
+
+      /* --- 0.18 « Se » : la tête de lecture se pose sur MODIL 4, la station s'ouvre --- */
+      tl.fromTo("#f16-dot", { opacity: 0, scale: 1.8, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 0.16);
+      tl.fromTo("#f16-m4on", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.16, ease: "expo.out" }, 0.20);
+      tl.fromTo("#f16-line", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.14, ease: "power3.out" }, 0.20);
+      tl.fromTo("#f16-card", { opacity: 0, clipPath: "inset(49.5% 0% 49.5% 0% round 40px)" },
+        { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 40px)", duration: 0.22, ease: "power3.out" }, 0.32);
+      tl.to("#f16-line", { opacity: 0, duration: 0.1, ease: "none" }, 0.46);
+      tl.fromTo("#f16-cc", { scale: 1.06 }, { scale: 1, duration: 0.3, ease: "expo.out" }, 0.32);
+      tl.fromTo("#f16-lab", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 0.48);
+      /* 0.56 « atelye » : le titre s'imprime */
+      tl.fromTo("#f16-title", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 0.54);
+      tl.fromTo("#f16-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.66);
+
+      /* tuiles de profondeur + vies finies */
+      tl.fromTo("#f16-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 0.89);
+      tl.fromTo("#f16-tfg", { opacity: 0, x: -80 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 1.05);
+      tl.to("#f16-t1", { y: -14, rotation: -5, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.0);
+      tl.to("#f16-tfg", { y: -40, rotation: 6, duration: 3.4, ease: "none" }, 1.1);
+
+      /* --- 1.30 « mete » : trois emplacements pointillés attendent ; 1.55 « aksan » : ils s'éclairent --- */
+      ["#f16-sl1", "#f16-sl2", "#f16-sl3"].forEach(function (s, i) {
+        tl.fromTo(s, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 1.28 + i * 0.06);
+        tl.fromTo(s, { backgroundColor: "rgba(237,233,226,0)" }, { backgroundColor: "rgba(237,233,226,1)", duration: 0.12, ease: "none", yoyo: true, repeat: 1 }, 1.55 + i * 0.06);
+      });
+      tl.to("#f16-dot", { scale: 1.25, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 1.55);
+
+      /* --- les piliers s'impriment sur leurs repères --- */
+      [["#f16-p1", "#f16-sl1", "#f16-i1", 2.06], ["#f16-p2", "#f16-sl2", "#f16-i2", 2.63], ["#f16-p3", "#f16-sl3", "#f16-i3", 3.42]].forEach(function (p) {
+        tl.fromTo(p[0], IN, SET, p[3] - 0.03);
+        tl.to(p[1], { opacity: 0, duration: 0.1, ease: "none" }, p[3] + 0.05);
+        tl.to("#f16-cc", { scale: 0.985, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, p[3] + 0.12);
+        tl.fromTo(p[2], { scale: 1 }, { scale: 1.18, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, p[3] + 0.32);
+      });
+      /* 3.26 « ak » : la tête de lecture respire */
+      tl.to("#f16-dot", { scale: 1.25, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 3.22);
+      /* 4.00 les trois piliers respirent ensemble */
+      ["#f16-p1", "#f16-p2", "#f16-p3"].forEach(function (p, i) {
+        tl.to(p, { y: -6, duration: 0.14, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.98 + i * 0.05);
+      });
+
+      /* --- 4.42 « gwoup » : le troisième pilier s'écarte, la photo du groupe s'ouvre entre les piliers --- */
+      tl.to("#f16-p3", { y: 280, duration: 0.2, ease: "expo.out" }, 4.34);
+      tl.fromTo("#f16-team", { opacity: 0, scale: 1.4, filter: "blur(10px)", clipPath: "inset(50% 0% 50% 0% round 26px)" },
+        { opacity: 1, scale: 1.15, filter: "blur(0px)", clipPath: "inset(0% 0% 0% 0% round 26px)", duration: 0.18, ease: "expo.out" }, 4.40);
+
+      /* --- 4.70 descente (handoff_out) : la photo remonte vers sa place de la frame 17, la station s'efface --- */
+      tl.to("#f16-team", { x: -50, y: -470, scale: 1, filter: "blur(6px)", duration: 0.3, ease: "power2.in" }, 4.70);
+      tl.to("#f16-card", { opacity: 0, filter: "blur(8px)", duration: 0.26, ease: "power2.in" }, 4.72);
+      tl.to("#f16-m4on", { opacity: 0, duration: 0.2, ease: "none" }, 4.75);
+      tl.fromTo("#f16-m4off", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none" }, 4.75);
+      tl.to(["#f16-t1", "#f16-tfg"], { opacity: 0, duration: 0.25, ease: "power2.in" }, 4.72);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        var els = [];
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          var bg = w.bg || (w.box ? w.el.querySelector(".lv-box-bg") : null);
+          if (bg) tl.fromTo(bg, { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+          els.push(w.el); if (w.bg) els.push(w.bg);
+        });
+        tl.to(els, { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      var S1 = sub($("f16-s1"), [["Se", 0.18], ["yon", 0.34], ["atelye", 0.56], ["ki", 0.89], ["pral", 1.05], ["mete", 1.30], ["aksan", 1.55]]);
+      var S2 = sub($("f16-s2"), [["sou", 1.84], ["aprantisaj,", 2.06], ["pratik", 2.63], ["ak", 3.26], [[["pwojè", 3.42], ["an", 4.26], ["gwoup.", 4.42]], 0, "group"]]);
+      words(S1, 1.70); words(S2, 4.86);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,274 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+
+    #f19-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* la bande + sa règle (mêmes coordonnées que la frame 18) */
+    #f19-strip { position: absolute; left: 250px; top: 120px; width: 740px; height: 1260px; border-radius: 40px; background: #F8F6F2;
+      box-shadow: 0 20px 50px rgba(40,30,20,.10), 0 0 0 1px rgba(27,26,24,.04);
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0px, #000 90px, #000 1080px, rgba(0,0,0,0) 1260px); }
+    #f19-ruler { position: absolute; left: 214px; top: 120px; width: 22px; height: 1260px; opacity: .35;
+      background: repeating-linear-gradient(to bottom, #B9B3A9 0 3px, transparent 3px 240px) 0 0 / 22px 100% no-repeat,
+                  repeating-linear-gradient(to bottom, #D9D3C9 0 3px, transparent 3px 60px) 8px 0 / 14px 100% no-repeat;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0px, #000 90px, #000 1080px, rgba(0,0,0,0) 1260px); }
+    .f19-rlab { position: absolute; left: 20px; width: 172px; text-align: right; font: 600 26px/1 "Inter"; letter-spacing: 2px;
+      text-transform: uppercase; color: #77726B; white-space: nowrap; }
+    #f19-l24 { color: #C4613F; font-weight: 800; }
+    .f19-dtick { position: absolute; left: 200px; width: 36px; height: 3px; border-radius: 2px; background: #B9B3A9; transform-origin: 100% 50%; }
+    .f19-dtick.big { left: 186px; width: 50px; height: 4px; background: #1B1A18; }
+    #f19-dot { position: absolute; left: 221px; top: 0; width: 30px; height: 30px; border-radius: 50%; background: #D97757;
+      box-shadow: 0 0 0 8px rgba(217,119,87,.18); }
+    #f19-line { position: absolute; left: 250px; top: 629px; width: 740px; height: 2px; background: #D97757; transform-origin: 0 50%; }
+    /* la conversation de groupe de la frame 18, qui remonte (handoff_in) */
+    #f19-chat { position: absolute; left: 280px; top: 230px; width: 680px; height: 1110px; border-radius: 40px; overflow: hidden;
+      background: radial-gradient(circle, rgba(27,26,24,.05) 2px, transparent 2.5px) 0 0 / 34px 34px, #F4F1EC;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08); }
+    #f19-chhd { position: absolute; left: 0; top: 0; width: 680px; height: 128px; background: #075E54; }
+    .f19-gb { position: absolute; left: 26px; width: 520px; height: 130px; border-radius: 6px 24px 24px 24px; background: #fff; }
+    /* station calendrier */
+    #f19-card { left: 280px; top: 220px; width: 680px; height: 820px; overflow: hidden; clip-path: inset(49.5% 0% 49.5% 0% round 40px); }
+    #f19-cc { position: absolute; left: 0; top: 0; width: 680px; height: 820px; transform-origin: 340px 410px; }
+    #f19-lab { position: absolute; left: 56px; top: 56px; font: 600 26px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    #f19-hr { position: absolute; left: 56px; right: 56px; top: 116px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+    .f19-slot { position: absolute; left: 40px; width: 600px; height: 290px; border-radius: 32px; background: #EDE9E2; transform-origin: 0 50%; }
+    .f19-row { position: absolute; left: 40px; width: 600px; height: 290px; border-radius: 32px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 44px; box-sizing: border-box;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .f19-day { font: 700 32px/1 "Inter"; letter-spacing: 4px; color: #77726B; }
+    .f19-num { font: 900 210px/1 "InterD"; letter-spacing: -6px; color: #1B1A18; }
+    .f19-mon { font: 800 64px/1 "Inter"; letter-spacing: 1px; color: #1B1A18; }
+    #f19-edge { position: absolute; left: 40px; top: 495px; width: 600px; height: 290px; border-radius: 32px; border: 5px solid #D97757;
+      box-sizing: border-box; box-shadow: 0 0 0 10px rgba(217,119,87,.10), 0 30px 70px rgba(217,119,87,.28); pointer-events: none; }
+    #f19-year { position: absolute; left: 250px; width: 740px; top: 1065px; text-align: center; font: 900 260px/1 "InterD"; letter-spacing: -8px;
+      color: transparent; -webkit-text-stroke: 3px rgba(27,26,24,.30); white-space: nowrap; }
+    /* la bande de la frame 20 (handoff_out) */
+    #f19-band { position: absolute; left: 110px; top: 230px; width: 860px; height: 1150px; border-radius: 40px;
+      background: linear-gradient(165deg, #fff, #F6F3EE); box-shadow: 0 50px 90px rgba(60,45,30,.14), 0 8px 18px rgba(60,45,30,.07), inset 0 1px 0 #fff; }
+    .f19-lane { position: absolute; top: 70px; width: 128px; height: 1010px; border-radius: 18px; background: #EDE9E2; opacity: .55; }
+    .f19-rt { position: absolute; left: 14px; width: 22px; height: 3px; border-radius: 2px; background: #D9D4CC; }
+    /* trait de crête (sous-titre) */
+    .f19-pk { position: relative; display: inline-block; }
+    .f19-pk-s { position: absolute; left: -6px; width: calc(100% + 12px); bottom: -8px; height: 16px; clip-path: inset(0% 100% 0% 0%); }
+  </style>
+
+  <div id="root" data-composition-id="19-dat-la" data-width="1080" data-height="1920" data-duration="3.80">
+    <div id="f19-bg" class="clip" data-start="0" data-duration="3.80" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f19-floor" class="lv-floor"></div>
+        <div id="f19-giant" class="lv-giant" style="left:-40px; top:1080px;">OKTÒB</div>
+      </div>
+    </div>
+
+    <div id="f19-stage" class="clip" data-start="0" data-duration="3.80" data-track-index="1">
+      <div id="f19-cam">
+        <div id="f19-band" style="opacity:0;">
+          <div class="f19-lane" style="left:60px"></div><div class="f19-lane" style="left:212px"></div><div class="f19-lane" style="left:364px"></div>
+          <div class="f19-lane" style="left:516px"></div><div class="f19-lane" style="left:668px"></div>
+          <div id="f19-bruler"></div>
+        </div>
+        <div id="f19-strip"></div>
+        <div id="f19-ruler"></div>
+        <div id="f19-days"></div>
+        <div id="f19-l17" class="f19-rlab" style="top:517px; opacity:0;">Sam 17</div>
+        <div id="f19-l24" class="f19-rlab" style="top:847px; opacity:0;">Sam 24</div>
+        <div id="f19-dot"></div>
+        <div id="f19-year" style="opacity:0;">2026</div>
+        <div id="f19-line" style="opacity:0;"></div>
+
+        <!-- station calendrier : deux tuiles de date -->
+        <div id="f19-card" class="lv-glass" style="opacity:0;">
+          <div id="f19-cc">
+            <div id="f19-lab">Dat yo</div>
+            <div id="f19-hr"></div>
+            <div id="f19-slot1" class="f19-slot" style="top:165px; opacity:0;"></div>
+            <div id="f19-slot2" class="f19-slot" style="top:495px; opacity:0;"></div>
+            <div id="f19-r17" class="f19-row" style="top:165px; opacity:0;">
+              <span class="f19-day">SAMDI</span><span class="f19-num">17</span><span id="f19-m17" class="f19-mon" style="opacity:0;">OKT</span>
+            </div>
+            <div id="f19-r24" class="f19-row" style="top:495px; opacity:0;">
+              <span class="f19-day">SAMDI</span><span class="f19-num">24</span><span id="f19-m24" class="f19-mon" style="opacity:0;">OKT</span>
+            </div>
+            <div id="f19-edge" style="opacity:0;"></div>
+          </div>
+        </div>
+
+        <!-- la conversation de la frame 18 remonte et sort -->
+        <div id="f19-chat">
+          <div id="f19-chhd"></div>
+          <div class="f19-gb" style="top:162px;"></div>
+          <div class="f19-gb" style="top:352px;"></div>
+          <div class="f19-gb" style="top:542px;"></div>
+          <div class="f19-gb" style="top:732px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f19-text" class="clip" data-start="0" data-duration="3.80" data-track-index="2">
+      <div id="f19-s1" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f19-grainc" class="clip" data-start="0" data-duration="3.80" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "19-dat-la", T = 3.80;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* règle calendrier : un jour par graduation, du samedi 17 (y 530) au samedi 24 (y 860) */
+      var Y17 = 530, Y24 = 860, DY = (Y24 - Y17) / 7, ticks = [];
+      for (var i = 0; i < 8; i++) {
+        var big = (i === 0 || i === 7), tk = document.createElement("div");
+        tk.className = "f19-dtick" + (big ? " big" : ""); tk.style.top = (Y17 + i * DY - (big ? 2 : 1.5)) + "px"; tk.style.opacity = 0;
+        $("f19-days").appendChild(tk); ticks.push(tk);
+      }
+      /* règle de la bande de la frame 20 */
+      for (var j = 0; j < 22; j++) {
+        var rt = document.createElement("div"); rt.className = "f19-rt"; rt.style.top = (70 + j * 48) + "px";
+        if (j % 4 === 0) rt.style.width = "32px";
+        $("f19-bruler").appendChild(rt);
+      }
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) ; "peak" = trait de crête accent */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else if (w[2] === "peak") sp.innerHTML = '<span class="f19-pk">' + w[0] + '<svg class="f19-pk-s" viewBox="0 0 100 16" preserveAspectRatio="none"><path d="M1 10.5 C 30 9.5 60 6.5 97 3 C 99.5 3.2 99.5 6.8 97.5 7.6 C 62 11.5 30 13.5 1 12.5 C 0 12 0 11 1 10.5 Z" fill="#D97757"/></svg></span>';
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box", peak: w[2] === "peak" });
+        });
+        return out;
+      }
+      function brk(list, i) { list[i].el.parentNode.insertBefore(document.createElement("br"), list[i].el); }
+      var S1 = sub($("f19-s1"), [["Dat", 0.25], ["la", 0.59], ["se", 0.90], ["17", 1.17, "box"], ["ak", 1.56], ["24", 1.84, "peak"], ["oktòb", 2.13], ["2026.", 2.67]]);
+      brk(S1, 6);
+
+      /* état de départ = dernière image de la frame 18 : la tête de lecture en bas de la règle */
+      gsap.set("#f19-dot", { y: 1290 });
+      gsap.set("#f19-chat", { y: -330, filter: "blur(4px)" });
+      gsap.set("#f19-bruler", { y: 60 }); /* = premier état de #f20-ruler */
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : arrive en descente floue (handoff_in), dérive, puis descente floue (handoff_out) --- */
+      tl.fromTo("#f19-cam", { y: 90, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.26, ease: "expo.out" }, 0);
+      tl.fromTo("#f19-cam", { scale: 1 }, { scale: 1.03, y: -24, duration: 3.14, ease: "none", immediateRender: false }, 0.26);
+      tl.to("#f19-cam", { scale: 1, y: -30, filter: "blur(6px)", duration: 0.40, ease: "power2.in" }, 3.40);
+      tl.fromTo("#f19-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 160px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f19-giant", { x: 0 }, { x: -110, duration: T, ease: "none" }, 0);
+
+      /* --- 0.00 → 0.35 le groupe WhatsApp remonte et sort --- */
+      tl.to("#f19-chat", { y: -1150, opacity: 0, filter: "blur(10px)", duration: 0.35, ease: "power2.in" }, 0);
+
+      /* --- 0.26 → 0.56 la station calendrier s'ouvre (trait accent → carte) --- */
+      tl.fromTo("#f19-line", { opacity: 1, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.12, ease: "expo.out" }, 0.24);
+      tl.fromTo("#f19-card", { opacity: 0, clipPath: "inset(49.5% 0% 49.5% 0% round 40px)" },
+        { opacity: 1, clipPath: "inset(0% 0% 0% 0% round 40px)", duration: 0.22, ease: "power3.out" }, 0.34);
+      tl.fromTo("#f19-cc", { scale: 1.06 }, { scale: 1, duration: 0.3, ease: "expo.out" }, 0.34);
+      tl.to("#f19-line", { opacity: 0, duration: 0.1, ease: "none" }, 0.50);
+      tl.fromTo("#f19-lab", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.14, ease: "expo.out" }, 0.44);
+      tl.fromTo("#f19-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.46);
+
+      /* --- 0.59 « la » : deux emplacements vides se tracent --- */
+      tl.fromTo("#f19-slot1", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.18, ease: "expo.out" }, 0.57);
+      tl.fromTo("#f19-slot2", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.18, ease: "expo.out" }, 0.67);
+
+      /* --- 0.90 « se » : la règle porte les jours, la tête de lecture remonte au 17 --- */
+      ticks.forEach(function (tk, i) {
+        tl.fromTo(tk, { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.12, ease: "expo.out" }, 0.88 + i * 0.025);
+      });
+      tl.to("#f19-dot", { y: Y17 - 15, duration: 0.30, ease: "expo.inOut" }, 0.88);
+
+      /* --- 1.17 « 17 » : la tuile du 17 tombe, trop grande et floue --- */
+      tl.fromTo("#f19-r17", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.15);
+      tl.fromTo("#f19-r17", { y: 0 }, { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.31);
+      tl.fromTo("#f19-l17", { opacity: 0, x: -16, filter: "blur(4px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 1.19);
+      tl.to("#f19-dot", { scale: 1.3, duration: 0.10, ease: "power2.out", yoyo: true, repeat: 1 }, 1.17);
+
+      /* --- 1.56 « ak » : la tête de lecture descend jour après jour vers le 24 --- */
+      tl.to("#f19-dot", { y: Y24 - 15, duration: 0.30, ease: "power2.inOut" }, 1.54);
+      ticks.forEach(function (tk, i) {
+        if (i > 0) tl.to(tk, { backgroundColor: i === 7 ? "#D97757" : "#5A554E", duration: 0.06, ease: "none" }, 1.56 + i * 0.038);
+      });
+      tl.to("#f19-r17", { opacity: 0.9, duration: 0.2, ease: "none" }, 1.60);
+
+      /* --- 1.84 « 24 » : la tuile du 24 tombe, bord accent + halo --- */
+      tl.fromTo("#f19-r24", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.82);
+      tl.fromTo("#f19-r24", { y: 0 }, { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.98);
+      tl.fromTo("#f19-edge", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.18, ease: "expo.out" }, 1.92);
+      tl.fromTo("#f19-l24", { opacity: 0, x: -16, filter: "blur(4px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 1.86);
+      tl.to("#f19-dot", { scale: 1.3, duration: 0.10, ease: "power2.out", yoyo: true, repeat: 1 }, 1.84);
+
+      /* --- 2.13 « oktòb » : le mois s'imprime sur les deux tuiles --- */
+      tl.fromTo("#f19-m17", { opacity: 0, x: 24, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 2.11);
+      tl.fromTo("#f19-m24", { opacity: 0, x: 24, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 2.17);
+
+      /* --- 2.67 « 2026 » : l'année géante en contour claque sous les dates --- */
+      tl.fromTo("#f19-year", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 2.64);
+      tl.to("#f19-card", { y: -6, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 2.70);
+
+      /* --- 2.95 → 3.40 vie : le halo du 24 respire (fini) --- */
+      tl.to("#f19-edge", { scale: 1.02, opacity: 0.7, duration: 0.22, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.95);
+      tl.to("#f19-year", { x: -14, duration: 0.8, ease: "none" }, 2.82);
+
+      /* --- 3.40 descente : les dates posées remontent, la bande de la frame 20 monte du bas --- */
+      tl.to(["#f19-card", "#f19-year"], { y: -520, opacity: 0, duration: 0.40, ease: "power2.in" }, 3.40);
+      tl.to(["#f19-strip", "#f19-ruler", "#f19-days", "#f19-l17", "#f19-l24", "#f19-dot"], { y: "-=420", opacity: 0, duration: 0.40, ease: "power2.in" }, 3.40);
+      tl.fromTo("#f19-band", { opacity: 0, y: 520 }, { opacity: 1, y: 120, duration: 0.40, ease: "power2.out" }, 3.40);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+          if (w.peak) tl.fromTo(w.el.querySelector(".f19-pk-s"), { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.35, ease: "power2.out" }, w.t);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 3.50);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>
