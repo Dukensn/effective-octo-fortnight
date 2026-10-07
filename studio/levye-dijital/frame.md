@@ -121,3 +121,30 @@ pin may use `assets/img/pin.png`.
 No slideshow, no static screenshot posing as UI, no invented numbers (only the voice's words: "santèn milye", "dizèn",
 "santèn", "30", dates, hours, phone, URL), no emoji, no gradient text, no second accent, no object doubled across a
 seam, no element in the subtitle band, no frozen hold > 0.5 s, no hesitating cursor, no `repeat:-1`, no Math.random.
+
+## OVERRIDES validés par le client après le pilote (PRIORITAIRES sur tout ce qui précède et sur STORYBOARD.md)
+
+Le pilote `compositions/frames/01-ak-claude.html` est LA référence de style, validée par le client (« fond clair,
+proprement, pas trop de couleur », riche en profondeur). Chaque séquence en reprend :
+- **le bloc CSS « LEVYE clair-riche : décor commun »** mot pour mot (`.lv-ground`, `.lv-floor`, `.lv-giant`, `.lv-grain`,
+  `.lv-glass`, `.lv-tile`, `.lv-sub`, `.lv-sw`, `.lv-box*`, `.lv-wm`) et la même structure de pistes : track 0 = fond
+  (`.lv-ground` + `.lv-floor` + un mot géant en filigrane propre à la séquence), track 1 = scène (`#fNN-cam` qui dérive),
+  track 2 = sous-titre + filigrane LEVYE DIJITAL, track 3 = grain ;
+- la fonction `sub()` et la fonction `words()` du pilote pour le sous-titre mot à mot (boîte orange #C4613F, texte blanc) ;
+- `<script src="assets/vendor/gsap.min.js"></script>` (JAMAIS le CDN) et l'enregistrement `window.__timelines[FID]` ;
+- les entrées « trop grand + flou → posé » en 0,14 à 0,18 s expo.out, la dérive permanente de `#fNN-cam`, les vies finies
+  (yoyo, repeat fini), aucune `repeat:-1`, aucun `Math.random`.
+
+Palette retenue : fond clair partout (le pivot de la frame 9 est un moment typographique SUR FOND CLAIR : le décor pâlit,
+pas de noir ; frame 10 : la lumière s'intensifie au lieu de sortir du noir). Encre #1B1A18, gris #5A554E / #8C877F /
+#B9B3A9 / #D9D4CC / #EDE9E2, blanc et verre. **Pistes de la bande : nuances d'encre et de gris, plus de couleurs par
+piste** ; l'orange #D97757 (#C4613F pour le fond de boîte) seulement pour : l'élément actif (le clip qui tombe, la
+station ouverte), la tête de lecture, le mot clé, l'étoile Claude, l'anneau de l'épingle. Couleurs de marque uniquement
+dans les vrais logos (WhatsApp vert, Facebook bleu) et en petit.
+
+Logos : les tracés officiels sont dans `assets/icons/{claude,whatsapp,facebook,meta}.svg` (Simple Icons, CC0) : lire le
+`d="..."` du fichier et le recopier EXACTEMENT, jamais de mémoire. Photos : `assets/img/sassou.png`, `assets/img/team.png`,
+épingle `assets/img/pin.png`.
+
+Contraste : tout texte lisible ≥ 3:1 sur son fond (le check HyperFrames le vérifie) ; texte gris minimum #77726B sur blanc.
+Aucun texte caché sous un élément opaque.
