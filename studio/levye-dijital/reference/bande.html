@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>Levye Dijital · la bande, référence exécutable</title>
+<!--
+  Source UNIQUE du code commun (frame.md, « The world: la bande »). Chaque séquence copie MOT POUR MOT le bloc CSS,
+  les gabarits et le kit JS ci-dessous. Seuls changements autorisés : « ../assets/ » devient « assets/ », et l'id de
+  chaque <template> reçoit le préfixe de la séquence (« f04-lv-clip »).
+  Ouvrir dans Chromium : demo("act1"), demo("act3"), demo("act4"), demo("cards"), demo("sub").
+  Le kit n'utilise pas GSAP : les séquences animent avec GSAP (assets/vendor/gsap.min.js, local) et appellent
+  le kit dans UN seul onUpdate.
+-->
+<style>
+/* ===================== LEVYE : début du bloc CSS à copier ===================== */
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter-Regular.otf"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter-Medium.otf"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter-SemiBold.otf"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter-Bold.otf"); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; }
+@font-face { font-family: "InterD"; src: url("../assets/fonts/InterDisplay-Black.otf"); font-weight: 900; }
+.lv-stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+.lv-paper { position: absolute; left: -400px; top: -400px; width: 1880px; height: 2720px; background: #EFECE6 radial-gradient(circle, #DAD5CC 2.2px, transparent 2.6px) 0 0 / 44px 44px; }
+.lv-dark { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #141312; }
+.lv-layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+.lv-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+/* la bande */
+.lv-strip { position: absolute; left: 250px; width: 740px; background: #F8F6F2; border-radius: 30px; box-shadow: 0 20px 50px rgba(40,30,20,.12), 0 0 0 1px rgba(27,26,24,.04); }
+.lv-tick { position: absolute; height: 3px; background: #D9D3C9; }
+.lv-tick.big { background: #B9B3A9; }
+.lv-rlab { position: absolute; left: 20px; width: 190px; text-align: right; font: 700 28px/1 "Inter"; letter-spacing: 1.5px; color: #8C877F; white-space: nowrap; }
+.lv-rlab.on { color: #D97757; }
+.lv-lane { position: absolute; width: 120px; border-radius: 18px; background: #EBE7DF; }
+.lv-lhead { position: absolute; width: 120px; text-align: center; font: 600 22px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #8C877F; }
+.lv-clip { position: absolute; width: 120px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font: 800 30px/1 "Inter"; color: #fff; box-shadow: 0 14px 30px rgba(40,30,20,.16); }
+.lv-playhead { position: absolute; left: 222px; width: 768px; height: 5px; background: #D97757; }
+.lv-playhead::before { content: ""; position: absolute; left: -12px; top: -13px; width: 30px; height: 30px; border-radius: 50%; background: #D97757; }
+.lv-monitor { position: absolute; width: 360px; height: 640px; border-radius: 28px; background: #111; overflow: hidden; box-shadow: 0 30px 60px rgba(40,30,20,.22); }
+.lv-rec { position: absolute; left: 20px; top: 18px; font: 700 22px "Inter"; color: #fff; background: rgba(0,0,0,.45); padding: 6px 14px; border-radius: 20px; }
+/* cartes et composants */
+.lv-card { position: absolute; background: #fff; border-radius: 34px; box-shadow: 0 30px 60px rgba(40,30,20,.16), 0 4px 12px rgba(40,30,20,.08); }
+.lv-chip { position: absolute; display: flex; align-items: center; gap: 18px; background: #fff; border-radius: 60px; padding: 16px 34px 16px 16px; font: 700 44px/1 "Inter"; color: #1B1A18; white-space: nowrap; box-shadow: 0 20px 40px rgba(40,30,20,.14); }
+.lv-chip .dot { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 800 30px "Inter"; color: #fff; }
+.lv-tile { position: absolute; width: 120px; height: 120px; border-radius: 28px; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 16px 34px rgba(40,30,20,.14); }
+.lv-tile svg { width: 66px; height: 66px; }
+.lv-label { font: 600 26px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #8C877F; white-space: nowrap; }
+.lv-claude { position: absolute; width: 860px; height: 1000px; border-radius: 54px; background: #FAF9F6; box-shadow: 0 30px 60px rgba(40,30,20,.18); overflow: hidden; }
+.lv-claude .hd { position: absolute; left: 44px; top: 40px; display: flex; align-items: center; gap: 16px; font: 700 36px "Inter"; color: #1B1A18; }
+.lv-claude .ub { position: absolute; right: 44px; top: 150px; max-width: 600px; background: #EDEAE4; border-radius: 30px; padding: 26px 32px; font: 400 36px/1.35 "Inter"; color: #1B1A18; }
+.lv-claude .in { position: absolute; left: 40px; right: 40px; bottom: 40px; height: 110px; border-radius: 55px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); font: 400 34px "Inter"; color: #A29D95; padding: 36px 40px; }
+.lv-wa { position: absolute; width: 820px; border-radius: 48px; background: #ECE5DD; overflow: hidden; box-shadow: 0 30px 60px rgba(40,30,20,.18); }
+.lv-wa .hd { height: 150px; background: #075E54; display: flex; align-items: center; gap: 24px; padding: 30px 36px 0; color: #fff; font: 700 38px "Inter"; }
+.lv-wa .av { width: 84px; height: 84px; border-radius: 50%; background: #D97757; display: flex; align-items: center; justify-content: center; font: 800 40px "Inter"; }
+.lv-bin, .lv-bout { margin: 22px 36px 0; padding: 20px 26px; border-radius: 22px; font: 500 34px/1.35 "Inter"; color: #1B1A18; max-width: 600px; width: fit-content; }
+.lv-bin { background: #fff; } .lv-bout { background: #D9FDD3; margin-left: auto; }
+.lv-cta { position: absolute; width: 900px; height: 190px; border-radius: 95px; background: #25D366; display: flex; align-items: center; gap: 30px; padding: 0 40px; box-shadow: 0 24px 50px rgba(37,211,102,.30); color: #fff; }
+.lv-cta svg { width: 110px; height: 110px; flex: none; }
+.lv-cta .t1 { font: 700 38px/1.1 "Inter"; } .lv-cta .t2 { font: 800 70px/1.05 "Inter"; letter-spacing: -1px; }
+.lv-link { position: absolute; height: 130px; border-radius: 65px; background: #fff; display: flex; align-items: center; gap: 24px; padding: 0 44px 0 24px; font: 700 46px "Inter"; color: #1B1A18; white-space: nowrap; box-shadow: 0 20px 40px rgba(40,30,20,.14); }
+.lv-link .g { width: 84px; height: 84px; border-radius: 50%; background: #1B1A18; display: flex; align-items: center; justify-content: center; }
+.lv-seat { position: absolute; width: 56px; height: 56px; border-radius: 14px; background: #EBE7DF; }
+.lv-cursor { position: absolute; width: 64px; height: 64px; }
+.lv-ring { position: absolute; border-radius: 50%; border: 5px solid #D97757; }
+/* sous-titre : bande y 1430 à 1640, mot par mot */
+.lv-sub { position: absolute; left: 70px; width: 940px; top: 1450px; text-align: center; font: 500 60px/1.28 "Inter"; letter-spacing: -0.5px; color: #1B1A18;
+  text-shadow: 0 2px 18px rgba(239,236,230,.95), 0 0 3px rgba(239,236,230,.9); }
+.lv-sub.dark { color: #F3EFE8; text-shadow: 0 2px 18px rgba(0,0,0,.7); }
+.lv-sw { display: inline-block; opacity: 0; }
+.lv-box { position: relative; display: inline-block; font-weight: 700; color: #B5532F; text-shadow: none; }
+.lv-box-bg { position: absolute; left: -12px; right: -12px; top: 4px; bottom: 0; border-radius: 12px; background: #F7DCCF; transform-origin: 0 50%; transform: scaleX(0); }
+.lv-box-tx { position: relative; }
+.lv-peak { position: relative; display: inline-block; font-weight: 700; }
+.lv-peak-st { position: absolute; left: -4px; right: -4px; bottom: -10px; height: 10px; background: #D97757; clip-path: polygon(0 70%, 100% 0, 100% 45%, 0 100%); transform-origin: 0 50%; transform: scaleX(0); }
+.lv-type { position: absolute; left: 60px; width: 960px; text-align: center; font: 700 84px/1.12 "Inter"; letter-spacing: -1.5px; color: #1B1A18; }
+.lv-wordmark { font: 900 150px/0.95 "InterD"; letter-spacing: -4px; color: #1B1A18; }
+.lv-wordmark .acc { color: #D97757; }
+/* ===================== LEVYE : fin du bloc CSS ===================== */
+html, body { margin: 0; background: #EFECE6; }
+#frame { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="frame"></div>
+
+<!-- ===================== LEVYE : gabarits à copier ===================== -->
+<template id="lv-logo-claude"><svg viewBox="0 0 24 24"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg></template>
+<template id="lv-logo-wa"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></template>
+<template id="lv-logo-fb"><svg viewBox="0 0 24 24"><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg></template>
+<template id="lv-cursor"><svg viewBox="0 0 32 32" width="64" height="64"><path d="M6 3 L6 25 L11.5 19.8 L15.2 28.2 L19 26.6 L15.4 18.4 L23 18.4 Z" fill="#1B1A18" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></template>
+<!-- ===================== LEVYE : fin des gabarits ===================== -->
+
+<script>
+/* ===================== LEVYE : début du kit JS à copier ===================== */
+var LV = {
+  TRACK: { "Tèks": "#D97757", "Imaj": "#5B8DEF", "Tranz.": "#9B7BE8", "Son": "#4CB98A", "Mizik": "#E2B23C", "Vwa": "#1B1A18" },
+  LANES: ["Tèks", "Imaj", "Tranz.", "Son", "Mizik"],
+  laneX: function (i) { return 290 + i * 136; },
+  el: function (host, cls, css, html) { var d = document.createElement("div"); d.className = cls; if (css) d.style.cssText = css; if (html != null) d.innerHTML = html; host.appendChild(d); return d; },
+  tpl: function (id) { return document.getElementById(id).innerHTML; },
+  /* caméra 2D : amène le point monde (x, y) au centre de scène (540, 760), échelle s, flou b px écran */
+  cam: function (worldEl, c) {
+    worldEl.style.transform = "translate(" + (540 - c.x * c.s).toFixed(2) + "px," + (760 - c.y * c.s).toFixed(2) + "px) scale(" + c.s.toFixed(4) + ")";
+    worldEl.style.filter = c.b > 0.25 ? "blur(" + c.b.toFixed(1) + "px)" : "none";
+  },
+  /* la bande : panneau, règle (ticks tous les 60 px), libellés {y: texte}, couloirs optionnels */
+  bande: function (host, o) {
+    var y0 = o.y0, y1 = o.y1, s = LV.el(host, "lv-strip", "top:" + y0 + "px;height:" + (y1 - y0) + "px"), i, y, r = { strip: s, labels: {}, lanes: [] };
+    for (i = 0, y = y0 + 20; y < y1 - 10; y += 60, i++) LV.el(host, "lv-tick" + (i % 4 === 0 ? " big" : ""), "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px");
+    Object.keys(o.labels || {}).forEach(function (k) { r.labels[k] = LV.el(host, "lv-rlab", "top:" + (+k - 14) + "px", o.labels[k]); });
+    if (o.lanes) LV.LANES.forEach(function (n, j) {
+      LV.el(host, "lv-lhead", "left:" + LV.laneX(j) + "px;top:" + (o.lanes.top - 50) + "px", n);
+      r.lanes.push(LV.el(host, "lv-lane", "left:" + LV.laneX(j) + "px;top:" + o.lanes.top + "px;height:" + o.lanes.h + "px"));
+    });
+    return r;
+  },
+  clip: function (host, lane, top, h, label) {
+    return LV.el(host, "lv-clip", "left:" + LV.laneX(LV.LANES.indexOf(lane)) + "px;top:" + top + "px;height:" + h + "px;background:" + LV.TRACK[lane], label || "");
+  },
+  chip: function (host, css, label, dotColor, glyph) {
+    return LV.el(host, "lv-chip", css, '<span class="dot" style="background:' + dotColor + '">' + (glyph || "") + "</span>" + label);
+  },
+  /* sous-titre : words = [["mot", "n"|"box"|"peak"], ...] ; renvoie les spans dans l'ordre (box/peak : span externe) */
+  sub: function (host, words, dark) {
+    var d = LV.el(host, "lv-sub" + (dark ? " dark" : ""), ""), out = [];
+    words.forEach(function (w, i) {
+      var sp = document.createElement("span"); sp.className = "lv-sw";
+      if (w[1] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+      else if (w[1] === "peak") sp.innerHTML = '<span class="lv-peak">' + w[0] + '<span class="lv-peak-st"></span></span>';
+      else sp.textContent = w[0];
+      d.appendChild(sp); if (i < words.length - 1) d.appendChild(document.createTextNode(" ")); out.push(sp);
+    });
+    return { el: d, words: out };
+  }
+};
+/* ===================== LEVYE : fin du kit JS ===================== */
+
+/* ---- démos (états de référence du storyboard) ---- */
+function demo(name) {
+  var f = document.getElementById("frame"); f.innerHTML = "";
+  var st = LV.el(f, "lv-stage", ""); LV.el(st, "lv-paper", "");
+  var lay = LV.el(st, "lv-layer", ""), w = LV.el(lay, "lv-world", "");
+  if (name === "act1") {
+    var m = LV.el(w, "lv-monitor", "left:360px;top:60px", '<div class="lv-rec">● REC 00:16</div>');
+    var b = LV.bande(w, { y0: 740, y1: 2400, labels: { 860: "00:00", 1100: "00:04", 1340: "00:08" }, lanes: { top: 830, h: 1500 } });
+    LV.clip(w, "Tèks", 850, 170, "Tèks"); LV.clip(w, "Imaj", 1040, 220, "Imaj");
+    LV.el(w, "lv-playhead", "top:1200px");
+    LV.cam(w, { x: 540, y: 900, s: 1, b: 0 });
+    LV.sub(st, [["Li", "n"], ["ajoute", "n"], ["tèks,", "box"], ["li", "n"], ["ajoute", "n"], ["imaj,", "n"]]).words.forEach(function (s) { s.style.opacity = 1; });
+    document.querySelector(".lv-box-bg").style.transform = "none";
+  } else if (name === "act3") {
+    LV.bande(w, { y0: 2900, y1: 5000, labels: { 3200: "MODIL 1", 4300: "MODIL 2" } }).labels[4300].classList.add("on");
+    var c = LV.el(w, "lv-card", "left:280px;top:3900px;width:680px;height:800px");
+    var t1 = LV.el(c, "lv-tile", "left:80px;top:420px", LV.tpl("lv-logo-claude"));
+    var t2 = LV.el(c, "lv-tile", "left:280px;top:420px;color:#25D366", LV.tpl("lv-logo-wa"));
+    var t3 = LV.el(c, "lv-tile", "left:480px;top:420px", LV.tpl("lv-logo-fb"));
+    LV.el(c, "", "position:absolute;left:0;right:0;top:120px;text-align:center;font:800 64px/1.1 Inter;color:#1B1A18", "Ajan IA");
+    LV.el(w, "lv-playhead", "top:4300px");
+    LV.cam(w, { x: 620, y: 4300, s: 1, b: 0 });
+  } else if (name === "act4") {
+    LV.bande(w, { y0: 8300, y1: 9900, labels: { 8500: "SAM 17", 9100: "SAM 24" } }).labels[9100].classList.add("on");
+    LV.el(w, "lv-playhead", "top:9100px");
+    LV.el(w, "", "position:absolute;left:300px;top:8700px;font:900 150px/1 InterD;letter-spacing:-4px;color:#1B1A18", '24 <span style="color:#D97757">OKT</span>');
+    LV.cam(w, { x: 620, y: 8900, s: 1, b: 0 });
+  } else if (name === "cards") {
+    var cta = LV.el(st, "lv-cta", "left:90px;top:900px", LV.tpl("lv-logo-wa") + '<div><div class="t1">Kontakte nou sou WhatsApp</div><div class="t2">31 43 3938</div></div>');
+    LV.el(st, "lv-link", "left:120px;top:1160px", '<span class="g"><svg viewBox="0 0 24 24" width="50" height="50"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="#fff" stroke-width="2"/></svg></span>levyedijital.vercel.app');
+    var cl = LV.el(st, "lv-claude", "left:110px;top:80px;transform:scale(.7);transform-origin:0 0", '<div class="hd"><span style="width:58px;height:58px;display:block">' + LV.tpl("lv-logo-claude") + '</span>Claude</div><div class="ub">Fè yon pub videyo 9:16 pou Levye Dijital, ak vwa m.</div><div class="in">Chat with Claude</div>');
+    LV.el(st, "lv-cursor", "left:700px;top:1020px", LV.tpl("lv-cursor"));
+  } else if (name === "sub") {
+    var s = LV.sub(st, [["Se", "n"], ["sa", "n"], ["n", "n"], ["ap", "n"], ["montre", "n"], ["w", "n"], ["nan", "n"], ["Levye Dijital.", "peak"]]);
+    s.words.forEach(function (x) { x.style.opacity = 1; }); document.querySelector(".lv-peak-st").style.transform = "none";
+    LV.el(st, "", "position:absolute;left:0;right:0;top:600px;text-align:center", '<div class="lv-wordmark">LEVYE<br><span class="acc">DIJITAL</span></div>');
+  }
+}
+demo(location.hash ? location.hash.slice(1) : "act1");
+</script>
+</body>
+</html>
