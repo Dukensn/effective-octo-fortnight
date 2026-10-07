@@ -1,0 +1,333 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    /* ===== la bande (monde, mêmes coordonnées que la frame 5) ===== */
+    #f06-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f06-pan { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #f06-world { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; transform-origin: 0 0; }
+    /* la bande s'efface avant la bande du sous-titre (masque statique, coordonnées monde) */
+    #f06-band { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px;
+      -webkit-mask-image: linear-gradient(#000 0px, #000 3430px, rgba(0,0,0,0) 3640px); mask-image: linear-gradient(#000 0px, #000 3430px, rgba(0,0,0,0) 3640px); }
+    .f06-strip { position: absolute; left: 250px; top: 740px; width: 740px; height: 3300px; border-radius: 30px;
+      background: linear-gradient(165deg, #FFFFFF, #F8F6F2); box-shadow: 0 30px 70px rgba(60,45,30,.13), 0 0 0 1px rgba(27,26,24,.04); }
+    .f06-tick { position: absolute; height: 3px; background: #D9D4CC; }
+    .f06-tick.big { background: #B9B3A9; }
+
+    /* œil sur la règle (« remake ») */
+    #f06-eye { left: 150px; top: 290px; }
+
+    /* stations-profils */
+    .f06-st { position: absolute; top: 560px; width: 250px; height: 400px; transform-origin: 50% 50%; }
+    #f06-biz { left: 70px; }
+    #f06-pwo { left: 760px; }
+    .f06-stt { position: absolute; left: 0; width: 250px; top: 318px; text-align: center; font: 800 40px/1 "Inter"; letter-spacing: -0.5px; color: #1B1A18; }
+    .f06-stl { position: absolute; left: 0; width: 250px; top: 366px; text-align: center; font: 600 18px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    /* vitrine HTML */
+    #f06-roof { position: absolute; left: 20px; top: 62px; width: 210px; height: 18px; border-radius: 6px; background: #1B1A18; }
+    #f06-awn { position: absolute; left: 20px; top: 80px; width: 210px; height: 52px; display: flex; }
+    .f06-stp { width: 35px; height: 52px; border-radius: 0 0 18px 18px; transform-origin: 50% 0; }
+    .f06-stp.a { background: #D97757; }
+    .f06-stp.b { background: #F7DCCF; }
+    #f06-wall { position: absolute; left: 30px; top: 132px; width: 190px; height: 160px; background: #EDE9E2; border-radius: 0 0 10px 10px; }
+    #f06-win { position: absolute; left: 14px; top: 24px; width: 82px; height: 74px; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 3px #B9B3A9; }
+    .f06-shelf { position: absolute; left: 10px; width: 62px; height: 4px; border-radius: 2px; background: #B9B3A9; }
+    .f06-goods { position: absolute; width: 14px; border-radius: 3px; background: #5A554E; }
+    #f06-door { position: absolute; left: 112px; top: 40px; width: 62px; height: 120px; border-radius: 10px 10px 0 0; background: #5A554E; transform-origin: 0 50%; }
+    #f06-knob { position: absolute; left: 46px; top: 60px; width: 8px; height: 8px; border-radius: 50%; background: #F3F0EA; }
+    /* boîte produit */
+    #f06-prod { position: absolute; left: 100px; top: 120px; width: 50px; height: 96px; border-radius: 14px 14px 10px 10px; background: #1B1A18; }
+    #f06-cap { position: absolute; left: 13px; top: -14px; width: 24px; height: 18px; border-radius: 5px; background: #5A554E; }
+    #f06-plab { position: absolute; left: 8px; top: 38px; width: 34px; height: 26px; border-radius: 5px; background: #F3F0EA; }
+    .f06-flap { position: absolute; top: 140px; width: 85px; height: 30px; background: #B9B3A9; }
+    #f06-fl { left: 40px; transform-origin: 0 100%; border-radius: 6px 0 0 0; }
+    #f06-fr { left: 125px; transform-origin: 100% 100%; border-radius: 0 6px 0 0; }
+    #f06-box { position: absolute; left: 40px; top: 170px; width: 170px; height: 130px; border-radius: 0 0 12px 12px; background: #CFC9BF;
+      box-shadow: inset 0 10px 0 rgba(27,26,24,.08); }
+    #f06-tape { position: absolute; left: 70px; top: 0; width: 30px; height: 46px; background: #D97757; }
+    #f06-tag { position: absolute; left: 34px; top: 58px; width: 102px; height: 56px; border-radius: 8px; background: #fff; box-shadow: 0 4px 10px rgba(60,45,30,.10); }
+    .f06-tbar { position: absolute; left: 12px; height: 7px; border-radius: 4px; background: #B9B3A9; }
+    .f06-bc { position: absolute; top: 34px; width: 3px; height: 14px; background: #5A554E; }
+
+    /* la carte 9:16 « pub » */
+    #f06-card { left: 330px; top: 386px; width: 420px; height: 748px; transform-origin: 50% 50%; }
+    #f06-av { position: absolute; left: 24px; top: 24px; width: 56px; height: 56px; border-radius: 50%; background: #1B1A18;
+      display: flex; align-items: center; justify-content: center; font: 800 28px/1 "Inter"; color: #fff; }
+    #f06-nm { position: absolute; left: 94px; top: 28px; font: 700 26px/1 "Inter"; color: #1B1A18; }
+    #f06-nl { position: absolute; left: 94px; top: 60px; font: 500 20px/1 "Inter"; letter-spacing: 1.5px; text-transform: uppercase; color: #77726B; }
+    #f06-media { position: absolute; left: 24px; top: 108px; width: 372px; height: 400px; border-radius: 24px; overflow: hidden;
+      background: linear-gradient(170deg, #F8F6F2 0%, #E4DFD7 100%); box-shadow: inset 0 0 0 1px rgba(27,26,24,.05); transform-origin: 50% 100%; }
+    #f06-msun { position: absolute; left: 236px; top: 46px; width: 90px; height: 90px; border-radius: 50%; background: #fff; }
+    #f06-mhill { position: absolute; left: -60px; top: 250px; width: 300px; height: 220px; border-radius: 50% 50% 0 0; background: #D9D4CC; }
+    #f06-mhill2 { position: absolute; left: 150px; top: 290px; width: 300px; height: 200px; border-radius: 50% 50% 0 0; background: #B9B3A9; }
+    #f06-mprod { position: absolute; left: 160px; top: 170px; width: 56px; height: 110px; border-radius: 16px 16px 12px 12px; background: #1B1A18;
+      box-shadow: 0 18px 30px rgba(27,26,24,.25); }
+    #f06-mcap { position: absolute; left: 14px; top: -16px; width: 28px; height: 20px; border-radius: 6px; background: #5A554E; }
+    #f06-sheen { position: absolute; left: -160px; top: -40px; width: 110px; height: 500px; transform: rotate(18deg); opacity: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.8), rgba(255,255,255,0)); }
+    .f06-ttl { position: absolute; left: 24px; font: 800 44px/1 "Inter"; letter-spacing: -0.8px; color: #1B1A18; }
+    #f06-cta { position: absolute; left: 24px; top: 664px; width: 372px; height: 60px; border-radius: 30px; background: #1B1A18;
+      display: flex; align-items: center; justify-content: center; }
+    #f06-chk { position: absolute; left: 330px; top: 80px; width: 76px; height: 76px; border-radius: 50%; background: #C4613F;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 26px rgba(196,97,63,.35); }
+    #f06-ring { position: absolute; left: 330px; top: 80px; width: 76px; height: 76px; border-radius: 50%; border: 4px solid #D97757; box-sizing: border-box; }
+  </style>
+
+  <div id="root" data-composition-id="06-biznis-pwodwi" data-width="1080" data-height="1920" data-duration="6.10">
+    <div id="f06-bg" class="clip" data-start="0" data-duration="6.10" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f06-floorw" style="position:absolute; left:0; top:0; width:1080px; height:1920px;"><div class="lv-floor"></div></div>
+        <div id="f06-giant0" class="lv-giant" style="left:-40px; top:1110px;">PIBLISITE</div>
+        <div id="f06-giant" class="lv-giant" style="left:-60px; top:1080px; opacity:0;">BIZNIS</div>
+      </div>
+    </div>
+
+    <div id="f06-stage" class="clip" data-start="0" data-duration="6.10" data-track-index="1">
+      <div id="f06-cam">
+        <div id="f06-pan">
+          <!-- la bande (suite de l'acte I), vide -->
+          <div id="f06-world">
+            <div id="f06-band">
+              <div class="f06-strip"></div>
+              <div id="f06-ruler"></div>
+            </div>
+          </div>
+
+          <!-- tuile de profondeur (arrière) -->
+          <div id="f06-t1" class="lv-tile" style="left:860px; top:190px; opacity:0;">
+            <svg viewBox="0 0 24 24" width="68" height="68"><path d="M3 12.2V4.5A1.5 1.5 0 0 1 4.5 3h7.7l8.8 8.8-9.2 9.2z" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.9" fill="#1B1A18"/></svg></div>
+
+          <!-- « remake » : un petit œil sur la règle -->
+          <div id="f06-eye" class="lv-tile" style="opacity:0;">
+            <svg id="f06-eyes" viewBox="0 0 24 24" width="76" height="76"><path d="M1.5 12S5.5 4.8 12 4.8 22.5 12 22.5 12 18.5 19.2 12 19.2 1.5 12 1.5 12Z" fill="none" stroke="#1B1A18" stroke-width="1.8" stroke-linejoin="round"/><circle id="f06-iris" cx="12" cy="12" r="3.8" fill="#1B1A18"/><circle cx="13.3" cy="10.8" r="1.1" fill="#fff"/></svg></div>
+
+          <!-- station Biznis : vitrine HTML -->
+          <div id="f06-biz" class="f06-st lv-glass" style="opacity:0;">
+            <div id="f06-roof"></div>
+            <div id="f06-wall">
+              <div id="f06-win">
+                <div class="f06-shelf" style="top:32px"></div><div class="f06-shelf" style="top:58px"></div>
+                <div class="f06-goods" style="left:14px; top:14px; height:18px;"></div><div class="f06-goods" style="left:34px; top:20px; height:12px; background:#B9B3A9;"></div>
+                <div class="f06-goods" style="left:52px; top:40px; height:18px;"></div><div class="f06-goods" style="left:20px; top:44px; height:14px; background:#B9B3A9;"></div>
+              </div>
+              <div id="f06-door"><div id="f06-knob"></div></div>
+            </div>
+            <div id="f06-awn"><div class="f06-stp a"></div><div class="f06-stp b"></div><div class="f06-stp a"></div><div class="f06-stp b"></div><div class="f06-stp a"></div><div class="f06-stp b"></div></div>
+            <div class="f06-stt">Biznis</div>
+          </div>
+
+          <!-- station Pwodwi : boîte carton + étiquette -->
+          <div id="f06-pwo" class="f06-st lv-glass" style="opacity:0;">
+            <div id="f06-prod"><div id="f06-cap"></div><div id="f06-plab"></div></div>
+            <div id="f06-fl" class="f06-flap"></div><div id="f06-fr" class="f06-flap"></div>
+            <div id="f06-box">
+              <div id="f06-tape"></div>
+              <div id="f06-tag">
+                <div class="f06-tbar" style="top:12px; width:60px;"></div><div class="f06-tbar" style="top:24px; width:40px; opacity:.6;"></div>
+                <div class="f06-bc" style="left:62px"></div><div class="f06-bc" style="left:68px; width:2px;"></div><div class="f06-bc" style="left:73px"></div><div class="f06-bc" style="left:79px; width:2px;"></div><div class="f06-bc" style="left:84px"></div>
+              </div>
+            </div>
+            <div class="f06-stt">Pwodwi</div>
+          </div>
+
+          <!-- la carte 9:16 « Piblisite pwofesyonèl » -->
+          <div id="f06-card" class="lv-glass" style="opacity:0;">
+            <div id="f06-av">L</div>
+            <div id="f06-nm">Levye Dijital</div>
+            <div id="f06-nl">Piblisite</div>
+            <div id="f06-media" style="opacity:0;">
+              <div id="f06-msun"></div><div id="f06-mhill"></div><div id="f06-mhill2"></div>
+              <div id="f06-mprod"><div id="f06-mcap"></div></div>
+              <div id="f06-sheen"></div>
+            </div>
+            <div id="f06-tt1" class="f06-ttl" style="top:536px; opacity:0;">Piblisite</div>
+            <div id="f06-tt2" class="f06-ttl" style="top:592px; opacity:0;">pwofesyonèl</div>
+            <div id="f06-cta" style="opacity:0;"><svg viewBox="0 0 24 24" width="34" height="34"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div id="f06-ring" style="opacity:0;"></div>
+            <div id="f06-chk" style="opacity:0;"><svg viewBox="0 0 24 24" width="44" height="44"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+
+        <!-- tuile de premier plan, floue, coupée par le bord -->
+        <div id="f06-tfg" class="lv-tile" style="left:-70px; top:1130px; width:210px; height:210px; border-radius:50px; opacity:0; filter:blur(9px);">
+          <svg viewBox="0 0 24 24" width="104" height="104"><path d="M5.5 8h13l-1.2 12.5H6.7z" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linejoin="round"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linecap="round"/></svg></div>
+      </div>
+    </div>
+
+    <div id="f06-text" class="clip" data-start="0" data-duration="6.10" data-track-index="2">
+      <div id="f06-s1" class="lv-sub"></div>
+      <div id="f06-s2" class="lv-sub"></div>
+      <div id="f06-s3" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f06-grainc" class="clip" data-start="0" data-duration="6.10" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "06-biznis-pwodwi", T = 6.10;
+      var $ = function (id) { return document.getElementById(id); };
+      var Q = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+      /* règle : un tick tous les 60 px, un long tous les 240 px (comme la frame 5) */
+      var ru = $("f06-ruler"), i, y, d;
+      for (i = 0, y = 760; y < 4020; y += 60, i++) {
+        d = document.createElement("div"); d.className = "f06-tick" + (i % 4 === 0 ? " big" : "");
+        d.style.cssText = "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px";
+        ru.appendChild(d);
+      }
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f06-s1"), [["Ou", 0.09], ["ka", 0.27], ["remake", 0.45], ["sa:", 0.79]]);
+      var S2 = sub($("f06-s2"), [["si", 1.30], ["w", 1.45], ["ta", 1.56], ["gen", 1.71], ["yon", 1.90], ["biznis,", 2.09, "box"], ["oubyen", 2.43], ["yon", 2.96], ["pwodwi,", 3.14]]);
+      var S3 = sub($("f06-s3"), [["ou", 3.52], ["ta", 3.67], ["renmen", 3.98], ["fè", 4.28], ["bèl", 4.43], ["piblisite", 4.62], ["ki", 5.05], ["pwofesyonèl,", 5.23]]);
+      /* 2 lignes de ≈ 26 caractères */
+      $("f06-s2").insertBefore(document.createElement("br"), S2[6].el);
+      $("f06-s3").insertBefore(document.createElement("br"), S3[5].el);
+
+      var tl = gsap.timeline({ paused: true });
+      /* caméra monde : amène le point (X, Y) au centre de scène (540, 760) à l'échelle s */
+      function C(X, Y, s, b) { return { x: 540 - X * s, y: 760 - Y * s, scale: s, filter: "blur(" + b + "px)" }; }
+
+      /* --- caméra : dérive permanente (reprend la frame 5 : y -26, ×1.03) --- */
+      tl.fromTo("#f06-cam", { y: -26, scale: 1.03 }, { y: -10, scale: 1.015, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f06-floorw", { y: 70 }, { y: 40, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f06-giant0", { x: -110, opacity: 1 }, { x: -150, opacity: 0, duration: 0.8, ease: "power1.in" }, 0);
+      tl.fromTo("#f06-giant", { x: 40, opacity: 0 }, { x: -60, opacity: 1, duration: T, ease: "none" }, 0.3);
+      /* fin de la descente (handoff_in : cam(540, 2700, 0.9), flou 8) puis dérive de la bande (+12 px/s) */
+      tl.fromTo("#f06-world", C(540, 2700, 0.9, 8), Object.assign(C(540, 2985, 1, 0), { duration: 0.55, ease: "power2.out" }), 0);
+      tl.to("#f06-world", Object.assign(C(540, 3050, 1, 0), { duration: T - 0.55, ease: "none" }), 0.55);
+      tl.fromTo("#f06-band", { opacity: 1 }, { opacity: 0.6, duration: 0.6, ease: "power1.out" }, 1.7);
+
+      /* --- 0.45 « remake » : un petit œil s'imprime sur la règle --- */
+      tl.fromTo("#f06-eye", { opacity: 0, scale: 1.6, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 0.43);
+      tl.fromTo("#f06-eyes", { scaleY: 1 }, { scaleY: 0.12, duration: 0.06, ease: "power2.in", yoyo: true, repeat: 1, transformOrigin: "50% 50%" }, 0.80);
+      tl.fromTo("#f06-iris", { x: 0 }, { x: 3, duration: 0.2, ease: "expo.out" }, 1.30);
+      tl.to("#f06-eye", { opacity: 0, y: -30, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 1.72);
+
+      /* tuile de profondeur arrière : vie finie */
+      tl.fromTo("#f06-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 0.62);
+      tl.to("#f06-t1", { y: -16, rotation: -4, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0.8);
+      tl.to("#f06-t1", { y: -24, rotation: 3, duration: 2.5, ease: "none" }, 3.6);
+
+      /* --- 1.80 cran caméra sur Biznis ; 1.90 la vitrine tombe (signature 1) --- */
+      tl.to("#f06-pan", { x: 80, duration: 0.4, ease: "expo.inOut" }, 1.70);
+      tl.fromTo("#f06-biz", { opacity: 0, scale: 1.9, filter: "blur(8px)" }, { opacity: 1, scale: 1.18, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.90);
+      tl.to("#f06-biz", { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 2.06);
+      /* 2.09 « biznis, » : le store rayé se déroule, la porte s'ouvre */
+      Q(".f06-stp").forEach(function (s, k) {
+        tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: 0.18, ease: "expo.out" }, 2.07 + k * 0.025);
+      });
+      tl.fromTo("#f06-door", { scaleX: 1 }, { scaleX: 0.55, duration: 0.18, ease: "power2.out" }, 2.24);
+      tl.to("#f06-door", { scaleX: 1, duration: 0.3, ease: "power2.inOut" }, 2.62);
+      /* 2.43 « oubyen » : la vitrine passe à l'encre (l'actif change) */
+      Q(".f06-stp.a").forEach(function (s) { tl.to(s, { backgroundColor: "#B9B3A9", duration: 0.3, ease: "power1.out" }, 2.43); });
+      Q(".f06-stp.b").forEach(function (s) { tl.to(s, { backgroundColor: "#EDE9E2", duration: 0.3, ease: "power1.out" }, 2.43); });
+
+      /* --- 2.90 cran sur Pwodwi ; 2.96 la boîte tombe --- */
+      tl.to("#f06-pan", { x: -80, duration: 0.4, ease: "expo.inOut" }, 2.70);
+      tl.fromTo("#f06-pwo", { opacity: 0, scale: 1.9, filter: "blur(8px)" }, { opacity: 1, scale: 1.18, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.96);
+      tl.to("#f06-pwo", { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 3.12);
+      /* 3.14 « pwodwi, » : les rabats s'ouvrent, le produit sort */
+      tl.fromTo("#f06-fl", { rotation: 0 }, { rotation: -38, duration: 0.2, ease: "expo.out" }, 3.14);
+      tl.fromTo("#f06-fr", { rotation: 0 }, { rotation: 38, duration: 0.2, ease: "expo.out" }, 3.16);
+      tl.fromTo("#f06-prod", { y: 70 }, { y: 0, duration: 0.24, ease: "back.out(2)" }, 3.20);
+      tl.fromTo("#f06-tag", { scale: 1.3, rotation: -6 }, { scale: 1, rotation: 0, duration: 0.16, ease: "expo.out" }, 3.24);
+      /* 3.52 « ou » : le ruban passe à l'encre */
+      tl.to("#f06-tape", { backgroundColor: "#8C877F", duration: 0.3, ease: "power1.out" }, 3.52);
+
+      /* --- 3.98 « renmen » : les deux stations se soulèvent, la tuile avant glisse --- */
+      tl.to(["#f06-biz", "#f06-pwo"], { y: -12, duration: 0.2, ease: "power2.out", yoyo: true, repeat: 1 }, 3.98);
+      tl.fromTo("#f06-tfg", { opacity: 0, x: -80 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 3.98);
+      tl.to("#f06-tfg", { y: -20, rotation: 3, duration: T - 4.28, ease: "none" }, 4.28);
+
+      /* --- 4.40 recentrage : les stations s'écartent et passent au second plan --- */
+      tl.to("#f06-pan", { x: 0, duration: 0.4, ease: "expo.inOut" }, 4.30);
+      tl.to(["#f06-biz", "#f06-pwo"], { scale: 1, filter: "blur(1.5px)", duration: 0.4, ease: "power2.out" }, 4.40);
+
+      /* --- 4.43 « bèl » : la carte 9:16 arrive trop grande et floue --- */
+      tl.fromTo("#f06-card", { opacity: 0, scale: 1.8, filter: "blur(14px)" }, { opacity: 1, scale: 1.22, filter: "blur(5px)", duration: 0.16, ease: "expo.out" }, 4.43);
+      tl.to("#f06-card", { scale: 1.17, filter: "blur(4px)", duration: 0.64, ease: "none" }, 4.59);
+      /* 4.62 « piblisite » : l'image de la pub et le titre */
+      tl.fromTo("#f06-media", { opacity: 0, scaleY: 0.6 }, { opacity: 1, scaleY: 1, duration: 0.18, ease: "expo.out" }, 4.60);
+      tl.fromTo("#f06-tt1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 4.66);
+      tl.fromTo("#f06-cta", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 4.78);
+      tl.fromTo("#f06-mprod", { y: 40 }, { y: 0, duration: 0.3, ease: "expo.out" }, 4.66);
+      /* 5.05 « ki » */
+      tl.fromTo("#f06-tt2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 5.03);
+      /* 5.23 « pwofesyonèl, » : la carte se pose, coche */
+      tl.to("#f06-card", { scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.21);
+      tl.to("#f06-card", { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 5.37);
+      tl.fromTo("#f06-chk", { opacity: 0, scale: 2, rotation: -90, filter: "blur(6px)" }, { opacity: 1, scale: 1, rotation: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.23);
+      tl.fromTo("#f06-ring", { opacity: 1, scale: 1 }, { opacity: 0, scale: 2.2, duration: 0.45, ease: "expo.out" }, 5.27);
+      /* 5.55 reflet sur l'image (la pub « brille ») */
+      tl.fromTo("#f06-sheen", { x: 0, opacity: 0 }, { x: 560, opacity: 1, duration: 0.45, ease: "power1.inOut" }, 5.55);
+      tl.to("#f06-sheen", { opacity: 0, duration: 0.1, ease: "none" }, 5.92);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 1.15);
+      words(S2, 3.37);
+      words(S3, 5.90);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

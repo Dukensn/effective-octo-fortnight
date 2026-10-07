@@ -1,0 +1,370 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+
+    #f24-iris { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; clip-path: circle(1300px at 540px 972px); }
+    #f24-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f24-g1, #f24-g2 { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* carte + épingle de la frame 21, floues derrière (= frame 23) */
+    #f24-map { left: 60px; top: 220px; width: 960px; height: 1120px; overflow: hidden; opacity: .5; filter: blur(10px); }
+    .f24-road { position: absolute; height: 26px; border-radius: 13px; background: #E3DED6; }
+    #f24-pin { position: absolute; left: 700px; top: 300px; width: 44px; height: 44px; border-radius: 50%; background: #1B1A18; }
+    #f24-pinring { position: absolute; left: 676px; top: 276px; width: 80px; height: 80px; border-radius: 50%; border: 6px solid #D97757; box-sizing: border-box; }
+    /* grille des 30 places (état final de la frame 23 : reculée, floue) */
+    #f24-grid { left: 180px; top: 440px; width: 720px; height: 640px; transform-origin: 50% 50%; }
+    .f24-slot { position: absolute; width: 84px; height: 84px; border-radius: 22px; background: #EDE9E2; }
+    .f24-seat { position: absolute; width: 84px; height: 84px; border-radius: 22px; background: #1B1A18;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 10px 18px rgba(27,26,24,.18); }
+    /* bouton WhatsApp (cta-wa, repris de la frame 23) */
+    #f24-btn { position: absolute; left: 110px; top: 600px; width: 860px; height: 160px; border-radius: 80px; background: #15803D; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 26px;
+      box-shadow: 0 40px 70px rgba(37,140,80,.28), 0 8px 18px rgba(60,45,30,.10), inset 0 2px 0 rgba(255,255,255,.35); }
+    #f24-btn-tx { font: 700 46px "Inter"; letter-spacing: -0.4px; color: #FFFFFF; white-space: nowrap; }
+    #f24-sheen { position: absolute; left: 0; top: 0; width: 220px; height: 160px; transform: translateX(-300px) skewX(-18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.38), rgba(255,255,255,0)); }
+    /* numéro (état final de la frame 23) */
+    #f24-num { position: absolute; left: 0; width: 1080px; top: 810px; height: 144px; display: flex; justify-content: center;
+      font: 900 120px/1 "InterD"; font-variant-numeric: tabular-nums; color: #1B1A18; }
+    .f24-cell { position: relative; width: 82px; height: 144px; text-align: center; }
+    .f24-gap { width: 40px; }
+    .f24-sl { position: absolute; left: 8px; right: 8px; top: 134px; height: 8px; border-radius: 4px; background: #1B1A18; }
+    /* curseur + anneau du clic */
+    #f24-cur { position: absolute; left: 798px; top: 688px; width: 48px; height: 64px; transform-origin: 2px 2px; }
+    .f24-ring { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 6px solid #D97757; box-sizing: border-box; opacity: 0; }
+    /* carte formulaire (HTML) */
+    #f24-form { left: 190px; top: 420px; width: 700px; height: 600px; transform-origin: 350px 300px; }
+    #f24-flab { position: absolute; left: 48px; top: 44px; font: 600 26px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    #f24-fhr { position: absolute; left: 48px; right: 48px; top: 96px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+    .f24-field { position: absolute; left: 48px; width: 604px; }
+    .f24-flb { font: 600 30px/1 "Inter"; color: #5A554E; margin-bottom: 14px; }
+    .f24-in { position: relative; height: 92px; border-radius: 22px; background: #F7F5F1; border: 2px solid #E4DFD7; box-sizing: border-box;
+      font: 500 36px/88px "Inter"; color: #1B1A18; padding-left: 28px; }
+    .f24-foc { position: absolute; left: -2px; top: -2px; right: -2px; bottom: -2px; border-radius: 22px; border: 3px solid #1B1A18; box-sizing: border-box; opacity: 0; }
+    .f24-caret { display: inline-block; width: 3px; height: 40px; margin-left: 3px; vertical-align: -7px; background: #1B1A18; opacity: 0; }
+    #f24-send { position: absolute; left: 48px; top: 470px; width: 604px; height: 88px; border-radius: 44px; background: #1B1A18;
+      font: 700 38px/88px "Inter"; color: #FFFFFF; text-align: center; transform-origin: 50% 50%; }
+    /* pilule du lien (link-pill) */
+    #f24-pill { position: absolute; left: 120px; top: 1120px; width: 840px; height: 120px; border-radius: 60px; background: #FFFFFF;
+      display: flex; align-items: center; justify-content: center; gap: 22px; font: 700 44px/1 "Inter"; color: #1B1A18; white-space: nowrap;
+      box-shadow: 0 30px 56px rgba(60,45,30,.16), 0 0 0 1px rgba(27,26,24,.05), inset 0 1px 0 #fff; }
+    #f24-ucaret { display: inline-block; width: 4px; height: 50px; margin-left: 2px; vertical-align: -9px; background: #D97757; }
+    /* carte de fin */
+    #f24-end { left: 90px; top: 200px; width: 900px; height: 1180px; }
+    #f24-wm1, #f24-wm2 { position: absolute; left: 0; width: 900px; text-align: center; font: 900 150px/1 "InterD"; letter-spacing: -4px; }
+    #f24-wm1 { top: 50px; color: #1B1A18; }
+    #f24-wm2 { top: 196px; color: #D97757; }
+    .f24-info { position: absolute; left: 0; width: 900px; text-align: center; white-space: nowrap; }
+    .f24-i1 { font: 800 50px/1 "Inter"; letter-spacing: -0.8px; color: #1B1A18; }
+    .f24-i2 { font: 600 38px/1 "Inter"; color: #5A554E; }
+    #f24-hr2 { position: absolute; left: 330px; width: 240px; top: 528px; height: 3px; border-radius: 2px; background: #D9D4CC; transform-origin: 50% 50%; }
+    #f24-ebtn { position: absolute; left: 90px; top: 720px; width: 720px; height: 140px; border-radius: 70px; background: #15803D; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 24px;
+      box-shadow: 0 34px 60px rgba(37,140,80,.26), 0 8px 18px rgba(60,45,30,.10), inset 0 2px 0 rgba(255,255,255,.35); }
+    #f24-enum { font: 800 64px/1 "Inter"; letter-spacing: 1px; color: #1B1A18; white-space: nowrap; }
+    #f24-esheen { position: absolute; left: 0; top: 0; width: 200px; height: 140px; transform: translateX(-300px) skewX(-18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.38), rgba(255,255,255,0)); }
+    #f24-ering { position: absolute; left: 76px; top: 706px; width: 748px; height: 168px; border-radius: 84px; border: 6px solid #D97757; box-sizing: border-box; }
+    #f24-epill { position: absolute; left: 130px; top: 900px; width: 640px; height: 100px; border-radius: 50px; background: #FFFFFF;
+      display: flex; align-items: center; justify-content: center; gap: 18px; font: 700 40px/1 "Inter"; color: #1B1A18; white-space: nowrap;
+      box-shadow: 0 20px 40px rgba(60,45,30,.12), 0 0 0 2px rgba(27,26,24,.08); }
+    #f24-mini { position: absolute; left: 310px; top: 1040px; width: 280px; height: 130px; border-radius: 22px; background: #F8F6F2; overflow: hidden;
+      box-shadow: 0 14px 30px rgba(60,45,30,.12), 0 0 0 1px rgba(27,26,24,.05); }
+    .f24-ml { position: absolute; top: 16px; width: 40px; height: 98px; border-radius: 9px; background: #EDE9E2; overflow: hidden; }
+    .f24-mf { position: absolute; left: 0; top: 0; width: 40px; height: 98px; border-radius: 9px; transform-origin: 50% 0%; }
+    #f24-mph { position: absolute; left: 10px; top: 16px; width: 260px; height: 3px; border-radius: 2px; background: #D97757; }
+    /* trait de crête (sous-titre) */
+    .f24-pk { position: relative; display: inline-block; }
+    .f24-pk-s { position: absolute; left: -6px; width: calc(100% + 12px); bottom: -8px; height: 16px; clip-path: inset(0% 100% 0% 0%); }
+  </style>
+
+  <div id="root" data-composition-id="24-fomile-fen" data-width="1080" data-height="1920" data-duration="8.69">
+    <div id="f24-bg" class="clip" data-start="0" data-duration="8.69" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f24-floor" class="lv-floor"></div>
+        <div id="f24-giant" class="lv-giant" style="left:-60px; top:1080px;">LYEN</div>
+      </div>
+    </div>
+
+    <div id="f24-stage" class="clip" data-start="0" data-duration="8.69" data-track-index="1">
+      <div id="f24-iris">
+        <div id="f24-cam">
+          <!-- ===== Scène 1 : formulaire + lien ===== -->
+          <div id="f24-g1">
+            <div id="f24-map" class="lv-glass">
+              <div class="f24-road" style="left:-100px; top:360px; width:1200px; transform:rotate(-14deg);"></div>
+              <div class="f24-road" style="left:-100px; top:760px; width:1200px; transform:rotate(9deg);"></div>
+              <div class="f24-road" style="left:380px; top:-100px; width:1400px; transform:rotate(72deg); transform-origin:0 0;"></div>
+              <div id="f24-pinring"></div><div id="f24-pin"></div>
+            </div>
+            <div id="f24-grid" class="lv-glass">
+              <div id="f24-seats"></div>
+            </div>
+            <div id="f24-btn">
+              <div id="f24-sheen"></div>
+              <svg id="f24-logo" viewBox="0 0 24 24" width="84" height="84"><path id="f24-wa" fill="#FFFFFF" d=""/></svg>
+              <div id="f24-btn-tx">Kontakte nou sou WhatsApp</div>
+            </div>
+            <div id="f24-num"></div>
+
+            <div id="f24-form" class="lv-glass" style="opacity:0;">
+              <div id="f24-flab">Fòmilè enskripsyon</div>
+              <div id="f24-fhr"></div>
+              <div id="f24-f1" class="f24-field" style="top:130px; opacity:0;">
+                <div class="f24-flb">Non</div>
+                <div class="f24-in"><span id="f24-name"></span><span id="f24-c1" class="f24-caret"></span><div id="f24-foc1" class="f24-foc"></div></div>
+              </div>
+              <div id="f24-f2" class="f24-field" style="top:300px; opacity:0;">
+                <div class="f24-flb">Telefòn</div>
+                <div class="f24-in"><span id="f24-c2" class="f24-caret"></span><div id="f24-foc2" class="f24-foc"></div></div>
+              </div>
+              <div id="f24-send" style="opacity:0;">Voye</div>
+            </div>
+
+            <div id="f24-pill" style="opacity:0;">
+              <svg id="f24-globe" viewBox="0 0 24 24" width="56" height="56"><g fill="none" stroke="#1B1A18" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.7 3.9 5.9 3.9 9.5s-1.3 6.8-3.9 9.5M12 2.5C9.4 5.2 8.1 8.4 8.1 12s1.3 6.8 3.9 9.5"/></g></svg>
+              <span><span id="f24-url"></span><span id="f24-ucaret"></span></span>
+            </div>
+
+            <div id="f24-ring1" class="f24-ring" style="left:760px; top:1180px;"></div>
+            <svg id="f24-cur" viewBox="0 0 44 60"><path d="M2 2L2 50L14 38L22 56L30 52L22 35L39 35Z" fill="#1B1A18" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/></svg>
+          </div>
+
+          <!-- ===== Scène 2 : carte de fin ===== -->
+          <div id="f24-g2">
+            <div id="f24-end" class="lv-glass" style="opacity:0;">
+              <div id="f24-wm1" style="opacity:0;">LEVYE</div>
+              <div id="f24-wm2" style="opacity:0;">DIJITAL</div>
+              <div id="f24-d1" class="f24-info f24-i1" style="top:390px; opacity:0;">Samdi 17 &amp; 24 oktòb 2026</div>
+              <div id="f24-d2" class="f24-info f24-i2" style="top:454px; opacity:0;">10:00 AM – 4:00 PM</div>
+              <div id="f24-hr2" style="opacity:0;"></div>
+              <div id="f24-v1" class="f24-info f24-i1" style="top:556px; opacity:0;">Sassou's Lamadone Club</div>
+              <div id="f24-v2" class="f24-info f24-i2" style="top:618px; opacity:0;">anfas Plas Anacaona</div>
+              <div id="f24-ering" style="opacity:0;"></div>
+              <div id="f24-ebtn" style="opacity:0;">
+                <div id="f24-esheen"></div>
+                <svg viewBox="0 0 24 24" width="76" height="76"><path id="f24-wa2" fill="#FFFFFF" d=""/></svg>
+                <div id="f24-enum">31 43 3938</div>
+              </div>
+              <div id="f24-epill" style="opacity:0;">
+                <svg viewBox="0 0 24 24" width="48" height="48"><g fill="none" stroke="#1B1A18" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.7 3.9 5.9 3.9 9.5s-1.3 6.8-3.9 9.5M12 2.5C9.4 5.2 8.1 8.4 8.1 12s1.3 6.8 3.9 9.5"/></g></svg>
+                levyedijital.vercel.app
+              </div>
+              <div id="f24-mini" style="opacity:0;">
+                <div class="f24-ml" style="left:20px;"><div class="f24-mf" style="background:#1B1A18;"></div></div>
+                <div class="f24-ml" style="left:72px;"><div class="f24-mf" style="background:#5A554E;"></div></div>
+                <div class="f24-ml" style="left:124px;"><div class="f24-mf" style="background:#8C877F;"></div></div>
+                <div class="f24-ml" style="left:176px;"><div class="f24-mf" style="background:#B9B3A9;"></div></div>
+                <div class="f24-ml" style="left:228px;"><div class="f24-mf" style="background:#5A554E;"></div></div>
+                <div id="f24-mph" style="opacity:0;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f24-text" class="clip" data-start="0" data-duration="8.69" data-track-index="2">
+      <div id="f24-s1" class="lv-sub"></div>
+      <div id="f24-s2" class="lv-sub"></div>
+      <div id="f24-wmk" class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f24-grainc" class="clip" data-start="0" data-duration="8.69" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "24-fomile-fen", T = 8.69;
+      var $ = function (id) { return document.getElementById(id); };
+      /* logo WhatsApp officiel (assets/icons/whatsapp.svg, Simple Icons CC0) */
+      var WA = "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z";
+      $("f24-wa").setAttribute("d", WA);
+      $("f24-wa2").setAttribute("d", WA);
+
+      /* la grille 6 x 5 (état final de la frame 23 : la place du coin s'est envolée) */
+      var host = $("f24-seats");
+      for (var r = 0; r < 5; r++) for (var c = 0; c < 6; c++) {
+        var x = 53 + c * 106, y = 110 + r * 106;
+        var sl = document.createElement("div"); sl.className = "f24-slot"; sl.style.left = x + "px"; sl.style.top = y + "px"; host.appendChild(sl);
+        if (r === 0 && c === 5) continue;
+        var st = document.createElement("div"); st.className = "f24-seat"; st.style.left = x + "px"; st.style.top = y + "px"; host.appendChild(st);
+      }
+      /* le numéro imprimé (état final de la frame 23) */
+      "31 43 3938".split("").forEach(function (ch) {
+        var cell = document.createElement("div");
+        if (ch === " ") { cell.className = "f24-gap"; $("f24-num").appendChild(cell); return; }
+        cell.className = "f24-cell"; cell.textContent = ch;
+        var u = document.createElement("div"); u.className = "f24-sl"; cell.appendChild(u);
+        $("f24-num").appendChild(cell);
+      });
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) ; "peak" = trait de crête accent */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else if (w[2] === "peak") sp.innerHTML = '<span class="f24-pk">' + w[0] + '<svg class="f24-pk-s" viewBox="0 0 100 16" preserveAspectRatio="none"><path d="M1 10.5 C 30 9.5 60 6.5 97 3 C 99.5 3.2 99.5 6.8 97.5 7.6 C 62 11.5 30 13.5 1 12.5 C 0 12 0 11 1 10.5 Z" fill="#D97757"/></svg></span>';
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box", peak: w[2] === "peak" });
+        });
+        return out;
+      }
+      function brk(list, i) { list[i].el.parentNode.insertBefore(document.createElement("br"), list[i].el); }
+      var S1 = sub($("f24-s1"), [["Ou", 0.13], ["ka", 0.42], ["ranpli", 0.60], ["fòmilè", 0.94, "box"], ["enskripsyon", 1.33], ["an", 1.97], ["tou,", 2.14]]);
+      brk(S1, 4);
+      var S2 = sub($("f24-s2"), [["lè", 2.40], ["w", 2.60], ["ale", 2.73], ["sou", 2.94], ["levyedijital.vercel.app", 3.18, "peak"]]);
+      brk(S2, 4);
+
+      /* état de départ = dernière image de la frame 23 */
+      gsap.set("#f24-grid", { y: -250, scale: 0.72, opacity: 0.4, filter: "blur(8px)" });
+      gsap.set("#f24-map", { x: 24 });
+      gsap.set("#f24-cur", { x: 176, y: 104 });
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : dérive permanente (poussée lente), recul à l'assemblage de la carte de fin, dérive jusqu'à l'iris --- */
+      tl.fromTo("#f24-cam", { y: 0, scale: 1 }, { y: -28, scale: 1.03, duration: 4.40, ease: "none" }, 0);
+      tl.to("#f24-cam", { y: 0, scale: 0.98, duration: 0.5, ease: "expo.inOut" }, 4.40);
+      tl.to("#f24-cam", { y: -24, scale: 1.02, duration: 3.79, ease: "none" }, 4.90);
+      tl.fromTo("#f24-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 240px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f24-giant", { x: 0 }, { x: -150, duration: T, ease: "none" }, 0);
+      tl.to("#f24-map", { x: 44, duration: 4.4, ease: "none" }, 0);
+
+      /* --- 0.13 « Ou » : les emplacements du numéro s'effacent, le curseur se décale --- */
+      tl.to(".f24-sl", { opacity: 0, scaleX: 0, duration: 0.2, ease: "power2.in", stagger: 0.02 }, 0.13);
+      tl.to("#f24-cur", { x: 150, y: 120, duration: 0.3, ease: "power2.out" }, 0.18);
+      /* --- 0.60 « ranpli » : le bouton monte et se range en haut, numéro et grille s'effacent --- */
+      tl.to("#f24-btn", { y: -380, scale: 0.7, duration: 0.40, ease: "expo.inOut" }, 0.56);
+      tl.to("#f24-cur", { y: -270, duration: 0.40, ease: "expo.inOut" }, 0.56);
+      tl.to("#f24-num", { y: -120, opacity: 0, filter: "blur(8px)", duration: 0.28, ease: "power2.in" }, 0.56);
+      tl.to("#f24-grid", { y: -420, opacity: 0, duration: 0.36, ease: "power2.in" }, 0.56);
+
+      /* --- 0.94 « fòmilè » : la carte formulaire arrive trop grande et floue, se pose --- */
+      tl.fromTo("#f24-form", { opacity: 0, scale: 1.3, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 0.92);
+      tl.fromTo("#f24-form", { y: 0 }, { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.08);
+      tl.fromTo("#f24-fhr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 1.00);
+      /* --- 1.33 « enskripsyon » : les champs se posent en cascade --- */
+      tl.fromTo("#f24-f1", { opacity: 0, y: 24, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 1.31);
+      tl.fromTo("#f24-f2", { opacity: 0, y: 24, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 1.39);
+      tl.fromTo("#f24-send", { opacity: 0, y: 24, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 1.47);
+      /* 1.55 → 1.90 le champ « Non » se remplit */
+      tl.fromTo("#f24-foc1", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 1.55);
+      tl.fromTo("#f24-c1", { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "none" }, 1.55);
+      var NAME = "Mari", nm = { n: 0 };
+      tl.fromTo(nm, { n: 0 }, { n: NAME.length, duration: 0.30, ease: "none", onUpdate: function () { $("f24-name").textContent = NAME.slice(0, Math.round(nm.n)); } }, 1.60);
+      /* --- 1.97 « an » : le focus passe sur « Telefòn » --- */
+      tl.to(["#f24-foc1", "#f24-c1"], { opacity: 0, duration: 0.06, ease: "none" }, 1.95);
+      tl.fromTo("#f24-foc2", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 1.97);
+      tl.fromTo("#f24-c2", { opacity: 0 }, { opacity: 1, duration: 0.06, ease: "none", yoyo: true, repeat: 3, repeatDelay: 0.1 }, 2.00);
+      /* --- 2.14 « tou » : le bouton « Voye » répond --- */
+      tl.to("#f24-send", { scale: 1.05, duration: 0.10, ease: "power2.out", yoyo: true, repeat: 1 }, 2.14);
+      /* --- 2.40 « lè » : la carte remonte pour laisser la place au lien --- */
+      tl.to("#f24-form", { y: -50, scale: 0.96, duration: 0.30, ease: "expo.inOut" }, 2.38);
+      tl.to("#f24-btn", { y: -400, duration: 0.3, ease: "expo.inOut" }, 2.38);
+      tl.to("#f24-cur", { x: 120, y: -230, duration: 0.3, ease: "power2.out" }, 2.42);
+
+      /* --- 2.73 « ale » : la pilule du lien arrive --- */
+      tl.fromTo("#f24-pill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.71);
+      tl.fromTo("#f24-globe", { rotation: -90 }, { rotation: 0, duration: 0.5, ease: "expo.out" }, 2.71);
+      tl.fromTo("#f24-ucaret", { opacity: 1 }, { opacity: 0, duration: 0.06, ease: "none", yoyo: true, repeat: 3, repeatDelay: 0.08 }, 2.86);
+      /* --- 3.18 → 4.08 l'URL se tape --- */
+      var URL = "levyedijital.vercel.app", ty = { n: 0 };
+      tl.fromTo(ty, { n: 0 }, { n: URL.length, duration: 0.90, ease: "none", onUpdate: function () { $("f24-url").textContent = URL.slice(0, Math.round(ty.n)); } }, 3.18);
+      /* --- 3.50 → 4.00 le curseur arrive en UNE courbe et clique la pilule --- */
+      tl.to("#f24-cur", { x: -38, duration: 0.45, ease: "power3.out" }, 3.50);
+      tl.to("#f24-cur", { y: 492, duration: 0.45, ease: "power2.inOut" }, 3.50);
+      tl.to("#f24-cur", { scale: 0.85, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.00);
+      tl.to("#f24-pill", { scale: 0.96, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.00);
+      tl.fromTo("#f24-ring1", { opacity: 1, scale: 0.3 }, { opacity: 0, scale: 2.6, duration: 0.5, ease: "expo.out" }, 4.02);
+      tl.to("#f24-ucaret", { opacity: 0, duration: 0.06, ease: "none" }, 4.10);
+
+      /* ===== 4.40 → 4.90 tout le film se ramasse (implosion) ===== */
+      tl.to("#f24-g1", { scale: 0.18, opacity: 0, filter: "blur(12px)", duration: 0.50, ease: "power3.in" }, 4.40);
+
+      /* ===== 4.85 → 5.20 la carte de fin s'assemble en cascade ===== */
+      tl.fromTo("#f24-end", { opacity: 0, scale: 1.2, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 4.84);
+      tl.fromTo("#f24-wm1", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.88);
+      tl.fromTo("#f24-wm2", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.94);
+      ["#f24-d1", "#f24-d2", "#f24-v1", "#f24-v2"].forEach(function (id, i) {
+        tl.fromTo(id, { opacity: 0, y: 22, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 5.00 + i * 0.04);
+      });
+      tl.fromTo("#f24-hr2", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.2, ease: "expo.out" }, 5.04);
+      tl.fromTo("#f24-ebtn", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.10);
+      tl.fromTo("#f24-epill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.16);
+      /* --- 5.20 la miniature des 5 pistes, toutes pleines (rime du début) --- */
+      tl.fromTo("#f24-mini", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.20);
+      document.querySelectorAll(".f24-mf").forEach(function (f, i) {
+        tl.fromTo(f, { scaleY: 0 }, { scaleY: 1, duration: 0.24, ease: "expo.out" }, 5.26 + i * 0.05);
+      });
+
+      /* ===== 5.60 → 7.90 tenue vivante ===== */
+      /* l'anneau du bouton respire (vie finie) */
+      tl.fromTo("#f24-ering", { opacity: 0, scale: 0.98 }, { opacity: 0.9, scale: 1, duration: 0.2, ease: "expo.out" }, 5.56);
+      tl.to("#f24-ering", { opacity: 0.25, scale: 1.05, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: 3 }, 5.76);
+      /* reflets sur le bouton, la tête de lecture parcourt la miniature, le globe tourne */
+      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut" }, 6.05);
+      tl.fromTo("#f24-mph", { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.1, ease: "none" }, 6.45);
+      tl.to("#f24-mph", { y: 95, duration: 1.0, ease: "none" }, 6.55);
+      tl.to("#f24-epill", { scale: 1.04, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 6.95);
+      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 7.25);
+      tl.to("#f24-ebtn", { scale: 1.03, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 7.62);
+
+      /* ===== 7.90 → 8.69 iris vers le bouton WhatsApp, puis papier nu ===== */
+      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 972px)" }, { clipPath: "circle(0px at 540px 972px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 7.90);
+      tl.to(["#f24-floor", "#f24-giant", "#f24-wmk"], { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 8.10);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+          if (w.peak) tl.fromTo(w.el.querySelector(".f24-pk-s"), { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.35, ease: "power2.out" }, w.t);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 2.25);
+      words(S2, 4.40);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

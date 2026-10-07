@@ -1,0 +1,248 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+    #f11-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* bande du programme (règle MODIL, tête de lecture, ouverture de station : style de la frame 14) */
+    .f11-rail { position: absolute; left: 70px; top: -600px; width: 3px; height: 3200px; background: rgba(27,26,24,.13); }
+    .f11-ticks { position: absolute; left: 58px; top: -600px; width: 27px; height: 3200px;
+      background: repeating-linear-gradient(to bottom, rgba(27,26,24,.16) 0 2px, transparent 2px 80px); }
+    .f11-mod { position: absolute; left: 120px; display: flex; align-items: center; gap: 16px; font: 700 30px "Inter"; letter-spacing: 6px; color: #1B1A18; }
+    .f11-mdot { width: 14px; height: 14px; border-radius: 50%; background: #D97757; display: inline-block; }
+    .f11-ph { position: absolute; left: 60px; width: 60px; height: 24px; }
+    .f11-ph-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: #D97757; box-shadow: 0 0 0 6px rgba(217,119,87,.18); }
+    .f11-ph-ln { position: absolute; left: 24px; top: 11px; width: 36px; height: 2px; background: #D97757; }
+    .f11-open { position: absolute; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 12px rgba(217,119,87,.5); }
+
+    /* la marque de la frame 10 qui remonte hors du cadre (handoff_in) */
+    #f11-brand { position: absolute; left: 0; top: 150px; width: 1080px; text-align: center; font: 900 150px/0.95 "InterD"; letter-spacing: -4px; color: #1B1A18; }
+    #f11-brand span { color: #D97757; }
+
+    /* station MODIL 1 */
+    #f11-card { left: 120px; top: 270px; width: 880px; height: 1110px; opacity: 0; clip-path: inset(555px 0px 555px 0px); }
+    #f11-big { position: absolute; left: 50px; top: 40px; font: 900 220px/1 "InterD"; letter-spacing: -6px; color: #1B1A18; white-space: nowrap; }
+    #f11-fm { position: absolute; left: 60px; top: 284px; font: 600 30px/1 "Inter"; letter-spacing: 4px; color: #77726B; }
+    #f11-pills { position: absolute; left: 56px; top: 336px; width: 600px; height: 70px; }
+    .f11-pill { position: absolute; top: 0; height: 68px; padding: 0 34px; border-radius: 34px; font: 700 34px/68px "Inter"; white-space: nowrap; box-sizing: border-box; }
+    #f11-pt { left: 0; background: #FFFFFF; border: 2px solid #D9D4CC; color: #1B1A18; line-height: 64px; }
+    #f11-pp { left: 216px; background: #1B1A18; color: #FFFFFF; box-shadow: 0 14px 30px rgba(27,26,24,.18); }
+    #f11-hr { position: absolute; left: 56px; right: 56px; top: 446px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+    #f11-slot { position: absolute; left: 56px; top: 480px; width: 124px; height: 124px; border-radius: 30px; border: 3px dashed #D9D4CC; box-sizing: border-box; }
+    #f11-fbt { position: absolute; left: 56px; top: 480px; width: 124px; height: 124px; border-radius: 30px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 22px 44px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    #f11-fbtt { position: absolute; left: 210px; top: 514px; font: 800 58px/1 "Inter"; letter-spacing: -1px; color: #1B1A18; white-space: nowrap; }
+
+    /* carte Ads Manager (HTML, sans chiffre) */
+    #f11-ads { position: absolute; left: 56px; top: 640px; width: 768px; height: 420px; border-radius: 30px; background: #F7F5F1;
+      border: 1px solid rgba(27,26,24,.07); box-sizing: border-box; box-shadow: 0 18px 40px rgba(60,45,30,.08);
+      clip-path: inset(205px 0px 205px 0px round 30px); opacity: 0; }
+    #f11-ah { position: absolute; left: 34px; top: 26px; display: flex; align-items: center; gap: 14px; font: 700 32px/1 "Inter"; color: #1B1A18; white-space: nowrap; }
+    #f11-ahr { position: absolute; left: 34px; right: 34px; top: 92px; height: 1px; background: rgba(27,26,24,.09); transform-origin: 0 50%; }
+    .f11-row { position: absolute; left: 0; width: 768px; height: 52px; }
+    .f11-lab { position: absolute; left: 34px; top: 0; font: 600 30px/52px "Inter"; color: #5A554E; }
+    .f11-fld { position: absolute; left: 210px; top: 0; width: 380px; height: 52px; border-radius: 14px; background: #EFEBE5; }
+    .f11-bar { position: absolute; left: 20px; top: 20px; height: 12px; border-radius: 6px; background: #D9D4CC; }
+    #f11-tg { position: absolute; left: 650px; top: 4px; width: 80px; height: 44px; border-radius: 22px; background: #1B1A18; }
+    #f11-knob { position: absolute; left: 41px; top: 5px; width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; }
+    #f11-chw { position: absolute; left: 34px; top: 262px; width: 698px; height: 130px; clip-path: inset(0px 698px 0px 0px); }
+    #f11-end { position: absolute; left: 708px; top: 266px; width: 24px; height: 24px; border-radius: 50%; background: #D97757;
+      box-shadow: 0 0 0 7px rgba(217,119,87,.20); opacity: 0; }
+  </style>
+
+  <div id="root" data-composition-id="11-facebook-ads" data-width="1080" data-height="1920" data-duration="3.80">
+    <div id="f11-bg" class="clip" data-start="0" data-duration="3.80" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f11-floor" class="lv-floor"></div>
+        <div id="f11-giant" class="lv-giant" style="left:-60px; top:1080px;">ADS</div>
+      </div>
+    </div>
+
+    <div id="f11-stage" class="clip" data-start="0" data-duration="3.80" data-track-index="1">
+      <div id="f11-cam">
+        <div class="f11-rail"></div><div class="f11-ticks"></div>
+        <div id="f11-brand">LEVYE<br><span>DIJITAL</span></div>
+        <div id="f11-mod" class="f11-mod" style="top:200px; opacity:0;"><span class="f11-mdot"></span>MODIL 1</div>
+        <div id="f11-ph" class="f11-ph" style="top:813px;"><div class="f11-ph-dot"></div><div class="f11-ph-ln"></div></div>
+
+        <div id="f11-card" class="lv-glass">
+          <div id="f11-big" style="opacity:0;">2 JOU</div>
+          <div id="f11-fm" style="opacity:0;">FÒMASYON</div>
+          <div id="f11-pills">
+            <div id="f11-pt" class="f11-pill" style="opacity:0;">Teyori</div>
+            <div id="f11-pp" class="f11-pill" style="opacity:0;">Pratik</div>
+          </div>
+          <div id="f11-hr" style="transform:scaleX(0);"></div>
+          <div id="f11-slot" style="opacity:0;"></div>
+          <div id="f11-fbt" style="opacity:0;"><svg viewBox="0 0 24 24" width="74" height="74"><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg></div>
+          <div id="f11-fbtt" style="opacity:0;">Facebook Ads</div>
+
+          <div id="f11-ads">
+            <div id="f11-ah" style="opacity:0;"><svg viewBox="0 0 24 24" width="38" height="38"><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Ads Manager</div>
+            <div id="f11-ahr" style="transform:scaleX(0);"></div>
+            <div id="f11-r1" class="f11-row" style="top:112px; opacity:0;">
+              <div class="f11-lab">Kanpay</div>
+              <div class="f11-fld"><div class="f11-bar" style="width:220px;"></div></div>
+              <div id="f11-tg"><div id="f11-knob"></div></div>
+            </div>
+            <div id="f11-r2" class="f11-row" style="top:184px; opacity:0;">
+              <div class="f11-lab">Bidjè</div>
+              <div class="f11-fld"><div class="f11-bar" style="width:150px;"></div></div>
+            </div>
+            <div id="f11-chw">
+              <svg viewBox="0 0 698 130" width="698" height="130">
+                <path d="M0 30H698M0 65H698M0 100H698" stroke="rgba(27,26,24,.07)" stroke-width="2" fill="none"/>
+                <path d="M0 118 L78 104 L156 110 L234 88 L312 92 L390 70 L468 62 L546 46 L624 34 L686 16 L686 130 L0 130 Z" fill="rgba(27,26,24,.05)"/>
+                <path d="M0 118 L78 104 L156 110 L234 88 L312 92 L390 70 L468 62 L546 46 L624 34 L686 16" stroke="#1B1A18" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div id="f11-end"></div>
+          </div>
+        </div>
+        <div id="f11-open" class="f11-open" style="left:120px; top:824px; width:880px;"></div>
+      </div>
+    </div>
+
+    <div id="f11-text" class="clip" data-start="0" data-duration="3.80" data-track-index="2">
+      <div id="f11-s1" class="lv-sub"></div>
+      <div id="f11-s2" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f11-grainc" class="clip" data-start="0" data-duration="3.80" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "11-facebook-ads", T = 3.80;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* sous-titres mot à mot (sub()/words() du pilote ; "group" = une boîte sur plusieurs mots, chacun sur son repère) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          if (w[2] === "group") {
+            var bx = document.createElement("span"); bx.className = "lv-box";
+            bx.innerHTML = '<span class="lv-box-bg"></span><span class="lv-box-tx"></span>';
+            var tx = bx.querySelector(".lv-box-tx");
+            w[0].forEach(function (g, j) {
+              var gs = document.createElement("span"); gs.className = "lv-sw"; gs.textContent = g[0];
+              tx.appendChild(gs); if (j < w[0].length - 1) tx.appendChild(document.createTextNode(" "));
+              out.push({ el: gs, t: g[1], bg: j === 0 ? bx.querySelector(".lv-box-bg") : null });
+            });
+            host.appendChild(bx);
+          } else {
+            var sp = document.createElement("span"); sp.className = "lv-sw";
+            if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+            else sp.textContent = w[0];
+            host.appendChild(sp);
+            out.push({ el: sp, t: w[1], box: w[2] === "box" });
+          }
+          if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+        });
+        return out;
+      }
+
+      var tl = gsap.timeline({ paused: true });
+      var IN = { opacity: 0, scale: 1.4, filter: "blur(8px)" };
+      function SET(o) { var s = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }; for (var k in o) s[k] = o[k]; return s; }
+
+      /* --- caméra : arrive en descente floue (handoff_in), se pose, puis dérive --- */
+      tl.fromTo("#f11-cam", { y: 100, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.out" }, 0);
+      tl.to("#f11-cam", { y: -30, scale: 1.03, duration: T - 0.42, ease: "none" }, 0.42);
+      tl.fromTo("#f11-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f11-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
+      /* la marque (frame 10) remonte hors du cadre */
+      tl.fromTo("#f11-brand", { y: 0, opacity: 1 }, { y: -420, opacity: 0, duration: 0.5, ease: "power2.out" }, 0);
+
+      /* --- 0.10 règle MODIL 1 ; 0.15 « De » : la tête de lecture s'arrête ; 0.25 la station s'ouvre (trait 2 px → carte) --- */
+      tl.fromTo("#f11-mod", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 0.10);
+      tl.fromTo("#f11-ph", { scale: 0.4 }, { scale: 1, duration: 0.18, ease: "expo.out", transformOrigin: "12px 12px" }, 0.15);
+      tl.fromTo("#f11-open", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.2, ease: "expo.out" }, 0.25);
+      tl.fromTo("#f11-card", { opacity: 0, clipPath: "inset(555px 0px 555px 0px)" }, { opacity: 1, clipPath: "inset(-120px -120px -200px -120px)", duration: 0.34, ease: "expo.out" }, 0.38);
+      tl.to("#f11-open", { opacity: 0, duration: 0.14, ease: "power2.out" }, 0.47);
+
+      /* --- 0.31 « jou » : 2 JOU en gros (posé à 0.45, la carte vient de s'ouvrir) ; 0.52 « fòmasyon » --- */
+      tl.fromTo("#f11-big", { opacity: 0, scale: 1.3, filter: "blur(10px)" }, SET({ duration: 0.18, transformOrigin: "0% 50%" }), 0.44);
+      tl.fromTo("#f11-fm", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 0.55);
+      /* --- 0.91 « ak » : pastille Teyori ; 1.19 « pratik » : pastille Pratik (active) --- */
+      tl.fromTo("#f11-pt", IN, SET({ transformOrigin: "50% 50%" }), 0.89);
+      tl.fromTo("#f11-pp", { opacity: 0, scale: 1.6, filter: "blur(8px)" }, SET({ duration: 0.14, transformOrigin: "50% 50%" }), 1.17);
+      tl.to("#f11-pp", { y: -6, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.31);
+      tl.to("#f11-big", { x: -6, duration: 1.6, ease: "none" }, 1.0);
+      /* --- 1.58 « pou » : le filet se trace ; 1.81 « metrize » : la place du logo s'esquisse --- */
+      tl.fromTo("#f11-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 1.58);
+      tl.fromTo("#f11-slot", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 1.79);
+      tl.to("#f11-slot", { scale: 1.06, duration: 0.18, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.0);
+      /* --- 2.42 « Facebook » : le vrai logo arrive trop grand et flou, se pose --- */
+      tl.fromTo("#f11-fbt", { opacity: 0, scale: 1.7, filter: "blur(10px)" }, SET({ duration: 0.16 }), 2.40);
+      tl.to("#f11-slot", { opacity: 0, duration: 0.1, ease: "none" }, 2.46);
+      tl.fromTo("#f11-fbtt", { opacity: 0, x: 30, filter: "blur(6px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.52);
+      tl.to("#f11-fbt", { y: -8, rotation: -4, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.6);
+      /* --- 2.93 « Ads » : la carte Ads Manager s'ouvre --- */
+      tl.fromTo("#f11-ads", { opacity: 0, scale: 1.06, clipPath: "inset(205px 0px 205px 0px round 30px)" },
+        { opacity: 1, scale: 1, clipPath: "inset(0px 0px 0px 0px round 30px)", duration: 0.22, ease: "power3.out" }, 2.90);
+      tl.fromTo("#f11-ah", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 3.02);
+      tl.fromTo("#f11-ahr", { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "expo.out" }, 3.06);
+      tl.fromTo("#f11-r1", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.14, ease: "expo.out" }, 3.08);
+      tl.fromTo("#f11-r2", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.14, ease: "expo.out" }, 3.14);
+      tl.fromTo("#f11-chw", { clipPath: "inset(0px 698px 0px 0px)" }, { clipPath: "inset(0px 0px 0px 0px)", duration: 0.42, ease: "power2.out" }, 3.16);
+      tl.fromTo("#f11-end", { opacity: 0, scale: 2.2, filter: "blur(6px)" }, SET({ duration: 0.14 }), 3.56);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        var els = [];
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          var bg = w.bg || (w.box ? w.el.querySelector(".lv-box-bg") : null);
+          if (bg) tl.fromTo(bg, { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+          els.push(w.el); if (w.bg) els.push(w.bg);
+        });
+        tl.to(els, { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      var S1 = sub($("f11-s1"), [[[["De", 0.15], ["jou", 0.31]], 0, "group"], ["fòmasyon", 0.52], ["ak", 0.91], ["pratik", 1.19]]);
+      var S2 = sub($("f11-s2"), [["pou", 1.58], ["metrize", 1.81], ["Facebook", 2.42], ["Ads,", 2.93]]);
+      words(S1, 1.46);
+      words(S2, 3.65);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

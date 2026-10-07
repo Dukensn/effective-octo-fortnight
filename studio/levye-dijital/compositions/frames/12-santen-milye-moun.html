@@ -1,0 +1,308 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+    #f12-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* bande du programme (règle MODIL, tête de lecture : style de la frame 14) */
+    .f12-rail { position: absolute; left: 70px; top: -600px; width: 3px; height: 3200px; background: rgba(27,26,24,.13); }
+    .f12-ticks { position: absolute; left: 58px; top: -600px; width: 27px; height: 3200px;
+      background: repeating-linear-gradient(to bottom, rgba(27,26,24,.16) 0 2px, transparent 2px 80px); }
+    .f12-mod { position: absolute; left: 120px; display: flex; align-items: center; gap: 16px; font: 700 30px "Inter"; letter-spacing: 6px; color: #1B1A18; }
+    .f12-mdot { width: 14px; height: 14px; border-radius: 50%; background: #D97757; display: inline-block; }
+    .f12-ph { position: absolute; left: 60px; width: 60px; height: 24px; }
+    .f12-ph-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: #D97757; box-shadow: 0 0 0 6px rgba(217,119,87,.18); }
+    .f12-ph-ln { position: absolute; left: 24px; top: 11px; width: 36px; height: 2px; background: #D97757; }
+
+    /* station MODIL 1 telle que la frame 11 la laisse (handoff_in) */
+    #f12-card { left: 120px; top: 270px; width: 880px; height: 1110px; }
+    #f12-big { position: absolute; left: 50px; top: 40px; font: 900 220px/1 "InterD"; letter-spacing: -6px; color: #1B1A18; white-space: nowrap; }
+    #f12-fm { position: absolute; left: 60px; top: 284px; font: 600 30px/1 "Inter"; letter-spacing: 4px; color: #77726B; }
+    #f12-pills { position: absolute; left: 56px; top: 336px; width: 600px; height: 70px; }
+    .f12-pill { position: absolute; top: 0; height: 68px; padding: 0 34px; border-radius: 34px; font: 700 34px/68px "Inter"; white-space: nowrap; box-sizing: border-box; }
+    #f12-pt { left: 0; background: #FFFFFF; border: 2px solid #D9D4CC; color: #1B1A18; line-height: 64px; }
+    #f12-pp { left: 216px; background: #1B1A18; color: #FFFFFF; box-shadow: 0 14px 30px rgba(27,26,24,.18); }
+    #f12-hr { position: absolute; left: 56px; right: 56px; top: 446px; height: 2px; background: rgba(27,26,24,.08); }
+    #f12-fbt { position: absolute; left: 56px; top: 480px; width: 124px; height: 124px; border-radius: 30px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 22px 44px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    #f12-fbtt { position: absolute; left: 210px; top: 514px; font: 800 58px/1 "Inter"; letter-spacing: -1px; color: #1B1A18; white-space: nowrap; }
+    #f12-ads { position: absolute; left: 56px; top: 640px; width: 768px; height: 420px; border-radius: 30px; background: #F7F5F1;
+      border: 1px solid rgba(27,26,24,.07); box-sizing: border-box; box-shadow: 0 18px 40px rgba(60,45,30,.08); }
+    #f12-ah { position: absolute; left: 34px; top: 26px; display: flex; align-items: center; gap: 14px; font: 700 32px/1 "Inter"; color: #1B1A18; white-space: nowrap; }
+    #f12-ahr { position: absolute; left: 34px; right: 34px; top: 92px; height: 1px; background: rgba(27,26,24,.09); }
+    .f12-row { position: absolute; left: 0; width: 768px; height: 52px; }
+    .f12-lab { position: absolute; left: 34px; top: 0; font: 600 30px/52px "Inter"; color: #5A554E; }
+    .f12-fld { position: absolute; left: 210px; top: 0; width: 380px; height: 52px; border-radius: 14px; background: #EFEBE5; }
+    .f12-bar { position: absolute; left: 20px; top: 20px; height: 12px; border-radius: 6px; background: #D9D4CC; }
+    #f12-tg { position: absolute; left: 650px; top: 4px; width: 80px; height: 44px; border-radius: 22px; background: #1B1A18; }
+    #f12-knob { position: absolute; left: 41px; top: 5px; width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; }
+    #f12-chw { position: absolute; left: 34px; top: 262px; width: 698px; height: 130px; }
+    #f12-end { position: absolute; left: 708px; top: 266px; width: 24px; height: 24px; border-radius: 50%; background: #D97757; box-shadow: 0 0 0 7px rgba(217,119,87,.20); }
+    /* champ Bidjè : pièce + « ti kòb » (pas de montant) */
+    #f12-foc { position: absolute; left: -4px; top: -4px; width: 388px; height: 60px; border-radius: 17px; border: 3px solid #D97757; box-sizing: border-box; }
+    #f12-coin { position: absolute; left: 16px; top: 8px; width: 36px; height: 36px; border-radius: 50%; box-sizing: border-box;
+      background: radial-gradient(circle at 35% 30%, #FFFFFF 0 10%, #D9D4CC 45%, #B9B3A9 100%); border: 2px solid #8C877F; }
+    #f12-coin i { position: absolute; left: 7px; top: 7px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(90,85,78,.55); box-sizing: border-box; }
+    #f12-tk { position: absolute; left: 66px; top: 0; font: 700 30px/52px "Inter"; color: #1B1A18; white-space: nowrap; }
+
+    /* la portée : pub 9:16 miniature, anneaux de points-personnes */
+    #f12-reach { position: absolute; left: 0; top: 0; width: 880px; height: 1110px; }
+    .f12-guide { position: absolute; border-radius: 50%; border: 2px dashed #D9D4CC; box-sizing: border-box; }
+    #f12-wave1, #f12-wave2, #f12-wave3 { position: absolute; left: 340px; top: 670px; width: 200px; height: 200px; border-radius: 50%;
+      border: 4px solid #1B1A18; box-sizing: border-box; }
+    #f12-ad { position: absolute; left: 385px; top: 672px; width: 110px; height: 196px; border-radius: 16px; overflow: hidden; background: #1B1A18;
+      box-shadow: 0 24px 46px rgba(27,26,24,.28), 0 0 0 4px #FFFFFF; }
+    #f12-adimg { position: absolute; left: 8px; top: 8px; width: 94px; height: 112px; border-radius: 10px; overflow: hidden; }
+    .f12-adbar { position: absolute; left: 10px; height: 8px; border-radius: 4px; background: #8C877F; }
+    #f12-adbtn { position: absolute; left: 10px; top: 162px; width: 58px; height: 20px; border-radius: 10px; background: #FFFFFF; }
+    #f12-adstar { position: absolute; left: 78px; top: 162px; width: 20px; height: 20px; }
+    .f12-p { position: absolute; width: 24px; height: 30px; }
+    .f12-p::before { content: ""; position: absolute; left: 6px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: #1B1A18; }
+    .f12-p::after { content: ""; position: absolute; left: 0; top: 15px; width: 24px; height: 15px; border-radius: 12px 12px 4px 4px; background: #1B1A18; }
+    .f12-d { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #5A554E; }
+    .f12-e { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #8C877F; }
+  </style>
+
+  <div id="root" data-composition-id="12-santen-milye-moun" data-width="1080" data-height="1920" data-duration="6.00">
+    <div id="f12-bg" class="clip" data-start="0" data-duration="6.00" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f12-floor" class="lv-floor"></div>
+        <div id="f12-giant" class="lv-giant" style="left:-60px; top:1080px;">ADS</div>
+      </div>
+    </div>
+
+    <div id="f12-stage" class="clip" data-start="0" data-duration="6.00" data-track-index="1">
+      <div id="f12-cam">
+        <div class="f12-rail"></div><div class="f12-ticks"></div>
+        <div id="f12-mod" class="f12-mod" style="top:200px;"><span class="f12-mdot"></span>MODIL 1</div>
+        <div id="f12-ph" class="f12-ph" style="top:813px;"><div class="f12-ph-dot"></div><div class="f12-ph-ln"></div></div>
+
+        <div id="f12-card" class="lv-glass">
+          <div id="f12-big">2 JOU</div>
+          <div id="f12-fm">FÒMASYON</div>
+          <div id="f12-pills">
+            <div id="f12-pt" class="f12-pill">Teyori</div>
+            <div id="f12-pp" class="f12-pill">Pratik</div>
+          </div>
+          <div id="f12-hr"></div>
+          <div id="f12-fbt"><svg viewBox="0 0 24 24" width="74" height="74"><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg></div>
+          <div id="f12-fbtt">Facebook Ads</div>
+
+          <div id="f12-reach">
+            <div id="f12-g1" class="f12-guide" style="left:300px; top:630px; width:280px; height:280px; opacity:0;"></div>
+            <div id="f12-g2" class="f12-guide" style="left:220px; top:550px; width:440px; height:440px; opacity:0;"></div>
+            <div id="f12-g3" class="f12-guide" style="left:138px; top:468px; width:604px; height:604px; opacity:0;"></div>
+            <div id="f12-wave1" style="opacity:0;"></div>
+            <div id="f12-wave2" style="opacity:0;"></div>
+            <div id="f12-wave3" style="opacity:0;"></div>
+            <div id="f12-crowd"></div>
+            <div id="f12-ad" style="opacity:0;">
+              <div id="f12-adimg"><svg viewBox="0 0 94 112" width="94" height="112"><rect width="94" height="112" fill="#5A554E"/><circle cx="70" cy="28" r="10" fill="#B9B3A9"/><path d="M0 112 L30 58 L52 88 L66 70 L94 112 Z" fill="#8C877F"/><path d="M0 112 L18 90 L40 112 Z" fill="#B9B3A9"/></svg></div>
+              <div class="f12-adbar" style="top:132px; width:86px;"></div>
+              <div class="f12-adbar" style="top:146px; width:60px; background:#5A554E;"></div>
+              <div id="f12-adbtn"></div>
+              <svg id="f12-adstar" viewBox="0 0 24 24" width="20" height="20"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+            </div>
+          </div>
+
+          <div id="f12-ads">
+            <div id="f12-ah"><svg viewBox="0 0 24 24" width="38" height="38"><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Ads Manager</div>
+            <div id="f12-ahr"></div>
+            <div id="f12-r1" class="f12-row" style="top:112px;">
+              <div class="f12-lab">Kanpay</div>
+              <div class="f12-fld"><div class="f12-bar" style="width:220px;"></div></div>
+              <div id="f12-tg"><div id="f12-knob"></div></div>
+            </div>
+            <div id="f12-r2" class="f12-row" style="top:184px;">
+              <div class="f12-lab">Bidjè</div>
+              <div id="f12-bf" class="f12-fld">
+                <div id="f12-foc" style="opacity:0;"></div>
+                <div id="f12-bbar" class="f12-bar" style="width:150px;"></div>
+                <div id="f12-coin" style="opacity:0;"><i></i></div>
+                <div id="f12-tk" style="opacity:0;">ti kòb</div>
+              </div>
+            </div>
+            <div id="f12-chw">
+              <svg viewBox="0 0 698 130" width="698" height="130">
+                <path d="M0 30H698M0 65H698M0 100H698" stroke="rgba(27,26,24,.07)" stroke-width="2" fill="none"/>
+                <path d="M0 118 L78 104 L156 110 L234 88 L312 92 L390 70 L468 62 L546 46 L624 34 L686 16 L686 130 L0 130 Z" fill="rgba(27,26,24,.05)"/>
+                <path d="M0 118 L78 104 L156 110 L234 88 L312 92 L390 70 L468 62 L546 46 L624 34 L686 16" stroke="#1B1A18" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div id="f12-end"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f12-text" class="clip" data-start="0" data-duration="6.00" data-track-index="2">
+      <div id="f12-s1" class="lv-sub"></div>
+      <div id="f12-s2" class="lv-sub"></div>
+      <div id="f12-s3" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f12-grainc" class="clip" data-start="0" data-duration="6.00" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "12-santen-milye-moun", T = 6.00;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* sous-titres mot à mot (sub()/words() du pilote ; "group" = une boîte sur plusieurs mots, chacun sur son repère) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          if (w[2] === "group") {
+            var bx = document.createElement("span"); bx.className = "lv-box";
+            bx.innerHTML = '<span class="lv-box-bg"></span><span class="lv-box-tx"></span>';
+            var tx = bx.querySelector(".lv-box-tx");
+            w[0].forEach(function (g, j) {
+              var gs = document.createElement("span"); gs.className = "lv-sw"; gs.textContent = g[0];
+              tx.appendChild(gs); if (j < w[0].length - 1) tx.appendChild(document.createTextNode(" "));
+              out.push({ el: gs, t: g[1], bg: j === 0 ? bx.querySelector(".lv-box-bg") : null });
+            });
+            host.appendChild(bx);
+          } else {
+            var sp = document.createElement("span"); sp.className = "lv-sw";
+            if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+            else sp.textContent = w[0];
+            host.appendChild(sp);
+            out.push({ el: sp, t: w[1], box: w[2] === "box" });
+          }
+          if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+        });
+        return out;
+      }
+
+      /* foule déterministe : 3 anneaux autour de la pub (centre carte 440, 770) ; l'anneau 3 en deux rangs serrés */
+      function crowd(host) {
+        var RINGS = [[140, 10, "f12-p", 24, 30, 0, 0], [220, 24, "f12-d", 14, 14, 7.5, 1], [288, 40, "f12-e", 10, 10, 0, 2], [314, 44, "f12-e", 10, 10, 4.1, 2]];
+        var out = [[], [], []];
+        RINGS.forEach(function (r) {
+          for (var i = 0; i < r[1]; i++) {
+            var a = (i / r[1]) * Math.PI * 2 + (r[5] - 90) * Math.PI / 180;
+            var cx = Math.cos(a) * r[0], cy = Math.sin(a) * r[0];
+            var el = document.createElement("span"); el.className = r[2];
+            el.style.left = (440 + cx - r[3] / 2).toFixed(1) + "px"; el.style.top = (770 + cy - r[4] / 2).toFixed(1) + "px";
+            host.appendChild(el); out[r[6]].push({ el: el, dx: cx, dy: cy });
+          }
+        });
+        return out;
+      }
+      var RING = crowd($("f12-crowd"));
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : reprend la dérive de la frame 11, recul pour voir la foule, puis descente floue vers M2 --- */
+      tl.fromTo("#f12-cam", { y: -30, scale: 1.03, filter: "blur(0px)" }, { y: -60, scale: 1.05, duration: 3.36, ease: "none" }, 0);
+      tl.to("#f12-cam", { y: -30, scale: 0.9, duration: 0.94, ease: "power2.inOut" }, 3.36);
+      tl.to("#f12-cam", { y: -50, scale: 0.92, duration: 1.40, ease: "none" }, 4.30);
+      tl.to("#f12-cam", { y: -995, scale: 1, filter: "blur(6px)", duration: 0.30, ease: "power2.in" }, 5.70);
+      tl.fromTo("#f12-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 160px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f12-giant", { x: -90 }, { x: -230, duration: T, ease: "none" }, 0);
+      /* la tête de lecture descend avec la caméra vers MODIL 2 (handoff_out) */
+      tl.to("#f12-ph", { y: 1120, scale: 0.4, duration: 0.30, ease: "power2.in", transformOrigin: "12px 12px" }, 5.70);
+
+      /* --- 0.16 « pou » : le haut de la station s'efface, la carte Ads Manager monte --- */
+      tl.to(["#f12-big", "#f12-fm", "#f12-pills", "#f12-hr", "#f12-fbt", "#f12-fbtt"], { opacity: 0, y: -40, duration: 0.2, ease: "power2.in", stagger: 0.03 }, 0.16);
+      tl.to("#f12-ads", { y: -606, duration: 0.5, ease: "expo.inOut" }, 0.28);
+      /* 0.68 « fè » : le point du graphique bat */
+      tl.to("#f12-end", { scale: 1.5, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, 0.68);
+
+      /* --- 1.02 « piblisite » : la pub 9:16 miniature au centre --- */
+      tl.fromTo("#f12-ad", { opacity: 0, scale: 1.6, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 1.00);
+      tl.fromTo("#f12-adstar", { rotation: 0 }, { rotation: 120, duration: 1.2, ease: "power1.out", transformOrigin: "50% 50%" }, 1.1);
+      tl.to("#f12-adbtn", { scale: 0.8, duration: 0.07, ease: "power2.out", yoyo: true, repeat: 1, transformOrigin: "50% 50%" }, 1.46);
+      /* --- 1.62 « ateyn » : un anneau d'onde part de la pub --- */
+      tl.fromTo("#f12-wave1", { opacity: 0.6, scale: 0.5 }, { opacity: 0, scale: 3.4, duration: 0.8, ease: "power2.out" }, 1.62);
+      tl.to("#f12-ad", { scale: 1.06, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, 1.62);
+      /* 1.87 « petèt » : les trois cercles de portée s'esquissent */
+      ["#f12-g1", "#f12-g2", "#f12-g3"].forEach(function (g, i) {
+        tl.fromTo(g, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 1.87 + i * 0.07);
+      });
+
+      /* --- 2.30 « plizyè », 2.58 « santèn », 2.86 « milye » : les points-personnes se multiplient par anneau --- */
+      [[0, 2.28, 0.016], [1, 2.56, 0.007], [2, 2.84, 0.0028]].forEach(function (R) {
+        RING[R[0]].forEach(function (d, i) {
+          tl.fromTo(d.el, { opacity: 0, x: -d.dx * 0.7, y: -d.dy * 0.7, scale: 0.3 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.18, ease: "expo.out" }, R[1] + i * R[2]);
+        });
+      });
+      /* --- 3.11 « moun » : toute la foule bat, deuxième onde --- */
+      tl.to(RING[0].concat(RING[1], RING[2]).map(function (d) { return d.el; }), { scale: 1.35, duration: 0.09, ease: "power2.out", yoyo: true, repeat: 1, stagger: 0.0015 }, 3.11);
+      tl.fromTo("#f12-wave2", { opacity: 0.45, scale: 0.5 }, { opacity: 0, scale: 3.8, duration: 0.9, ease: "power2.out" }, 3.11);
+      /* 3.36 → 4.30 recul (caméra) ; 3.68 « pandan » : troisième onde */
+      tl.fromTo("#f12-wave3", { opacity: 0.35, scale: 0.5 }, { opacity: 0, scale: 3.8, duration: 0.9, ease: "power2.out" }, 3.68);
+      tl.to("#f12-ad", { rotation: -3, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.4);
+
+      /* --- 4.30 « depanse » : le champ Bidjè prend le focus --- */
+      tl.fromTo("#f12-foc", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 4.28);
+      tl.fromTo("#f12-bf", { backgroundColor: "#EFEBE5" }, { backgroundColor: "#FFFFFF", duration: 0.2, ease: "none" }, 4.30);
+      tl.to("#f12-ads", { scale: 1.02, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 4.30);
+      /* --- 4.89 « ti kòb » : une petite pièce + « ti kòb » (aucun montant) --- */
+      tl.to("#f12-bbar", { opacity: 0, scaleX: 0.3, duration: 0.1, ease: "power2.in", transformOrigin: "0% 50%" }, 4.82);
+      tl.fromTo("#f12-coin", { opacity: 0, scale: 1.8, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.87);
+      tl.fromTo("#f12-tk", { opacity: 0, x: 20, filter: "blur(4px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 4.96);
+      tl.to("#f12-coin", { scaleX: 0.15, duration: 0.09, ease: "power2.in", yoyo: true, repeat: 1 }, 5.06);
+      tl.to("#f12-end", { scale: 1.5, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, 5.40);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        var els = [];
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          var bg = w.bg || (w.box ? w.el.querySelector(".lv-box-bg") : null);
+          if (bg) tl.fromTo(bg, { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+          els.push(w.el); if (w.bg) els.push(w.bg);
+        });
+        tl.to(els, { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      var S1 = sub($("f12-s1"), [["pou", 0.16], ["w", 0.43], ["ka", 0.53], ["fè", 0.68], ["yon", 0.82], ["piblisite", 1.02], ["ki", 1.48], ["ateyn", 1.62]]);
+      var S2 = sub($("f12-s2"), [["petèt", 1.87], ["plizyè", 2.30], [[["santèn", 2.58], ["milye", 2.86]], 0, "group"], ["moun,", 3.11]]);
+      var S3 = sub($("f12-s3"), [["tout", 3.36], ["pandan", 3.68], ["w", 4.03], ["ap", 4.16], ["depanse", 4.30], ["yon", 4.72], ["ti", 4.89], ["kòb.", 5.04]]);
+      words(S1, 1.75);
+      words(S2, 3.24);
+      words(S3, 5.85);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

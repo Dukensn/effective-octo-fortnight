@@ -1,0 +1,266 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    /* ===== la bande (monde, coordonnées de STORYBOARD.md, acte I : mêmes que 05) ===== */
+    #f03-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f03-world { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; transform-origin: 0 0; }
+    .f03-strip { position: absolute; left: 250px; top: 740px; width: 740px; height: 3300px; border-radius: 30px;
+      background: linear-gradient(165deg, #FFFFFF, #F8F6F2); box-shadow: 0 30px 70px rgba(60,45,30,.13), 0 0 0 1px rgba(27,26,24,.04); }
+    .f03-tick { position: absolute; height: 3px; background: #D9D4CC; }
+    .f03-tick.big { background: #B9B3A9; }
+    .f03-rlab { position: absolute; left: 20px; width: 170px; text-align: right; font: 700 28px/1 "Inter"; letter-spacing: 1.5px; color: #77726B; }
+    .f03-lhead { position: absolute; top: 780px; width: 120px; text-align: center; font: 600 22px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    .f03-lane { position: absolute; top: 830px; width: 120px; height: 900px; border-radius: 18px; background: #EDE9E2; }
+    .f03-clip { position: absolute; width: 120px; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      font: 800 26px/1 "Inter"; color: #fff; box-shadow: 0 14px 30px rgba(40,30,20,.16); }
+    #f03-vwa { position: absolute; left: 290px; top: 1770px; width: 664px; height: 120px; border-radius: 18px; background: #EDE9E2; overflow: hidden;
+      clip-path: inset(49.5% 0% 49.5% 0%); }
+    #f03-vwal { position: absolute; left: 18px; top: 14px; font: 700 20px/1 "Inter"; letter-spacing: 2px; color: #5A554E; }
+    .f03-wv { position: absolute; width: 6px; border-radius: 3px; background: #1B1A18; transform: scaleY(0); }
+    #f03-scrub { position: absolute; left: 86px; top: 8px; width: 4px; height: 104px; border-radius: 2px; background: #D97757; opacity: 0; box-shadow: 0 0 12px rgba(217,119,87,.5); }
+    #f03-vline { position: absolute; left: 290px; top: 1829px; width: 664px; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); }
+    #f03-ph { position: absolute; left: 222px; top: 858px; width: 768px; height: 5px; background: #D97757; box-shadow: 0 0 18px rgba(217,119,87,.45); transform: translateY(60px); }
+    #f03-ph::before { content: ""; position: absolute; left: -12px; top: -13px; width: 30px; height: 30px; border-radius: 50%; background: #D97757; }
+
+    /* moniteur 9:16 (world x 360, y 60) : silhouette de la pub (fin de la séquence 2) */
+    #f03-mon { position: absolute; left: 360px; top: 60px; width: 360px; height: 640px; border-radius: 28px; background: #1B1A18; overflow: hidden;
+      transform-origin: 50% 50%; box-shadow: 0 40px 80px rgba(40,30,20,.26), 0 6px 14px rgba(40,30,20,.12); }
+    #f03-rec { position: absolute; left: 20px; top: 40px; font: 700 22px "Inter"; color: #fff; background: rgba(255,255,255,.14); padding: 6px 14px; border-radius: 20px; }
+    .f03-sil { position: absolute; background: #2C2926; }
+
+    /* la carte « Veo 3 · Jenere » (rejetée) */
+    #f03-veo { position: absolute; left: 380px; top: 1320px; width: 480px; height: 250px; border-radius: 30px; opacity: 0;
+      background: linear-gradient(165deg, #EFECE7, #E3DED6); border: 1px solid rgba(27,26,24,.08);
+      box-shadow: 0 40px 80px rgba(60,45,30,.20), 0 6px 14px rgba(60,45,30,.10), inset 0 1px 0 #fff; }
+    #f03-vplay { position: absolute; left: 36px; top: 40px; width: 104px; height: 104px; border-radius: 26px; background: #8C877F;
+      display: flex; align-items: center; justify-content: center; }
+    #f03-vt { position: absolute; left: 168px; top: 40px; font: 800 58px/1 "Inter"; letter-spacing: -1px; color: #1B1A18; }
+    #f03-vs { position: absolute; left: 170px; top: 112px; font: 600 30px/1 "Inter"; color: #5A554E; }
+    #f03-vtrack { position: absolute; left: 36px; right: 36px; top: 184px; height: 14px; border-radius: 7px; background: #D9D4CC; overflow: hidden; }
+    #f03-vfill { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #8C877F; transform-origin: 0 50%; transform: scaleX(0); }
+    #f03-vx { position: absolute; left: -16px; right: -16px; top: 118px; height: 10px; border-radius: 5px; background: #D97757;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 6px 16px rgba(217,119,87,.4); }
+  </style>
+
+  <div id="root" data-composition-id="03-pa-veo-3" data-width="1080" data-height="1920" data-duration="4.45">
+    <div id="f03-bg" class="clip" data-start="0" data-duration="4.45" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f03-floorw" style="position:absolute; left:0; top:0; width:1080px; height:1920px;"><div class="lv-floor"></div></div>
+        <div id="f03-giant" class="lv-giant" style="left:-30px; top:1100px;">VWA</div>
+      </div>
+    </div>
+
+    <div id="f03-stage" class="clip" data-start="0" data-duration="4.45" data-track-index="1">
+      <div id="f03-cam">
+        <!-- tuile de profondeur : le micro (la voix) -->
+        <div id="f03-t1" class="lv-tile" style="left:40px; top:360px; opacity:0;">
+          <svg viewBox="0 0 24 24" width="70" height="70"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="#1B1A18"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M8.5 21.5h7" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linecap="round"/></svg></div>
+
+        <div id="f03-world">
+          <div class="f03-strip"></div>
+          <div id="f03-ruler"></div>
+          <div class="f03-rlab" style="top:846px">00:00</div>
+          <div class="f03-rlab" style="top:1086px">00:04</div>
+          <div class="f03-rlab" style="top:1326px">00:08</div>
+          <div class="f03-rlab" style="top:1566px">00:12</div>
+          <div class="f03-rlab" style="top:1806px">00:16</div>
+
+          <div class="f03-lhead" style="left:290px">Tèks</div><div class="f03-lhead" style="left:426px">Imaj</div>
+          <div class="f03-lhead" style="left:562px">Tranz.</div><div class="f03-lhead" style="left:698px">Son</div>
+          <div class="f03-lhead" style="left:834px">Mizik</div>
+          <div class="f03-lane" style="left:290px"></div><div class="f03-lane" style="left:426px"></div>
+          <div class="f03-lane" style="left:562px"></div><div class="f03-lane" style="left:698px"></div>
+          <div class="f03-lane" style="left:834px"></div>
+
+          <div id="f03-c2" class="f03-clip" style="left:426px; top:850px; height:180px; background:#5A554E;">Zouti</div>
+          <div id="f03-c4" class="f03-clip" style="left:562px; top:870px; height:200px; background:#77726B; font-size:22px;">Lojisyèl</div>
+
+          <div id="f03-vline"></div>
+          <div id="f03-vwa"><div id="f03-vwal">VWA</div><div id="f03-scrub"></div></div>
+
+          <div id="f03-ph"></div>
+
+          <div id="f03-mon">
+            <div class="f03-sil" style="left:30px; top:110px; width:300px; height:220px; border-radius:18px;"></div>
+            <div class="f03-sil" style="left:30px; top:370px; width:300px; height:16px; border-radius:8px; background:#3A3632;"></div>
+            <div class="f03-sil" style="left:30px; top:402px; width:210px; height:16px; border-radius:8px; background:#3A3632;"></div>
+            <div class="f03-sil" style="left:40px; top:520px; width:280px; height:60px; border-radius:10px; background:#262321;"></div>
+            <div id="f03-rec">● REC</div>
+          </div>
+
+          <!-- la carte Veo 3 : arrive, se pose de travers, se fait barrer, tombe -->
+          <div id="f03-veo">
+            <div id="f03-vplay"><svg viewBox="0 0 24 24" width="52" height="52"><path d="M8 5v14l11-7z" fill="#fff"/></svg></div>
+            <div id="f03-vt">Veo 3</div>
+            <div id="f03-vs">Jenere</div>
+            <div id="f03-vtrack"><div id="f03-vfill"></div></div>
+            <div id="f03-vx"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f03-text" class="clip" data-start="0" data-duration="4.45" data-track-index="2">
+      <div id="f03-s1" class="lv-sub"></div>
+      <div id="f03-s2" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f03-grainc" class="clip" data-start="0" data-duration="4.45" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "03-pa-veo-3", T = 4.45;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* règle : un tick tous les 60 px, un long tous les 240 px (comme 05) */
+      var ru = $("f03-ruler"), i, y, d;
+      for (i = 0, y = 760; y < 4020; y += 60, i++) {
+        d = document.createElement("div"); d.className = "f03-tick" + (i % 4 === 0 ? " big" : "");
+        d.style.cssText = "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px";
+        ru.appendChild(d);
+      }
+      /* forme d'onde de la voix (déterministe, mêmes barres que 05) dans le couloir Vwa */
+      var vw = $("f03-vwa"), wv = [];
+      for (i = 0; i < 70; i++) {
+        var h = 14 + Math.abs(Math.sin(i * 0.61) * 34 + Math.sin(i * 1.73) * 18 + Math.sin(i * 0.17) * 12);
+        d = document.createElement("div"); d.className = "f03-wv";
+        d.style.cssText = "left:" + (90 + i * 8.2).toFixed(1) + "px;top:" + (60 - h / 2).toFixed(1) + "px;height:" + h.toFixed(1) + "px";
+        vw.insertBefore(d, $("f03-scrub")); wv.push(d);
+      }
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f03-s1"), [["Se", 0.22], ["pa", 0.45], ["jenere", 0.61], ["l", 0.93], ["jenere", 1.05], ["tankou", 1.37], ["Veo", 1.75], ["3.", 1.95]]);
+      var S2 = sub($("f03-s2"), [["Mwen", 2.38], ["jis", 2.75], ["ba", 2.93], ["l", 3.08], ["vwa", 3.19], ["a.", 3.74]]);
+      /* [boîte : Veo 3.] : une seule boîte autour des deux mots, chacun garde son repère */
+      var bx = document.createElement("span"); bx.className = "lv-box";
+      var bbg = document.createElement("span"); bbg.className = "lv-box-bg"; bx.appendChild(bbg);
+      var btx = document.createElement("span"); btx.className = "lv-box-tx"; bx.appendChild(btx);
+      $("f03-s1").insertBefore(bx, S1[6].el);
+      btx.appendChild(S1[6].el); btx.appendChild(document.createTextNode(" ")); btx.appendChild(S1[7].el);
+      if (bx.nextSibling && bx.nextSibling.nodeType === 3) bx.nextSibling.remove();
+
+      var tl = gsap.timeline({ paused: true });
+      /* caméra monde : amène le point (X, Y) au centre de scène (540, 760) à l'échelle s */
+      function C(X, Y, s, b) { return { x: 540 - X * s, y: 760 - Y * s, scale: s, filter: "blur(" + b + "px)" }; }
+      function at(o, d, e) { return Object.assign(o, { duration: d, ease: e }); }
+
+      /* --- caméra : dérive permanente (reprise de l'état final de la séquence 2) --- */
+      tl.fromTo("#f03-cam", { y: -90, scale: 0.96 }, { y: -105, scale: 0.97, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f03-floorw", { y: 0 }, { y: 60, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f03-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
+      /* 0.00 cran sur le couloir Vwa, dérive x, puis 4.10 départ vers les couloirs (handoff_out) */
+      tl.fromTo("#f03-world", C(540, 1300, 0.82, 6), at(C(540, 1420, 1.0, 0), 0.3, "expo.out"), 0);
+      tl.to("#f03-world", at(C(505, 1440, 1.0, 0), 3.8, "none"), 0.3);
+      tl.to("#f03-world", at(C(540, 1150, 0.85, 6), 0.35, "power2.in"), 4.10);
+
+      /* --- 0.20 la carte Veo 3 arrive trop grande et floue, flotte au-dessus de la bande --- */
+      tl.fromTo("#f03-veo", { opacity: 0, scale: 1.6, y: -60, rotation: 4, filter: "blur(10px)" },
+        { opacity: 1, scale: 1, y: -50, rotation: 3, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 0.20);
+      tl.to("#f03-veo", { y: -64, rotation: 1, duration: 0.6, ease: "sine.inOut" }, 0.38);
+      tl.fromTo("#f03-vfill", { scaleX: 0 }, { scaleX: 0.85, duration: 1.3, ease: "power1.inOut" }, 0.40);
+      tl.to("#f03-vplay", { scale: 1.1, duration: 0.16, ease: "power2.out", yoyo: true, repeat: 1 }, 0.61);
+      /* 1.05 « jenere » : elle se pose de travers */
+      tl.to("#f03-veo", { y: 0, rotation: -6, duration: 0.14, ease: "expo.out" }, 1.03);
+      tl.to("#f03-veo", { y: 5, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.17);
+      /* 1.75 « Veo 3 » : un trait accent la barre */
+      tl.to("#f03-vx", { scaleX: 1, duration: 0.25, ease: "power2.out" }, 1.75);
+      tl.to("#f03-veo", { x: -8, duration: 0.04, ease: "power1.inOut", yoyo: true, repeat: 3 }, 1.95);
+      /* 2.10 elle bascule et tombe hors du cadre à gauche */
+      tl.to("#f03-veo", { rotation: -25, duration: 0.12, ease: "power2.out" }, 2.10);
+      tl.to("#f03-veo", { x: -820, y: 420, rotation: -48, filter: "blur(6px)", duration: 0.3, ease: "power2.in" }, 2.16);
+      tl.to("#f03-veo", { opacity: 0, duration: 0.06, ease: "none" }, 2.40);
+
+      /* --- 2.38 « Mwen » : le couloir Vwa s'ouvre pleine largeur (signature 2 en petit) --- */
+      tl.fromTo("#f03-vline", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.12, ease: "expo.out" }, 2.36);
+      tl.fromTo("#f03-vwa", { clipPath: "inset(49.5% 0% 49.5% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.22, ease: "power3.out" }, 2.48);
+      tl.to("#f03-vline", { opacity: 0, duration: 0.1, ease: "none" }, 2.56);
+      tl.fromTo("#f03-vwal", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.14, ease: "expo.out" }, 2.60);
+
+      /* --- 2.75 tuile micro en profondeur --- */
+      tl.fromTo("#f03-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.85, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 2.75);
+      tl.to("#f03-t1", { y: -14, rotation: -4, duration: 1.0, ease: "sine.inOut" }, 2.91);
+
+      /* --- 3.19 « vwa » : la forme d'onde se dessine de gauche à droite (clip actif), signature 1 --- */
+      wv.forEach(function (b, k) {
+        tl.fromTo(b, { scaleY: 0, backgroundColor: "#D97757" }, { scaleY: 1, duration: 0.14, ease: "expo.out" }, 3.17 + k * 0.0086);
+      });
+      tl.to("#f03-t1", { scale: 1.12, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 3.19);
+      /* --- 3.74 → 4.30 la tête de lecture parcourt la forme d'onde, chaque barre passe à l'encre --- */
+      tl.fromTo("#f03-scrub", { opacity: 0, x: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 3.72);
+      tl.to("#f03-scrub", { x: 570, duration: 0.56, ease: "none" }, 3.74);
+      wv.forEach(function (b, k) {
+        tl.to(b, { backgroundColor: "#1B1A18", duration: 0.12, ease: "power1.out" }, 3.74 + k * 0.008);
+      });
+      tl.to("#f03-scrub", { opacity: 0, duration: 0.1, ease: "none" }, 4.30);
+      tl.to("#f03-t1", { opacity: 0, filter: "blur(10px)", duration: 0.3, ease: "power2.in" }, 4.10);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 2.26);
+      tl.fromTo(bbg, { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, 1.71);
+      tl.to(bbg, { opacity: 0, duration: 0.12, ease: "power2.in" }, 2.26);
+      words(S2, 4.30);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

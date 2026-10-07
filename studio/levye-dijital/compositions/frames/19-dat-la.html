@@ -51,6 +51,10 @@
     .f19-dtick.big { left: 186px; width: 50px; height: 4px; background: #1B1A18; }
     #f19-dot { position: absolute; left: 221px; top: 0; width: 30px; height: 30px; border-radius: 50%; background: #D97757;
       box-shadow: 0 0 0 8px rgba(217,119,87,.18); }
+    #f19-brk { position: absolute; left: 104px; top: 270px; width: 28px; height: 1024px; }
+    #f19-mwa { position: absolute; left: 70px; top: 782px; width: 0; height: 0; }
+    #f19-mwa-in { position: absolute; left: -92px; top: -32px; width: 184px; height: 64px; border-radius: 32px; border: 4px solid #D97757;
+      background: #fff; font: 800 32px/56px "Inter"; letter-spacing: 2px; color: #C4613F; text-align: center; transform: rotate(-90deg); }
     #f19-line { position: absolute; left: 250px; top: 629px; width: 740px; height: 2px; background: #D97757; transform-origin: 0 50%; }
     /* la conversation de groupe de la frame 18, qui remonte (handoff_in) */
     #f19-chat { position: absolute; left: 280px; top: 230px; width: 680px; height: 1110px; border-radius: 40px; overflow: hidden;
@@ -101,6 +105,12 @@
         </div>
         <div id="f19-strip"></div>
         <div id="f19-ruler"></div>
+        <!-- règle des 30 jours de la frame 18 (s'efface) -->
+        <div id="f19-jdays"></div>
+        <svg id="f19-brk" viewBox="0 0 28 1024" preserveAspectRatio="none">
+          <path d="M26 2 H6 V1022 H26 M6 512 H-2" fill="none" stroke="#D97757" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div id="f19-mwa"><div id="f19-mwa-in">1 MWA</div></div>
         <div id="f19-days"></div>
         <div id="f19-l17" class="f19-rlab" style="top:517px; opacity:0;">Sam 17</div>
         <div id="f19-l24" class="f19-rlab" style="top:847px; opacity:0;">Sam 24</div>
@@ -159,6 +169,18 @@
         tk.className = "f19-dtick" + (big ? " big" : ""); tk.style.top = (Y17 + i * DY - (big ? 2 : 1.5)) + "px"; tk.style.opacity = 0;
         $("f19-days").appendChild(tk); ticks.push(tk);
       }
+      /* règle des 30 jours de la frame 18 (état final : imprimée, J30 en accent) */
+      var JDY = 1020 / 29;
+      for (var q = 0; q < 30; q++) {
+        var jb = (q === 0 || (q + 1) % 10 === 0), jt = document.createElement("div");
+        jt.className = "f19-dtick" + (jb ? " big" : ""); jt.style.top = (270 + q * JDY - (jb ? 2 : 1.5)) + "px";
+        $("f19-jdays").appendChild(jt);
+        if (jb) {
+          var jl = document.createElement("div"); jl.className = "f19-rlab"; jl.textContent = "J" + (q + 1);
+          jl.style.top = (270 + q * JDY - 13) + "px"; if (q === 29) jl.style.color = "#C4613F";
+          $("f19-jdays").appendChild(jl);
+        }
+      }
       /* règle de la bande de la frame 20 */
       for (var j = 0; j < 22; j++) {
         var rt = document.createElement("div"); rt.className = "f19-rt"; rt.style.top = (70 + j * 48) + "px";
@@ -199,6 +221,10 @@
 
       /* --- 0.00 → 0.35 le groupe WhatsApp remonte et sort --- */
       tl.to("#f19-chat", { y: -1150, opacity: 0, filter: "blur(10px)", duration: 0.35, ease: "power2.in" }, 0);
+
+      /* --- 0.05 → 0.40 la règle des 30 jours s'efface (place au calendrier) --- */
+      tl.to(["#f19-brk", "#f19-mwa"], { opacity: 0, x: -20, filter: "blur(6px)", duration: 0.2, ease: "power2.in" }, 0.05);
+      tl.to("#f19-jdays", { opacity: 0, y: -60, filter: "blur(6px)", duration: 0.3, ease: "power2.in" }, 0.10);
 
       /* --- 0.26 → 0.56 la station calendrier s'ouvre (trait accent → carte) --- */
       tl.fromTo("#f19-line", { opacity: 1, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.12, ease: "expo.out" }, 0.24);
