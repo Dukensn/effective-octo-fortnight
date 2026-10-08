@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Short WhatsApp status cut of the full film (a status holds up to 90 s): whole frames only, cuts in voice silences.
-Keeps: 01-05 the whole hook (Claude, not Veo 3, my voice, the edit, "li ba m piblisite m", the silent gag),
-10-13 brand, 2 days, Facebook Ads, reach, AI agents, 19-24 date, hours, venue, 30 seats, WhatsApp, link, end card with
-the price held 8 s. Leaves out the diagnosis + pivot (06-09) and modules 3-5 + group (14-18).
+Keeps: 01 + 03-05 the hook (Claude, not Veo 3, my voice, the edit, "li ba m piblisite m", the silent gag),
+10-13 brand, 2 days, Facebook Ads, reach, AI agents, 18 the WhatsApp group, 19-24 date, hours, venue, 30 seats,
+WhatsApp, link, end card with the price held 8 s. Leaves out 02 (tools), the diagnosis + pivot (06-09), modules 3-5 (14-17).
 Video from renders/video[-dat2].mp4; audio: the same ranges cut from mix-final[-dat2].wav + a whoosh per cut.
-DAT=A|B python3 cut-kout.py (variant.py): A 85.1 s, B 86.35 s."""
+DAT=A|B python3 cut-kout.py (variant.py): A 84.5 s, B 85.75 s."""
 import subprocess, numpy as np
 from variant import SUFFIX, TOTAL
-R = [(0.00, 25.80), (44.90, 64.40), (90.40, TOTAL)]
+R = [(0.00, 3.20), (9.75, 25.80), (44.90, 64.40), (84.45, TOTAL)]
 SR = 48000
 def load(p):
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", p, "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"], capture_output=True, check=True).stdout
