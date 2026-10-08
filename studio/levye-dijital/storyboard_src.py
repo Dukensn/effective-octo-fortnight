@@ -7,9 +7,23 @@ import json
 import re
 import unicodedata
 
-B = [0, 3.20, 9.75, 14.20, 20.30, 25.80, 31.90, 34.05, 41.10, 44.90, 47.15, 50.95, 56.95, 64.40, 70.05, 75.95,
-     80.95, 84.45, 90.40, 94.20, 96.60, 101.05, 107.15, 110.15, 118.70, 127.80]
-W = json.load(open("onsets-atelye.json"))["words"]
+from variant import DAT, SUFFIX, TOTAL, F19, remap
+
+B0 = [0, 3.20, 9.75, 14.20, 20.30, 25.80, 31.90, 34.05, 41.10, 44.90, 47.15, 50.95, 56.95, 64.40, 70.05, 75.95,
+      80.95, 84.45, 90.40, 94.20, 96.60, 101.05, 107.15, 115.70, 124.39]   # original voice montage
+B = [round(remap(t), 2) for t in B0]
+W = []
+for w in json.load(open("onsets.json"))["words"]:
+    if DAT == "B" and F19 <= w["s"] < 94.20:
+        continue                                    # old date sentence, replaced below
+    w = dict(w, s=round(remap(w["s"]), 2))
+    if w["w"] == "levyedijital.vercel.app":
+        w["w"] = "atelyedijital.vercel.app"
+    W.append(w)
+if DAT == "B":
+    W += [{"w": a, "s": round(F19 + t, 2)} for a, t in [("Dat", .25), ("la", .47), ("se", .70), ("samdi", .82), ("24", 1.15),
+          ("oktòb", 1.78), ("ak", 2.27), ("31", 2.46), ("oktòb", 3.09), ("2026", 3.57), ("la.", 4.32)]]
+    W.sort(key=lambda w: w["s"])
 
 
 def cues(i):
@@ -19,13 +33,13 @@ def cues(i):
 
 HEADER = """---
 format: 1080x1920
-duration: 127.80s
+duration: {TOTAL:.2f}s
 message: "Claude te fè pub sa a ; aprann fè l ou menm nan Atelye Dijital : 2 jou fòmasyon, samdi 17 ak 24 oktòb 2026, Sassou's Lamadone Club."
 arc: Preuve (la pub se monte devant nous) → Gag muet → Diagnostic (biznis, pwodwi, kreyatè) → Pivot → Marque → Programme (5 modules) → Infos (date, lè, lokal, plas) → CTA WhatsApp + lyen
 audience: entrepreneurs, vendeurs et créateurs de contenu en Haïti, non techniques, sur WhatsApp
 mode: autonomous
 captions: disabled
-voice: "assets/audio/voix-montage-atelye.wav (127.80 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
+voice: "assets/audio/voix-montage-atelye{SUFFIX}.wav ({TOTAL:.2f} s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
 direction: "B · Liy tan an (la bande de montage verticale), avec la fin de C (l'épingle qui se plante sur le Sassou's)"
 patterns: ../patterns/STORYBOARD-CRAFT.md, ../patterns/PATTERNS.md
 ---
@@ -278,34 +292,27 @@ Scene 2 (2.10 à 3.80 s) : noir
   TEXTE ÉCRAN : « N ap fè nou konnen plas yo limite » puis « a [boîte : 30 moun] sèlman, » puis « kidonk si w rive an reta, n ap dezole pou ou. »
   ÉTAPES : 0.98 « plas » : la grille vide arrive ; 1.89 « 30 » : « 30 » en gros, les places s'allument une à une (0,03 s d'écart, ticks) ; 3.61 « rive an reta » : petite horloge qui dépasse ; 4.90 « dezole » : la porte se ferme doucement ; 5.80 dérive.
   SON : ticks 103.00 → 104.00."""),
-("Pri", "Une carte-ticket blanche arrive devant la grille des 30 places (floue, en retrait) : « PRI » puis « 95 dola » en très gros ; anneau accent au mot « 95 » ; la carte s'efface et la grille revient nette.",
- "Pou patisipe, w ap peye 95 dola.", "info", "stat-hero (Adapt)", "le prix 95 dola", "spring-pop-entrance, depth-of-field-blur", "light",
- "à 3.00 local (110.15 global) : caméra cam(540, 900, 1.0) ; grille 30/30 allumée, la carte et l'épingle floues derrière",
- """Scene 1 (0.00 à 3.00 s)
-  TEXTE ÉCRAN : « Pou patisipe, » puis « w ap peye [boîte : 95 dola.] »
-  ÉTAPES : 0.10 la grille recule et se floute ; 0.28 « patisipe » : la carte-ticket arrive trop grande et floue, se pose ; 1.56 « 95 » : le chiffre tombe, anneau accent ; 2.10 « dola » ; 2.60 la carte s'efface, la grille revient nette.
-  SON : pop 108.71, chime 108.75."""),
 ("WhatsApp", "Le bouton vert « Kontakte nou sou WhatsApp » arrive ; la tête de lecture devenue curseur arrive en courbe et clique ; le numéro « 31 43 3938 » s'imprime chiffre par chiffre.",
  "Pou rezève plas ou, tanpri kontakte nou kounye a sou WhatsApp, oswa klike sou lyen WhatsApp ki anba videyo sa a, oubyen ekri nou sou 31 43 3938.", "cta", "cta-morph-press (Adapt)", "le bouton WhatsApp et le numéro", "cursor-click-ripple, press-release-spring", "light",
  "à 8.55 local (115.70 global) : caméra cam(540, 900, 1.0), bouton WhatsApp avec le numéro, curseur posé à côté",
  """Scene 1 (0.00 à 8.55 s)
   TEXTE ÉCRAN : « Pou rezève plas ou, » puis « tanpri kontakte nou kounye a sou [boîte : WhatsApp,] » puis « oswa klike sou lyen WhatsApp ki anba videyo sa a, » puis « oubyen ekri nou sou 31 43 3938. »
   ÉTAPES : 0.31 « rezève » : une place de la grille se détache et vole vers le haut ; 1.63 « kontakte » : le bouton WhatsApp arrive trop grand et flou, se pose ; 2.91 « WhatsApp » : le curseur arrive en courbe (0,45 s) et clique (anneau accent) ; 4.26 « lyen » : une flèche pointe vers le bas (vers le lien sous la vidéo) ; 4.48 deuxième clic ; 7.55 « 31 » : le numéro s'imprime en gros sous le bouton, chiffre par chiffre, jusqu'à 3938 (8.20) ; 8.40 recul.
-  SON : clic 113.10, clic 114.70, chime 118.10."""),
+  SON : clic 110.10, clic 111.70, chime 115.10 (temps de la variante A)."""),
 ("Fòmilè + fen", "Le lien « atelyedijital.vercel.app » se tape dans une pilule ; le curseur clique ; recul final : carte de fin (ATELYE DIJITAL, Samdi 17 & 24 oktòb 2026, Sassou's Lamadone Club, bouton WhatsApp, lien) ; les 5 pistes pleines en miniature ; tenue vivante puis iris.",
  "Ou ka ranpli fòmilè enskripsyon an tou, lè w ale sou atelyedijital.vercel.app", "end", "cta-morph-press (Adapt)", "le lien, puis la carte de fin", "cursor-click-ripple, viewport-change", "light",
- "fin du film (127.80) : iris fermé",
+ "fin du film ({TOTAL:.2f}) : iris fermé",
  """Scene 1 (0.00 à 4.40 s) : le lien
   TEXTE ÉCRAN : « Ou ka ranpli fòmilè enskripsyon an tou, » puis « lè w ale sou [trait : atelyedijital.vercel.app] »
   ÉTAPES : 0.94 « fòmilè » : une carte formulaire (3 champs HTML : Non, Telefòn, Klike) arrive ; 2.73 « ale » : la pilule de lien ; 3.18 l'URL se tape (0,9 s, typing) ; 4.00 le curseur clique la pilule.
 Scene 2 (4.40 à 8.69 s) : carte de fin
   TEXTE ÉCRAN : aucun sous-titre ; la carte : ATELYE DIJITAL, « Samdi 17 & 24 oktòb 2026 · 10:00 AM – 4:00 PM », « Sassou's Lamadone Club · anfas Plas Anacaona », bouton WhatsApp « 31 43 3938 », lien.
   ÉTAPES : 4.40 recul : tout le film se ramasse (implosion 0,5 s) puis la carte de fin s'assemble (0,3 s, cascade) ; 5.20 la miniature des 5 pistes pleines (rime) ; 5.60 → 7.90 tenue vivante (dérive, l'anneau du bouton respire) ; 7.90 → 8.69 iris vers le bouton WhatsApp.
-  SON : typing 121.40 → 123.10, clic 123.40, whoosh-cinematic 127.00."""),
+  SON : typing 118.40 → 120.10, clic 120.11, whoosh-cinematic 123.61 (temps de la variante A)."""),
 ]
 
 
-FIDS = {"Pri": "22b-pri", "WhatsApp": "23-whatsapp", "Fòmilè + fen": "24-fomile-fen"}
+FIDS = {"Dat la": "19-dat-la" + SUFFIX, "WhatsApp": "23-whatsapp", "Fòmilè + fen": "24-fomile-fen" + SUFFIX}
 
 
 def main():
@@ -336,8 +343,17 @@ Word cues: {cues(i)}
 
 {scenes}
 """)
-    open("STORYBOARD.md", "w").write("\n".join(out))
-    print(f"STORYBOARD.md: {len(F)} frames, {B[-1]:.2f} s")
+    text = "\n".join(out).replace("{TOTAL:.2f}", f"{TOTAL:.2f}").replace("{SUFFIX}", SUFFIX)
+    if DAT == "B":   # new date: Saturdays 24 and 31 October 2026
+        for a, b in [("samdi 17 ak 24 oktòb", "samdi 24 ak 31 oktòb"), ("Samdi 17 & 24 oktòb", "Samdi 24 & 31 oktòb"),
+                     ("« SAM 17 OKT » puis « SAM 24 OKT »", "« SAM 24 OKT » puis « SAM 31 OKT »"),
+                     ('"Dat la se 17 ak 24 oktòb 2026."', '"Dat la se samdi 24 oktòb ak 31 oktòb 2026 la."'),
+                     ("« Dat la se [boîte : 17] ak [trait : 24] oktòb 2026. »", "« Dat la se samdi [boîte : 24] oktòb » puis « ak [trait : 31] oktòb 2026 la. »"),
+                     ("1.17 « 17 » : « SAM 17 » + gros « 17 OKT » ; 1.84 « 24 » : « SAM 24 » + gros « 24 OKT » ; 2.67 « 2026 » ; 3.40 descente.",
+                      "1.15 « 24 » : « SAM 24 » + gros « 24 OKT » ; 2.46 « 31 » : « SAM 31 » + gros « 31 OKT » ; 3.57 « 2026 » ; 4.65 descente.")]:
+            text = text.replace(a, b)
+    open("STORYBOARD.md", "w").write(text)
+    print(f"STORYBOARD.md (DAT={DAT}): {len(F)} frames, {B[-1]:.2f} s")
 
 
 main()

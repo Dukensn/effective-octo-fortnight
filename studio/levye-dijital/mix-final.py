@@ -8,15 +8,15 @@ Music (user-provided track assets/music/funk.mp3, 111 BPM, bar 2.162 s, main dro
      repeated on downbeats with 40 ms crossfades, fade out over the end card
 Ducking: music gain follows the voice envelope (-12 dB under speech, 0.25 s attack, 0.6 s release).
 SFX: names from ../.claude/skills/media-use/audio/assets/sfx/, events in assets/audio/sfx-events.json ([name, t, gain]).
-Usage: python3 mix-final.py  -> assets/audio/mix-final.wav
+Usage: DAT=A|B python3 mix-final.py  -> assets/audio/mix-final[-dat2].wav (variant.py)
 """
 import json, subprocess
+from variant import SUFFIX, TOTAL, remap
 import numpy as np
 from scipy.ndimage import uniform_filter1d
 from scipy.signal import butter, sosfilt
 
 SR = 48000
-TOTAL = 127.80
 SFXDIR = "../.claude/skills/media-use/audio/assets/sfx"
 
 
@@ -27,7 +27,7 @@ def load(path, ch=2):
 
 
 N = int(TOTAL * SR)
-voice = load("assets/audio/voix-montage-atelye.wav")[:N]
+voice = load(f"assets/audio/voix-montage-atelye{SUFFIX}.wav")[:N]
 voice = np.pad(voice, ((0, N - len(voice)), (0, 0)))
 track = load("assets/music/funk.mp3")
 
@@ -79,6 +79,7 @@ except Exception:
     events = []
 cache = {}
 for name, t, g in events:
+    t = remap(t)   # sfx-events.json is on the original montage timeline
     if name not in cache:
         cache[name] = load(f"{SFXDIR}/{name}.mp3")
     s = cache[name] * float(g)
@@ -99,5 +100,5 @@ subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-
                 "-c:a", "pcm_s16le", tmp], input=mix.astype(np.float32).tobytes(), check=True)
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", tmp, "-af",
                 "loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=disabled", "-ar", str(SR),
-                "assets/audio/mix-final.wav"], check=True)
-print("assets/audio/mix-final.wav", round(N / SR, 2), "s,", len(events), "sfx")
+                f"assets/audio/mix-final{SUFFIX}.wav"], check=True)
+print(f"assets/audio/mix-final{SUFFIX}.wav", round(N / SR, 2), "s,", len(events), "sfx")

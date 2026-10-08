@@ -15,7 +15,8 @@ export HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 HYPERFRAMES_SKIP_SKILLS=1 HYPER
 # ---- settings (times in seconds on the final timeline, see STORYBOARD.md) ------------------------------------------
 FIRST_FRAME="01-ak-claude"      # id of the first frame (basename of its src, without .html)
 END_CARD="24-fomile-fen"          # id of the end card frame (the iris opens it)
-TOTAL="${TOTAL:-127.80}"               # final duration = STORYBOARD duration = TOTAL in build-audio.sh
+export DAT="${DAT:-A}"           # A = old date, B = new date (variant.py); STORYBOARD.md is rebuilt for it below
+TOTAL="${TOTAL:-$(python3 -c "from variant import TOTAL; print(TOTAL)")}"   # final duration = STORYBOARD duration
 AUDIO="assets/audio/${MIX:-mix.wav}"   # mix from build-audio.sh or build-music-options.py (MIX=mix-M2.wav bash assemble.sh); empty = silent
 
 # Light flash, dark world -> light world (empty LEAK_AT = no flash). The flash covers the screen from
@@ -48,9 +49,10 @@ RUN_LINT="${RUN_LINT:-1}"  # RUN_LINT=0 skips the lint
 
 S=../.claude/skills/product-launch-video/scripts
 [ -d "$S" ] || { echo "assemble: $S not found (the project must sit at the repository root)" >&2; exit 1; }
-export FIRST_FRAME END_CARD TOTAL AUDIO LEAK_AT LEAK_X LEAK_Y IRIS_AT IRIS_X IRIS_Y IRIS_FROM PAPER BED_START BED_END \
+export FIRST_FRAME END_CARD TOTAL AUDIO DAT LEAK_AT LEAK_X LEAK_Y IRIS_AT IRIS_X IRIS_Y IRIS_FROM PAPER BED_START BED_END \
   ACCENT ACCENT_LIGHT ACCENT_GLOW
 
+python3 storyboard_src.py
 python3 - <<'EOF'
 # a frame whose HTML exists on disk is marked animated; the others stay outline and are skipped by the assembler
 import os, re
@@ -193,6 +195,18 @@ import re
 p = "index.html"; s = open(p, encoding="utf-8").read()
 s2 = re.sub(r'<script src="https://cdn\.jsdelivr\.net/npm/gsap@[^"]+"[^>]*></script>', '<script src="assets/vendor/gsap.min.js"></script>', s)
 if s2 != s: open(p, "w", encoding="utf-8").write(s2); print("gsap: CDN link replaced by assets/vendor/gsap.min.js")
+PYEOF
+# ---- the written price (Atelye Dijital): a badge over the whole film, on top of every frame ----
+sed "s/@TOTAL@/$TOTAL/g" compositions/pri-badge.html.in > compositions/pri-badge.gen.html
+python3 - <<'PYEOF'
+import os, re
+p = "index.html"; s = open(p, encoding="utf-8").read(); T = os.environ["TOTAL"]
+badge = (f'<div\n        id="el-pri-badge"\n        class="scene"\n        data-composition-id="pri-badge"\n'
+         f'        data-composition-src="compositions/pri-badge.gen.html"\n        data-start="0"\n        data-duration="{T}"\n'
+         f'        data-track-index="2"\n      ></div>\n\n    </div>\n\n    <script>')
+if 'id="el-pri-badge"' not in s:
+    s = re.sub(r"\n    </div>\n\n    <script>", "\n      " + badge, s, count=1)
+    open(p, "w", encoding="utf-8").write(s); print("price badge mounted over", T, "s")
 PYEOF
 if [ "$RUN_LINT" = "1" ]; then
   npx hyperframes lint 2>&1 | grep -E "✗|error\(s\)|warning\(s\)" || echo "lint: no error reported"
