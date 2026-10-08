@@ -35,7 +35,7 @@
       transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
     .lv-box-tx { position: relative; }
 
-    #f24-iris { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; clip-path: circle(1300px at 540px 972px); }
+    #f24-iris { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; clip-path: circle(1300px at 540px 1142px); }
     #f24-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
     #f24-g1, #f24-g2 { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
     /* carte + épingle de la frame 21, floues derrière (= frame 23) */
@@ -90,21 +90,26 @@
     .f24-i1 { font: 800 50px/1 "Inter"; letter-spacing: -0.8px; color: #1B1A18; }
     .f24-i2 { font: 600 38px/1 "Inter"; color: #5A554E; }
     #f24-hr2 { position: absolute; left: 330px; width: 240px; top: 528px; height: 3px; border-radius: 2px; background: #D9D4CC; transform-origin: 50% 50%; }
-    #f24-ebtn { position: absolute; left: 90px; top: 720px; width: 720px; height: 140px; border-radius: 70px; background: #15803D; overflow: hidden;
+    #f24-ebtn { position: absolute; left: 90px; top: 900px; width: 720px; height: 140px; border-radius: 70px; background: #15803D; overflow: hidden;
       display: flex; align-items: center; justify-content: center; gap: 24px;
       box-shadow: 0 34px 60px rgba(37,140,80,.26), 0 8px 18px rgba(60,45,30,.10), inset 0 2px 0 rgba(255,255,255,.35); }
     #f24-enum { font: 800 64px/1 "Inter"; letter-spacing: 1px; color: #1B1A18; white-space: nowrap; }
     #f24-esheen { position: absolute; left: 0; top: 0; width: 200px; height: 140px; transform: translateX(-300px) skewX(-18deg);
       background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.38), rgba(255,255,255,0)); }
-    #f24-ering { position: absolute; left: 76px; top: 706px; width: 748px; height: 168px; border-radius: 84px; border: 6px solid #D97757; box-sizing: border-box; }
-    #f24-epill { position: absolute; left: 130px; top: 900px; width: 640px; height: 100px; border-radius: 50px; background: #FFFFFF;
+    #f24-ering { position: absolute; left: 76px; top: 886px; width: 748px; height: 168px; border-radius: 84px; border: 6px solid #D97757; box-sizing: border-box; }
+    #f24-epill { position: absolute; left: 130px; top: 1066px; width: 640px; height: 100px; border-radius: 50px; background: #FFFFFF;
       display: flex; align-items: center; justify-content: center; gap: 18px; font: 700 40px/1 "Inter"; color: #1B1A18; white-space: nowrap;
       box-shadow: 0 20px 40px rgba(60,45,30,.12), 0 0 0 2px rgba(27,26,24,.08); }
-    #f24-mini { position: absolute; left: 310px; top: 1040px; width: 280px; height: 130px; border-radius: 22px; background: #F8F6F2; overflow: hidden;
-      box-shadow: 0 14px 30px rgba(60,45,30,.12), 0 0 0 1px rgba(27,26,24,.05); }
-    .f24-ml { position: absolute; top: 16px; width: 40px; height: 98px; border-radius: 9px; background: #EDE9E2; overflow: hidden; }
-    .f24-mf { position: absolute; left: 0; top: 0; width: 40px; height: 98px; border-radius: 9px; transform-origin: 50% 0%; }
-    #f24-mph { position: absolute; left: 10px; top: 16px; width: 260px; height: 3px; border-radius: 2px; background: #D97757; }
+    /* le prix : écrit seulement ici, à la fin, en grand */
+    #f24-price { position: absolute; left: 90px; top: 690px; width: 720px; height: 170px; border-radius: 40px; background: #1B1A18; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 30px;
+      box-shadow: 0 34px 60px rgba(27,26,24,.28), 0 8px 18px rgba(60,45,30,.12), inset 0 2px 0 rgba(255,255,255,.12); }
+    #f24-plab { font: 700 34px/1 "Inter"; letter-spacing: 6px; color: #B9B3A9; }
+    #f24-pval { font: 900 104px/1 "InterD"; letter-spacing: -3px; color: #FFFFFF; white-space: nowrap; }
+    #f24-pval span { color: #E89A7C; }
+    #f24-psheen { position: absolute; left: 0; top: 0; width: 200px; height: 170px; transform: translateX(-300px) skewX(-18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0)); }
+    #f24-pring { position: absolute; left: 74px; top: 674px; width: 752px; height: 202px; border-radius: 56px; border: 6px solid #D97757; box-sizing: border-box; }
     /* trait de crête (sous-titre) */
     .f24-pk { position: relative; display: inline-block; }
     .f24-pk-s { position: absolute; left: -6px; width: calc(100% + 12px); bottom: -8px; height: 16px; clip-path: inset(0% 100% 0% 0%); }
@@ -172,6 +177,12 @@
               <div id="f24-hr2" style="opacity:0;"></div>
               <div id="f24-v1" class="f24-info f24-i1" style="top:556px; opacity:0;">Sassou's Lamadone Club</div>
               <div id="f24-v2" class="f24-info f24-i2" style="top:618px; opacity:0;">anfas Plas Anacaona</div>
+              <div id="f24-pring" style="opacity:0;"></div>
+              <div id="f24-price" style="opacity:0;">
+                <div id="f24-psheen"></div>
+                <div id="f24-plab">PRI</div>
+                <div id="f24-pval">95 dola <span>US</span></div>
+              </div>
               <div id="f24-ering" style="opacity:0;"></div>
               <div id="f24-ebtn" style="opacity:0;">
                 <div id="f24-esheen"></div>
@@ -181,14 +192,6 @@
               <div id="f24-epill" style="opacity:0;">
                 <svg viewBox="0 0 24 24" width="48" height="48"><g fill="none" stroke="#1B1A18" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.7 3.9 5.9 3.9 9.5s-1.3 6.8-3.9 9.5M12 2.5C9.4 5.2 8.1 8.4 8.1 12s1.3 6.8 3.9 9.5"/></g></svg>
                 atelyedijital.vercel.app
-              </div>
-              <div id="f24-mini" style="opacity:0;">
-                <div class="f24-ml" style="left:20px;"><div class="f24-mf" style="background:#1B1A18;"></div></div>
-                <div class="f24-ml" style="left:72px;"><div class="f24-mf" style="background:#5A554E;"></div></div>
-                <div class="f24-ml" style="left:124px;"><div class="f24-mf" style="background:#8C877F;"></div></div>
-                <div class="f24-ml" style="left:176px;"><div class="f24-mf" style="background:#B9B3A9;"></div></div>
-                <div class="f24-ml" style="left:228px;"><div class="f24-mf" style="background:#5A554E;"></div></div>
-                <div id="f24-mph" style="opacity:0;"></div>
               </div>
             </div>
           </div>
@@ -327,13 +330,12 @@
         tl.fromTo(id, { opacity: 0, y: 22, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 5.41 + i * 0.04);
       });
       tl.fromTo("#f24-hr2", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.2, ease: "expo.out" }, 5.45);
-      tl.fromTo("#f24-ebtn", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.51);
-      tl.fromTo("#f24-epill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.57);
-      /* --- 5.20 la miniature des 5 pistes, toutes pleines (rime du début) --- */
-      tl.fromTo("#f24-mini", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.61);
-      document.querySelectorAll(".f24-mf").forEach(function (f, i) {
-        tl.fromTo(f, { scaleY: 0 }, { scaleY: 1, duration: 0.24, ease: "expo.out" }, 5.67 + i * 0.05);
-      });
+      tl.fromTo("#f24-ebtn", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.95);
+      tl.fromTo("#f24-epill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 6.01);
+      /* --- 5.63 le prix tombe, trop grand et flou, impact + anneau accent --- */
+      tl.fromTo("#f24-price", { opacity: 0, scale: 1.6, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 5.63);
+      tl.fromTo("#f24-price", { y: 0 }, { y: 6, duration: 0.07, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 5.81);
+      tl.fromTo("#f24-pring", { opacity: 1, scale: 0.96 }, { opacity: 0, scale: 1.14, duration: 0.6, ease: "expo.out", immediateRender: false }, 5.70);
 
       /* ===== 5.60 → 7.90 tenue vivante ===== */
       /* l'anneau du bouton respire (vie finie) */
@@ -341,14 +343,18 @@
       tl.to("#f24-ering", { opacity: 0.25, scale: 1.05, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: 3 }, 6.17);
       /* reflets sur le bouton, la tête de lecture parcourt la miniature, le globe tourne */
       tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut" }, 6.46);
-      tl.fromTo("#f24-mph", { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.1, ease: "none" }, 6.86);
-      tl.to("#f24-mph", { y: 95, duration: 1.0, ease: "none" }, 6.96);
+      /* le prix marque le coup deux fois pendant la tenue */
+      tl.fromTo("#f24-psheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut" }, 6.80);
+      tl.to("#f24-price", { scale: 1.05, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 6.86);
+      tl.fromTo("#f24-pring", { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 1.12, duration: 0.6, ease: "expo.out", immediateRender: false }, 6.90);
+      tl.to("#f24-price", { scale: 1.05, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 7.90);
+      tl.fromTo("#f24-pring", { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 1.12, duration: 0.6, ease: "expo.out", immediateRender: false }, 7.94);
       tl.to("#f24-epill", { scale: 1.04, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 7.36);
       tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 7.66);
       tl.to("#f24-ebtn", { scale: 1.03, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 8.03);
 
       /* ===== 7.90 → 8.69 iris vers le bouton WhatsApp, puis papier nu ===== */
-      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 972px)" }, { clipPath: "circle(0px at 540px 972px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 8.31);
+      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 1142px)" }, { clipPath: "circle(0px at 540px 1142px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 8.31);
       tl.to(["#f24-floor", "#f24-giant", "#f24-wmk"], { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 8.51);
 
       /* --- sous-titres --- */

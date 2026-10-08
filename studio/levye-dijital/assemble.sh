@@ -196,18 +196,6 @@ p = "index.html"; s = open(p, encoding="utf-8").read()
 s2 = re.sub(r'<script src="https://cdn\.jsdelivr\.net/npm/gsap@[^"]+"[^>]*></script>', '<script src="assets/vendor/gsap.min.js"></script>', s)
 if s2 != s: open(p, "w", encoding="utf-8").write(s2); print("gsap: CDN link replaced by assets/vendor/gsap.min.js")
 PYEOF
-# ---- the written price (Atelye Dijital): a badge over the whole film, on top of every frame ----
-sed "s/@TOTAL@/$TOTAL/g" compositions/pri-badge.html.in > compositions/pri-badge.gen.html
-python3 - <<'PYEOF'
-import os, re
-p = "index.html"; s = open(p, encoding="utf-8").read(); T = os.environ["TOTAL"]
-badge = (f'<div\n        id="el-pri-badge"\n        class="scene"\n        data-composition-id="pri-badge"\n'
-         f'        data-composition-src="compositions/pri-badge.gen.html"\n        data-start="0"\n        data-duration="{T}"\n'
-         f'        data-track-index="2"\n      ></div>\n\n    </div>\n\n    <script>')
-if 'id="el-pri-badge"' not in s:
-    s = re.sub(r"\n    </div>\n\n    <script>", "\n      " + badge, s, count=1)
-    open(p, "w", encoding="utf-8").write(s); print("price badge mounted over", T, "s")
-PYEOF
 if [ "$RUN_LINT" = "1" ]; then
   npx hyperframes lint 2>&1 | grep -E "✗|error\(s\)|warning\(s\)" || echo "lint: no error reported"
 fi
