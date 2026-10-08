@@ -1,0 +1,374 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+    #f13-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* bande du programme (règle MODIL, tête de lecture, ouverture de station : style de la frame 14) */
+    .f13-rail { position: absolute; left: 70px; top: -600px; width: 3px; height: 3200px; background: rgba(27,26,24,.13); }
+    .f13-ticks { position: absolute; left: 58px; top: -600px; width: 27px; height: 3200px;
+      background: repeating-linear-gradient(to bottom, rgba(27,26,24,.16) 0 2px, transparent 2px 80px); }
+    .f13-mod { position: absolute; left: 120px; display: flex; align-items: center; gap: 16px; font: 700 30px "Inter"; letter-spacing: 6px; color: #1B1A18; }
+    .f13-mdot { width: 14px; height: 14px; border-radius: 50%; background: #D97757; display: inline-block; }
+    .f13-ph { position: absolute; left: 60px; width: 60px; height: 24px; }
+    .f13-ph-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; background: #D97757; box-shadow: 0 0 0 6px rgba(217,119,87,.18); }
+    .f13-ph-ln { position: absolute; left: 24px; top: 11px; width: 36px; height: 2px; background: #D97757; }
+    .f13-open { position: absolute; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 12px rgba(217,119,87,.5); }
+    .f13-hd { position: absolute; left: 56px; top: 42px; font: 800 52px/1.1 "Inter"; letter-spacing: -1px; color: #1B1A18; }
+    .f13-hr { position: absolute; left: 56px; right: 56px; top: 132px; height: 2px; background: rgba(27,26,24,.08); transform-origin: 0 50%; }
+
+    /* M1 (frame 12) qui remonte : la pub et ses anneaux de points-personnes (handoff_in) */
+    #f13-ghost { left: 120px; top: -850px; width: 880px; height: 1110px; }
+    .f13-guide { position: absolute; border-radius: 50%; border: 2px dashed #D9D4CC; box-sizing: border-box; }
+    #f13-gad { position: absolute; left: 385px; top: 672px; width: 110px; height: 196px; border-radius: 16px; overflow: hidden; background: #1B1A18;
+      box-shadow: 0 24px 46px rgba(27,26,24,.28), 0 0 0 4px #FFFFFF; }
+    .f13-p { position: absolute; width: 24px; height: 30px; }
+    .f13-p::before { content: ""; position: absolute; left: 6px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: #1B1A18; }
+    .f13-p::after { content: ""; position: absolute; left: 0; top: 15px; width: 24px; height: 15px; border-radius: 12px 12px 4px 4px; background: #1B1A18; }
+    .f13-d { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #5A554E; }
+    .f13-e { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #8C877F; }
+
+    /* station MODIL 2 : hub Claude + trois agents */
+    #f13-card { left: 120px; top: 270px; width: 880px; height: 1110px; opacity: 0; clip-path: inset(555px 0px 555px 0px); }
+    .f13-ln { position: absolute; left: 0; top: 0; width: 880px; height: 1110px; }
+    #f13-hubslot { position: absolute; left: 340px; top: 280px; width: 200px; height: 200px; border-radius: 50%; border: 3px dashed #D9D4CC; box-sizing: border-box; }
+    #f13-hub { position: absolute; left: 340px; top: 280px; width: 200px; height: 200px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 30px 60px rgba(60,45,30,.18), inset 0 1px 0 #fff; }
+    #f13-star { width: 116px; height: 116px; }
+    #f13-halo { position: absolute; left: 340px; top: 280px; width: 200px; height: 200px; border-radius: 50%; border: 3px solid #D97757; box-sizing: border-box; }
+    #f13-sats { position: absolute; left: 0; top: 0; width: 880px; height: 1110px; transform-origin: 440px 380px; }
+    .f13-sat { position: absolute; width: 46px; height: 46px; border-radius: 50%; background: #EDE9E2; box-shadow: 0 10px 20px rgba(60,45,30,.10); }
+    .f13-sat i { position: absolute; left: 16px; top: 16px; width: 14px; height: 14px; border-radius: 50%; background: #B9B3A9; }
+    .f13-slot { position: absolute; top: 930px; width: 150px; height: 150px; border-radius: 36px; border: 3px dashed #D9D4CC; box-sizing: border-box; }
+    .f13-tile { position: absolute; top: 930px; width: 150px; height: 150px; border-radius: 36px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 24px 48px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .f13-lab { position: absolute; top: 872px; width: 255px; text-align: center; font: 700 28px/34px "Inter"; color: #1B1A18; white-space: nowrap; }
+    /* fiche client miniature (tuile Kliyan) */
+    #f13-mc { position: relative; width: 96px; height: 74px; border-radius: 14px; background: #FFFFFF; border: 2px solid #D9D4CC; box-sizing: border-box; }
+    .f13-mb { position: absolute; height: 8px; border-radius: 4px; background: #D9D4CC; }
+
+    /* bulles de détail (une à la fois) */
+    .f13-pop { position: absolute; top: 520px; height: 300px; border-radius: 26px; background: #FFFFFF; overflow: hidden;
+      box-shadow: 0 30px 60px rgba(60,45,30,.18), 0 0 0 1px rgba(27,26,24,.05); }
+    .f13-sk { position: absolute; height: 14px; border-radius: 7px; background: #EDE9E2; }
+    #f13-pw { left: 530px; width: 330px; height: 320px; }
+    #f13-pwh { position: absolute; left: 0; top: 0; width: 330px; height: 66px; display: flex; align-items: center; gap: 12px; padding-left: 18px;
+      box-sizing: border-box; font: 700 25px/1 "Inter"; color: #1B1A18; border-bottom: 1px solid rgba(27,26,24,.08); }
+    #f13-pwb { position: absolute; left: 0; top: 66px; width: 330px; height: 254px; background: #F3F0EA; }
+    .f13-bub { position: absolute; padding: 12px 16px; font: 500 25px/1.25 "Inter"; white-space: nowrap; }
+    #f13-bin { left: 16px; top: 22px; background: #FFFFFF; color: #1B1A18; border-radius: 18px 18px 18px 4px; box-shadow: 0 4px 10px rgba(60,45,30,.08); }
+    #f13-bout { right: 16px; top: 112px; background: #1B1A18; color: #FFFFFF; border-radius: 18px 18px 4px 18px; }
+    #f13-bstar { position: absolute; left: 74px; top: 120px; width: 34px; height: 34px; }
+    #f13-auto { position: absolute; right: 16px; top: 184px; display: flex; align-items: center; gap: 8px; font: 600 20px/1 "Inter"; color: #77726B; }
+  </style>
+
+  <div id="root" data-composition-id="13-ajan-ia" data-width="1080" data-height="1920" data-duration="7.45">
+    <div id="f13-bg" class="clip" data-start="0" data-duration="7.45" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f13-floor" class="lv-floor"></div>
+        <div id="f13-giant" class="lv-giant" style="left:-60px; top:1080px;">AJAN</div>
+      </div>
+    </div>
+
+    <div id="f13-stage" class="clip" data-start="0" data-duration="7.45" data-track-index="1">
+      <div id="f13-cam">
+        <div class="f13-rail"></div><div class="f13-ticks"></div>
+        <div id="f13-ghost" class="lv-glass">
+          <div class="f13-guide" style="left:300px; top:630px; width:280px; height:280px;"></div>
+          <div class="f13-guide" style="left:220px; top:550px; width:440px; height:440px;"></div>
+          <div class="f13-guide" style="left:138px; top:468px; width:604px; height:604px;"></div>
+          <div id="f13-gcrowd"></div>
+          <div id="f13-gad">
+            <div style="position:absolute; left:8px; top:8px; width:94px; height:112px; border-radius:10px; overflow:hidden;"><svg viewBox="0 0 94 112" width="94" height="112"><rect width="94" height="112" fill="#5A554E"/><circle cx="70" cy="28" r="10" fill="#B9B3A9"/><path d="M0 112 L30 58 L52 88 L66 70 L94 112 Z" fill="#8C877F"/><path d="M0 112 L18 90 L40 112 Z" fill="#B9B3A9"/></svg></div>
+            <div style="position:absolute; left:10px; top:132px; width:86px; height:8px; border-radius:4px; background:#8C877F;"></div>
+            <div style="position:absolute; left:10px; top:146px; width:60px; height:8px; border-radius:4px; background:#5A554E;"></div>
+            <div style="position:absolute; left:10px; top:162px; width:58px; height:20px; border-radius:10px; background:#FFFFFF;"></div>
+          </div>
+        </div>
+        <div id="f13-mod" class="f13-mod" style="top:200px; opacity:0;"><span class="f13-mdot"></span>MODIL 2</div>
+        <div id="f13-ph" class="f13-ph" style="top:813px;"><div class="f13-ph-dot"></div><div class="f13-ph-ln"></div></div>
+
+        <div id="f13-card" class="lv-glass">
+          <div id="f13-hd" class="f13-hd" style="opacity:0;">Ajan IA</div>
+          <div id="f13-hr" class="f13-hr" style="transform:scaleX(0);"></div>
+
+          <!-- liens pointillés hub → agents (gris), et leur version active (accent) -->
+          <svg id="f13-l1" class="f13-ln" viewBox="0 0 880 1110" style="clip-path:inset(0px 0px 745px 0px);"><path d="M440 380 L185 860" stroke="#B9B3A9" stroke-width="4" stroke-dasharray="2 13" stroke-linecap="round" fill="none"/></svg>
+          <svg id="f13-l2" class="f13-ln" viewBox="0 0 880 1110" style="clip-path:inset(0px 0px 745px 0px);"><path d="M440 380 L440 860" stroke="#B9B3A9" stroke-width="4" stroke-dasharray="2 13" stroke-linecap="round" fill="none"/></svg>
+          <svg id="f13-l3" class="f13-ln" viewBox="0 0 880 1110" style="clip-path:inset(0px 0px 745px 0px);"><path d="M440 380 L695 860" stroke="#B9B3A9" stroke-width="4" stroke-dasharray="2 13" stroke-linecap="round" fill="none"/></svg>
+          <svg id="f13-a1" class="f13-ln" viewBox="0 0 880 1110" style="opacity:0;"><path d="M440 380 L185 860" stroke="#D97757" stroke-width="5" stroke-dasharray="2 13" stroke-linecap="round" fill="none"/></svg>
+          <svg id="f13-a2" class="f13-ln" viewBox="0 0 880 1110" style="opacity:0;"><path d="M440 380 L440 860" stroke="#D97757" stroke-width="5" stroke-dasharray="2 13" stroke-linecap="round" fill="none"/></svg>
+          <svg id="f13-a3" class="f13-ln" viewBox="0 0 880 1110" style="opacity:0;"><path d="M440 380 L695 860" stroke="#D97757" stroke-width="5" stroke-dasharray="2 13" stroke-linecap="round" fill="none"/></svg>
+
+          <div id="f13-sats">
+            <div id="f13-sat1" class="f13-sat" style="left:276px; top:408px; opacity:0;"><i></i></div>
+            <div id="f13-sat2" class="f13-sat" style="left:417px; top:207px; opacity:0;"><i></i></div>
+            <div id="f13-sat3" class="f13-sat" style="left:558px; top:408px; opacity:0;"><i></i></div>
+          </div>
+          <div id="f13-hubslot" style="opacity:0;"></div>
+          <div id="f13-halo" style="opacity:0;"></div>
+          <div id="f13-hub" style="opacity:0;"><svg id="f13-star" viewBox="0 0 24 24" width="116" height="116" style="opacity:0;"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg></div>
+
+          <!-- agents -->
+          <div id="f13-s1" class="f13-slot" style="left:110px; opacity:0;"></div>
+          <div id="f13-s2" class="f13-slot" style="left:365px; opacity:0;"></div>
+          <div id="f13-s3" class="f13-slot" style="left:620px; opacity:0;"></div>
+          <div id="f13-t1" class="f13-tile" style="left:110px; opacity:0;"><svg viewBox="0 0 24 24" width="78" height="78"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg></div>
+          <div id="f13-t2" class="f13-tile" style="left:365px; opacity:0;">
+            <div id="f13-mc">
+              <div style="position:absolute; left:10px; top:10px; width:28px; height:28px; border-radius:50%; background:#8C877F;"></div>
+              <div class="f13-mb" style="left:46px; top:14px; width:38px; background:#1B1A18;"></div>
+              <div class="f13-mb" style="left:46px; top:28px; width:28px;"></div>
+              <div class="f13-mb" style="left:10px; top:50px; width:72px;"></div>
+            </div>
+          </div>
+          <div id="f13-t3" class="f13-tile" style="left:620px; opacity:0;"><svg viewBox="0 0 24 24" width="64" height="64"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></div>
+          <div id="f13-b1" class="f13-lab" style="left:57px; opacity:0;">Kontni</div>
+          <div id="f13-b2" class="f13-lab" style="left:312px; opacity:0;">Kliyan</div>
+          <div id="f13-b3" class="f13-lab" style="left:567px; opacity:0;">Otomatizasyon</div>
+
+          <!-- détail 1 : un contenu créé -->
+          <div id="f13-pk" class="f13-pop" style="left:40px; width:290px; opacity:0;">
+            <div style="position:absolute; left:20px; top:20px; width:250px; height:150px; border-radius:16px; overflow:hidden;">
+              <svg viewBox="0 0 250 150" width="250" height="150"><rect width="250" height="150" fill="#D9D4CC"/><circle cx="190" cy="44" r="18" fill="#FFFFFF"/><path d="M0 150 L70 70 L120 120 L160 90 L250 150 Z" fill="#B9B3A9"/><path d="M0 150 L44 112 L92 150 Z" fill="#8C877F"/></svg>
+            </div>
+            <div id="f13-pk1" class="f13-sk" style="left:20px; top:194px; width:220px; background:#1B1A18; transform-origin:0 50%;"></div>
+            <div id="f13-pk2" class="f13-sk" style="left:20px; top:222px; width:170px; transform-origin:0 50%;"></div>
+            <div id="f13-pk3" class="f13-sk" style="left:20px; top:250px; width:120px; transform-origin:0 50%;"></div>
+            <svg id="f13-pks" viewBox="0 0 24 24" width="40" height="40" style="position:absolute; left:230px; top:240px;"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+          </div>
+          <!-- détail 2 : la fiche client -->
+          <div id="f13-pc" class="f13-pop" style="left:295px; width:290px; opacity:0;">
+            <div style="position:absolute; left:24px; top:24px; width:84px; height:84px; border-radius:50%; background:#1B1A18;">
+              <svg viewBox="0 0 84 84" width="84" height="84"><circle cx="42" cy="33" r="13" fill="#FFFFFF"/><path d="M18 70 C20 54 31 48 42 48 C53 48 64 54 66 70 Z" fill="#FFFFFF"/></svg>
+            </div>
+            <div class="f13-sk" style="left:128px; top:42px; width:130px; height:16px; background:#1B1A18;"></div>
+            <div class="f13-sk" style="left:128px; top:72px; width:96px;"></div>
+            <div style="position:absolute; left:24px; right:24px; top:132px; height:2px; background:rgba(27,26,24,.08);"></div>
+            <div id="f13-pc1" class="f13-sk" style="left:24px; top:160px; width:200px; transform-origin:0 50%;"></div>
+            <div id="f13-pc2" class="f13-sk" style="left:24px; top:198px; width:160px; transform-origin:0 50%;"></div>
+            <div id="f13-pc3" class="f13-sk" style="left:24px; top:236px; width:130px; transform-origin:0 50%;"></div>
+            <div id="f13-pck" style="position:absolute; left:216px; top:222px; width:48px; height:48px; border-radius:50%; background:#1B1A18; opacity:0;">
+              <svg viewBox="0 0 48 48" width="48" height="48"><path d="M14 25 L21 32 L34 17" stroke="#FFFFFF" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <!-- détail 3 : mini conversation WhatsApp à réponse automatique -->
+          <div id="f13-pw" class="f13-pop" style="opacity:0;">
+            <div id="f13-pwh"><svg viewBox="0 0 24 24" width="32" height="32"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>Levye Dijital</div>
+            <div id="f13-pwb">
+              <div id="f13-bin" class="f13-bub" style="opacity:0;">Bonjou, ki pri a?</div>
+              <svg id="f13-bstar" viewBox="0 0 24 24" width="34" height="34" style="opacity:0;"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+              <div id="f13-bout" class="f13-bub" style="opacity:0;">Men pri a…</div>
+              <div id="f13-auto" style="opacity:0;"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M3 13 L8 18 L15 8 M10 17 L11 18 L19 8" stroke="#77726B" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>otomatik</div>
+            </div>
+          </div>
+        </div>
+        <div id="f13-open" class="f13-open" style="left:120px; top:824px; width:880px;"></div>
+      </div>
+    </div>
+
+    <div id="f13-text" class="clip" data-start="0" data-duration="7.45" data-track-index="2">
+      <div id="f13-u1" class="lv-sub"></div>
+      <div id="f13-u2" class="lv-sub"></div>
+      <div id="f13-u3" class="lv-sub"></div>
+      <div id="f13-u4" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f13-grainc" class="clip" data-start="0" data-duration="7.45" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "13-ajan-ia", T = 7.45;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* sous-titres mot à mot (sub()/words() du pilote ; "group" = une boîte sur plusieurs mots, chacun sur son repère) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          if (w[2] === "group") {
+            var bx = document.createElement("span"); bx.className = "lv-box";
+            bx.innerHTML = '<span class="lv-box-bg"></span><span class="lv-box-tx"></span>';
+            var tx = bx.querySelector(".lv-box-tx");
+            w[0].forEach(function (g, j) {
+              var gs = document.createElement("span"); gs.className = "lv-sw"; gs.textContent = g[0];
+              tx.appendChild(gs); if (j < w[0].length - 1) tx.appendChild(document.createTextNode(" "));
+              out.push({ el: gs, t: g[1], bg: j === 0 ? bx.querySelector(".lv-box-bg") : null });
+            });
+            host.appendChild(bx);
+          } else {
+            var sp = document.createElement("span"); sp.className = "lv-sw";
+            if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+            else sp.textContent = w[0];
+            host.appendChild(sp);
+            out.push({ el: sp, t: w[1], box: w[2] === "box" });
+          }
+          if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+        });
+        return out;
+      }
+
+      /* la foule de la frame 12 dans son état final (mêmes positions déterministes) */
+      (function (host) {
+        var RINGS = [[140, 10, "f13-p", 24, 30, 0], [220, 24, "f13-d", 14, 14, 7.5], [288, 40, "f13-e", 10, 10, 0], [314, 44, "f13-e", 10, 10, 4.1]];
+        RINGS.forEach(function (r) {
+          for (var i = 0; i < r[1]; i++) {
+            var a = (i / r[1]) * Math.PI * 2 + (r[5] - 90) * Math.PI / 180;
+            var el = document.createElement("span"); el.className = r[2];
+            el.style.left = (440 + Math.cos(a) * r[0] - r[3] / 2).toFixed(1) + "px"; el.style.top = (770 + Math.sin(a) * r[0] - r[4] / 2).toFixed(1) + "px";
+            host.appendChild(el);
+          }
+        });
+      })($("f13-gcrowd"));
+
+      var tl = gsap.timeline({ paused: true });
+      function POP(o) { var s = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }; for (var k in o) s[k] = o[k]; return s; }
+      var IN = { opacity: 0, scale: 1.5, filter: "blur(8px)" };
+
+      /* --- caméra : arrive en descente floue (handoff_in), se pose, dérive, puis redescend vers M3 (handoff_out) --- */
+      tl.fromTo("#f13-cam", { y: 125, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 0);
+      tl.to("#f13-cam", { y: -30, scale: 1.03, duration: 7.10 - 0.45, ease: "none" }, 0.45);
+      tl.to("#f13-cam", { y: -1075, scale: 1, filter: "blur(6px)", duration: 0.35, ease: "power2.in" }, 7.10);
+      tl.fromTo("#f13-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 200px", duration: T, ease: "none" }, 0);
+      tl.fromTo("#f13-giant", { x: 0 }, { x: -170, duration: T, ease: "none" }, 0);
+      /* M1 remonte et sort */
+      tl.fromTo("#f13-ghost", { y: 0, opacity: 1 }, { y: -300, opacity: 0, duration: 0.55, ease: "power2.out" }, 0);
+
+      /* --- 0.10 règle MODIL 2, 0.15 la station s'ouvre : trait accent 2 px → carte de verre --- */
+      tl.fromTo("#f13-mod", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 0.10);
+      tl.fromTo("#f13-ph", { scale: 0.4 }, { scale: 1, duration: 0.18, ease: "expo.out", transformOrigin: "12px 12px" }, 0.15);
+      tl.fromTo("#f13-open", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.2, ease: "expo.out" }, 0.18);
+      tl.fromTo("#f13-card", { opacity: 0, clipPath: "inset(555px 0px 555px 0px)" }, { opacity: 1, clipPath: "inset(-120px -120px -200px -120px)", duration: 0.36, ease: "expo.out" }, 0.34);
+      tl.to("#f13-open", { opacity: 0, duration: 0.14, ease: "power2.out" }, 0.44);
+      tl.fromTo("#f13-hd", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, POP({ transformOrigin: "0% 50%" }), 0.54);
+      tl.fromTo("#f13-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.68);
+
+      /* --- 0.91 « kòman » : la place du hub ; 1.38 « pou » : trois places d'agents ; 1.58 « itilize » : le hub se remplit --- */
+      tl.fromTo("#f13-hubslot", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 0.89);
+      ["#f13-s1", "#f13-s2", "#f13-s3"].forEach(function (s, i) {
+        tl.fromTo(s, { opacity: 0, scale: 1.3, filter: "blur(6px)" }, POP({}), 1.36 + i * 0.07);
+      });
+      tl.fromTo("#f13-hub", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, POP({ duration: 0.18 }), 1.56);
+      tl.to("#f13-hubslot", { opacity: 0, duration: 0.1, ease: "none" }, 1.62);
+      /* --- 1.92 « ajan » : les liens pointillés partent du hub vers les agents --- */
+      ["#f13-l1", "#f13-l2", "#f13-l3"].forEach(function (l, i) {
+        tl.fromTo(l, { clipPath: "inset(0px 0px 745px 0px)" }, { clipPath: "inset(0px 0px 250px 0px)", duration: 0.4, ease: "power2.out" }, 1.90 + i * 0.06);
+      });
+      /* --- 2.51 « Claude » : l'étoile Claude (accent) tombe dans le hub ; anneau --- */
+      tl.fromTo("#f13-star", { opacity: 0, scale: 1.8, filter: "blur(8px)" }, POP({ transformOrigin: "50% 50%" }), 2.49);
+      tl.fromTo("#f13-star", { rotation: 0 }, { rotation: 150, duration: 7.10 - 2.49, ease: "power1.out", transformOrigin: "50% 50%" }, 2.49);
+      tl.fromTo("#f13-halo", { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 1.7, duration: 0.6, ease: "power2.out", immediateRender: false }, 2.53);
+      tl.to("#f13-hub", { scale: 1.08, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, 2.53);
+      /* --- 2.98 « ak », 3.14 « lòt », 3.36 « ankò » : d'autres agents en satellites --- */
+      [["#f13-sat1", 2.96], ["#f13-sat2", 3.12], ["#f13-sat3", 3.34]].forEach(function (s) {
+        tl.fromTo(s[0], { opacity: 0, scale: 1.8, filter: "blur(6px)" }, POP({ duration: 0.14 }), s[1]);
+      });
+      tl.fromTo("#f13-sats", { rotation: 0 }, { rotation: 24, duration: 7.10 - 2.96, ease: "none" }, 2.96);
+      tl.to("#f13-hub", { y: -8, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.5);
+
+      /* --- 4.01 « kreye » : agent 1 (logo Claude) ; 4.31 « kontni » : son libellé + un contenu créé --- */
+      tl.fromTo("#f13-t1", IN, POP({}), 3.99);
+      tl.to("#f13-s1", { opacity: 0, duration: 0.1, ease: "none" }, 4.05);
+      tl.to("#f13-a1", { opacity: 1, duration: 0.12, ease: "none" }, 4.01);
+      tl.fromTo("#f13-b1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 4.29);
+      tl.fromTo("#f13-pk", { opacity: 0, scale: 1.25, filter: "blur(8px)" }, POP({ duration: 0.18, transformOrigin: "50% 100%" }), 4.29);
+      ["#f13-pk1", "#f13-pk2", "#f13-pk3"].forEach(function (b, i) {
+        tl.fromTo(b, { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "expo.out" }, 4.42 + i * 0.07);
+      });
+      tl.fromTo("#f13-pks", { rotation: 0, scale: 0.6 }, { rotation: 90, scale: 1, duration: 0.5, ease: "expo.out", transformOrigin: "50% 50%" }, 4.42);
+
+      /* --- 4.69 « jere » : agent 2 (fiche client) ; 5.21 « kliyan » : la fiche client s'ouvre --- */
+      tl.fromTo("#f13-t2", IN, POP({}), 4.67);
+      tl.to("#f13-s2", { opacity: 0, duration: 0.1, ease: "none" }, 4.73);
+      tl.to("#f13-a1", { opacity: 0, duration: 0.12, ease: "none" }, 4.69);
+      tl.to("#f13-a2", { opacity: 1, duration: 0.12, ease: "none" }, 4.69);
+      tl.to("#f13-pk", { opacity: 0, y: -20, scale: 0.94, duration: 0.14, ease: "power2.in" }, 5.05);
+      tl.fromTo("#f13-b2", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 5.19);
+      tl.fromTo("#f13-pc", { opacity: 0, scale: 1.25, filter: "blur(8px)" }, POP({ duration: 0.18, transformOrigin: "50% 100%" }), 5.19);
+      ["#f13-pc1", "#f13-pc2", "#f13-pc3"].forEach(function (b, i) {
+        tl.fromTo(b, { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "expo.out" }, 5.30 + i * 0.07);
+      });
+      tl.fromTo("#f13-pck", { opacity: 0, scale: 1.8, filter: "blur(6px)" }, POP({ duration: 0.14 }), 5.58);
+
+      /* --- 6.02 « fè » : agent 3 (WhatsApp) ; 6.19 « otomatizasyon » : la conversation à réponse automatique --- */
+      tl.to("#f13-pc", { opacity: 0, y: -20, scale: 0.94, duration: 0.14, ease: "power2.in" }, 5.92);
+      tl.fromTo("#f13-t3", IN, POP({}), 6.00);
+      tl.to("#f13-s3", { opacity: 0, duration: 0.1, ease: "none" }, 6.06);
+      tl.to("#f13-a2", { opacity: 0, duration: 0.12, ease: "none" }, 6.02);
+      tl.to("#f13-a3", { opacity: 1, duration: 0.12, ease: "none" }, 6.02);
+      tl.fromTo("#f13-b3", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 6.17);
+      tl.fromTo("#f13-pw", { opacity: 0, scale: 1.2, filter: "blur(8px)" }, POP({ duration: 0.16, transformOrigin: "50% 100%" }), 6.10);
+      tl.fromTo("#f13-bin", { opacity: 0, y: 16, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.14, ease: "expo.out", transformOrigin: "0% 100%" }, 6.19);
+      tl.fromTo("#f13-bstar", { opacity: 0, scale: 0.5, rotation: 0 }, { opacity: 1, scale: 1, rotation: 90, duration: 0.3, ease: "expo.out", transformOrigin: "50% 50%" }, 6.42);
+      tl.fromTo("#f13-bout", { opacity: 0, y: 16, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.14, ease: "expo.out", transformOrigin: "100% 100%" }, 6.49);
+      tl.fromTo("#f13-auto", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.14, ease: "expo.out" }, 6.62);
+      /* 6.80 « WhatsApp. » : la tuile WhatsApp bat */
+      tl.to("#f13-t3", { scale: 1.1, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, 6.80);
+
+      /* --- 7.10 descente : les détails s'effacent, M2 remonte, la tête de lecture file vers MODIL 3 --- */
+      tl.to(["#f13-pw", "#f13-b1", "#f13-b2", "#f13-b3"], { opacity: 0, duration: 0.16, ease: "power2.out" }, 7.08);
+      tl.to("#f13-a3", { opacity: 0, duration: 0.16, ease: "none" }, 7.08);
+      tl.to("#f13-ph", { y: 1200, scale: 0.4, duration: 0.35, ease: "power2.in", transformOrigin: "12px 12px" }, 7.10);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        var els = [];
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          var bg = w.bg || (w.box ? w.el.querySelector(".lv-box-bg") : null);
+          if (bg) tl.fromTo(bg, { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, Math.max(0, w.t - 0.04));
+          els.push(w.el); if (w.bg) els.push(w.bg);
+        });
+        tl.to(els, { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      var U1 = sub($("f13-u1"), [["N", 0.19], ["ap", 0.28], ["montre", 0.43], ["w", 0.73], ["kòman", 0.91], ["pou", 1.38], ["itilize", 1.58]]);
+      var U2 = sub($("f13-u2"), [["ajan", 1.92], ["tankou", 2.14], ["Claude", 2.51, "box"], ["ak", 2.98], ["lòt", 3.14], ["ankò", 3.36]]);
+      var U3 = sub($("f13-u3"), [["pou", 3.81], ["kreye", 4.01], ["kontni,", 4.31], ["jere", 4.69], ["kliyan,", 5.21]]);
+      var U4 = sub($("f13-u4"), [["fè", 6.02], ["otomatizasyon", 6.19], ["WhatsApp.", 6.80]]);
+      words(U1, 1.80);
+      words(U2, 3.69);
+      words(U3, 5.90);
+      words(U4, 7.30);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

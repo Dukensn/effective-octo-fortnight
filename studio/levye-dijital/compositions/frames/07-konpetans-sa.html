@@ -40,7 +40,7 @@
     /* ===== la bande (monde, état de fin de la frame 6) ===== */
     #f07-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
     #f07-pan { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
-    #f07-world { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; transform-origin: 0 0; transform: translate(0px, -2290px); }
+    #f07-world { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; transform-origin: 0 0; }
     #f07-band { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; opacity: .6;
       -webkit-mask-image: linear-gradient(#000 0px, #000 3430px, rgba(0,0,0,0) 3640px); mask-image: linear-gradient(#000 0px, #000 3430px, rgba(0,0,0,0) 3640px); }
     .f07-strip { position: absolute; left: 250px; top: 740px; width: 740px; height: 3300px; border-radius: 30px;
@@ -93,18 +93,17 @@
     #f07-mprod { position: absolute; left: 160px; top: 170px; width: 56px; height: 110px; border-radius: 16px 16px 12px 12px; background: #1B1A18;
       box-shadow: 0 18px 30px rgba(27,26,24,.25); }
     #f07-mcap { position: absolute; left: 14px; top: -16px; width: 28px; height: 20px; border-radius: 6px; background: #5A554E; }
-      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.8), rgba(255,255,255,0)); }
     .f07-ttl { position: absolute; left: 24px; font: 800 44px/1 "Inter"; letter-spacing: -0.8px; color: #1B1A18; }
     #f07-cta { position: absolute; left: 24px; top: 664px; width: 372px; height: 60px; border-radius: 30px; background: #1B1A18;
       display: flex; align-items: center; justify-content: center; }
     #f07-chk { position: absolute; left: 330px; top: 80px; width: 76px; height: 76px; border-radius: 50%; background: #C4613F;
       display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 26px rgba(196,97,63,.35); }
     #f07-ring { position: absolute; left: 330px; top: 80px; width: 76px; height: 76px; border-radius: 50%; border: 4px solid #D97757; box-sizing: border-box; }
-    /* la carte : enveloppe (déplacement, flou) > découpe (clip-path) > retournement (rotationY) > deux faces */
-    #f07-card { position: absolute; }
+    /* la carte : enveloppe (déplacement, flou) > découpe (clip-path) > retournement (rotationY) > deux faces (échange d'opacité à 90°) */
+    #f07-card { position: absolute; left: 330px; top: 386px; width: 420px; height: 748px; transform-origin: 50% 50%; }
     #f07-clip { position: absolute; left: 0; top: 0; width: 420px; height: 748px; }
     #f07-flip { position: absolute; left: 0; top: 0; width: 420px; height: 748px; transform-origin: 50% 50%; }
-    .f07-face { left: 0; top: 0; width: 420px; height: 748px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .f07-face { left: 0; top: 0; width: 420px; height: 748px; }
     #f07-back { transform: rotateY(180deg); }
     #f07-lock { position: absolute; left: 170px; top: 196px; width: 80px; height: 96px; }
     #f07-shk { position: absolute; left: 0; top: 0; transform-origin: 72% 60%; }

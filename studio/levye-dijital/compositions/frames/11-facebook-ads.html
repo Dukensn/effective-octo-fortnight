@@ -48,9 +48,21 @@
     .f11-ph-ln { position: absolute; left: 24px; top: 11px; width: 36px; height: 2px; background: #D97757; }
     .f11-open { position: absolute; height: 2px; background: #D97757; transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 12px rgba(217,119,87,.5); }
 
-    /* la marque de la frame 10 qui remonte hors du cadre (handoff_in) */
-    #f11-brand { position: absolute; left: 0; top: 150px; width: 1080px; text-align: center; font: 900 150px/0.95 "InterD"; letter-spacing: -4px; color: #1B1A18; }
-    #f11-brand span { color: #D97757; }
+    /* dernière image de la frame 10 (handoff_in) : sa bande claire, sa règle, « MODIL 1 », sa tête de lecture, sa lumière */
+    #f11-bloom { position: absolute; left: -760px; top: -540px; width: 2600px; height: 2600px; border-radius: 50%; opacity: 0.35; transform: scale(2.8);
+      background: radial-gradient(circle, #FFFFFF 0%, #FFFFFF 45%, rgba(255,255,255,.6) 56%, rgba(255,255,255,0) 70%); }
+    #f11-x10 { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #f11-xcam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; transform: translateY(-24px) scale(1.03); }
+    #f11-xmask { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
+      -webkit-mask-image: linear-gradient(#000 0px, #000 1240px, rgba(0,0,0,0) 1400px); mask-image: linear-gradient(#000 0px, #000 1240px, rgba(0,0,0,0) 1400px); }
+    #f11-xworld { position: absolute; left: 0; top: 0; width: 1080px; height: 3600px; transform: translateY(-340px); }
+    .f11-xstrip { position: absolute; left: 250px; top: 1010px; width: 740px; height: 2600px; border-radius: 30px;
+      background: linear-gradient(165deg, #FFFFFF, #F8F6F2); box-shadow: 0 30px 70px rgba(60,45,30,.13), 0 0 0 1px rgba(27,26,24,.04); }
+    .f11-xtick { position: absolute; height: 3px; background: #D9D4CC; }
+    .f11-xtick.big { background: #B9B3A9; }
+    .f11-xlab { position: absolute; left: 20px; width: 170px; text-align: right; font: 700 28px/1 "Inter"; letter-spacing: 1.5px; color: #77726B; }
+    #f11-xph { position: absolute; left: 222px; top: 1046px; width: 768px; height: 5px; background: #D97757; box-shadow: 0 0 18px rgba(217,119,87,.45); transform: translateY(120px); }
+    #f11-xphd { position: absolute; left: 210px; top: 1033px; width: 30px; height: 30px; border-radius: 50%; background: #D97757; transform: translateY(120px); }
 
     /* station MODIL 1 */
     #f11-card { left: 120px; top: 270px; width: 880px; height: 1110px; opacity: 0; clip-path: inset(555px 0px 555px 0px); }
@@ -86,17 +98,23 @@
   <div id="root" data-composition-id="11-facebook-ads" data-width="1080" data-height="1920" data-duration="3.80">
     <div id="f11-bg" class="clip" data-start="0" data-duration="3.80" data-track-index="0" data-layout-ignore>
       <div class="lv-ground">
-        <div id="f11-floor" class="lv-floor"></div>
-        <div id="f11-giant" class="lv-giant" style="left:-60px; top:1080px;">ADS</div>
+        <div style="position:absolute; left:0; top:0; width:1080px; height:1920px; transform:translateY(-50px);"><div id="f11-floor" class="lv-floor"></div></div>
+        <div id="f11-giant0" class="lv-giant" style="left:-60px; top:1080px; transform:translateX(-70px);">LEVYE</div>
+        <div id="f11-giant" class="lv-giant" style="left:-60px; top:1080px; opacity:0;">ADS</div>
       </div>
+      <div id="f11-bloom"></div>
     </div>
 
     <div id="f11-stage" class="clip" data-start="0" data-duration="3.80" data-track-index="1">
+      <div id="f11-x10"><div id="f11-xcam"><div id="f11-xmask"><div id="f11-xworld">
+        <div class="f11-xstrip"></div><div id="f11-xruler"></div>
+        <div class="f11-xlab" style="top:1266px;">MODIL 1</div><div class="f11-xlab" style="top:2306px;">MODIL 2</div>
+        <div id="f11-xph"></div><div id="f11-xphd"></div>
+      </div></div></div></div>
       <div id="f11-cam">
-        <div class="f11-rail"></div><div class="f11-ticks"></div>
-        <div id="f11-brand">LEVYE<br><span>DIJITAL</span></div>
+        <div id="f11-rails" style="opacity:0;"><div class="f11-rail"></div><div class="f11-ticks"></div></div>
         <div id="f11-mod" class="f11-mod" style="top:200px; opacity:0;"><span class="f11-mdot"></span>MODIL 1</div>
-        <div id="f11-ph" class="f11-ph" style="top:813px;"><div class="f11-ph-dot"></div><div class="f11-ph-ln"></div></div>
+        <div id="f11-ph" class="f11-ph" style="top:813px; opacity:0;"><div class="f11-ph-dot"></div><div class="f11-ph-ln"></div></div>
 
         <div id="f11-card" class="lv-glass">
           <div id="f11-big" style="opacity:0;">2 JOU</div>
@@ -179,21 +197,33 @@
         return out;
       }
 
+      /* règle de la frame 10 (même construction) */
+      var ru = $("f11-xruler"), i, y, d;
+      for (i = 0, y = 1030; y < 3560; y += 60, i++) {
+        d = document.createElement("div"); d.className = "f11-xtick" + (i % 4 === 0 ? " big" : "");
+        d.style.cssText = "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px";
+        ru.appendChild(d);
+      }
+
       var tl = gsap.timeline({ paused: true });
       var IN = { opacity: 0, scale: 1.4, filter: "blur(8px)" };
       function SET(o) { var s = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }; for (var k in o) s[k] = o[k]; return s; }
 
       /* --- caméra : arrive en descente floue (handoff_in), se pose, puis dérive --- */
-      tl.fromTo("#f11-cam", { y: 100, scale: 1, filter: "blur(6px)" }, { y: 0, filter: "blur(0px)", duration: 0.42, ease: "power3.out" }, 0);
+      tl.fromTo("#f11-cam", { y: 100, scale: 1 }, { y: 0, duration: 0.42, ease: "power3.out" }, 0);
       tl.to("#f11-cam", { y: -30, scale: 1.03, duration: T - 0.42, ease: "none" }, 0.42);
       tl.fromTo("#f11-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 120px", duration: T, ease: "none" }, 0);
       tl.fromTo("#f11-giant", { x: 0 }, { x: -90, duration: T, ease: "none" }, 0);
-      /* la marque (frame 10) remonte hors du cadre */
-      tl.fromTo("#f11-brand", { y: 0, opacity: 1 }, { y: -420, opacity: 0, duration: 0.5, ease: "power2.out" }, 0);
+      tl.fromTo("#f11-giant", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 0);
+      tl.fromTo("#f11-giant0", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power1.out" }, 0);
+      tl.fromTo("#f11-bloom", { opacity: 0.35 }, { opacity: 0, duration: 0.6, ease: "power1.out" }, 0);
+      /* la bande de la frame 10 continue de descendre, floue, et cède la place à la règle MODIL du programme */
+      tl.fromTo("#f11-x10", { y: 0, opacity: 1, filter: "blur(0px)" }, { y: -320, opacity: 0, filter: "blur(8px)", duration: 0.34, ease: "power2.in" }, 0);
+      tl.fromTo("#f11-rails", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.08);
 
       /* --- 0.10 règle MODIL 1 ; 0.15 « De » : la tête de lecture s'arrête ; 0.25 la station s'ouvre (trait 2 px → carte) --- */
       tl.fromTo("#f11-mod", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "0% 50%" }, 0.10);
-      tl.fromTo("#f11-ph", { scale: 0.4 }, { scale: 1, duration: 0.18, ease: "expo.out", transformOrigin: "12px 12px" }, 0.15);
+      tl.fromTo("#f11-ph", { opacity: 0, scale: 2, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out", transformOrigin: "12px 12px" }, 0.14);
       tl.fromTo("#f11-open", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.2, ease: "expo.out" }, 0.25);
       tl.fromTo("#f11-card", { opacity: 0, clipPath: "inset(555px 0px 555px 0px)" }, { opacity: 1, clipPath: "inset(-120px -120px -200px -120px)", duration: 0.34, ease: "expo.out" }, 0.38);
       tl.to("#f11-open", { opacity: 0, duration: 0.14, ease: "power2.out" }, 0.47);
@@ -205,7 +235,6 @@
       tl.fromTo("#f11-pt", IN, SET({ transformOrigin: "50% 50%" }), 0.89);
       tl.fromTo("#f11-pp", { opacity: 0, scale: 1.6, filter: "blur(8px)" }, SET({ duration: 0.14, transformOrigin: "50% 50%" }), 1.17);
       tl.to("#f11-pp", { y: -6, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.31);
-      tl.to("#f11-big", { x: -6, duration: 1.6, ease: "none" }, 1.0);
       /* --- 1.58 « pou » : le filet se trace ; 1.81 « metrize » : la place du logo s'esquisse --- */
       tl.fromTo("#f11-hr", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 1.58);
       tl.fromTo("#f11-slot", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.16, ease: "expo.out" }, 1.79);

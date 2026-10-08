@@ -1,0 +1,240 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    #f10-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    /* la lumière : papier pâle de la frame 9, puis halo blanc qui s'ouvre depuis le point */
+    #f10-pale { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #F7F5F1; }
+    #f10-bloom { position: absolute; left: -760px; top: -540px; width: 2600px; height: 2600px; border-radius: 50%; opacity: 0;
+      background: radial-gradient(circle, #FFFFFF 0%, #FFFFFF 45%, rgba(255,255,255,.6) 56%, rgba(255,255,255,0) 70%); }
+    /* point de lumière accent (état de fin de la frame 9) */
+    #f10-halo { position: absolute; left: 420px; top: 640px; width: 240px; height: 240px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(217,119,87,.38) 0%, rgba(217,119,87,.12) 40%, rgba(217,119,87,0) 70%); }
+    #f10-pt { position: absolute; left: 525px; top: 745px; width: 30px; height: 30px; border-radius: 50%;
+      background: radial-gradient(circle at 45% 40%, #F2B59C 0%, #D97757 55%, #C4613F 100%);
+      box-shadow: 0 0 22px rgba(217,119,87,.65), 0 0 60px rgba(217,119,87,.30); }
+    .f10-ray { position: absolute; left: 400px; top: 758px; width: 280px; height: 4px; border-radius: 2px; opacity: 0;
+      background: linear-gradient(90deg, rgba(217,119,87,0), #D97757 50%, rgba(217,119,87,0)); transform-origin: 50% 50%; }
+
+    /* la bande claire (programme), masquée avant la bande du sous-titre */
+    #f10-mask { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
+      -webkit-mask-image: linear-gradient(#000 0px, #000 1240px, rgba(0,0,0,0) 1400px); mask-image: linear-gradient(#000 0px, #000 1240px, rgba(0,0,0,0) 1400px); }
+    #f10-world { position: absolute; left: 0; top: 0; width: 1080px; height: 3600px; opacity: 0; }
+    .f10-strip { position: absolute; left: 250px; top: 1010px; width: 740px; height: 2600px; border-radius: 30px;
+      background: linear-gradient(165deg, #FFFFFF, #F8F6F2); box-shadow: 0 30px 70px rgba(60,45,30,.13), 0 0 0 1px rgba(27,26,24,.04); }
+    .f10-tick { position: absolute; height: 3px; background: #D9D4CC; }
+    .f10-tick.big { background: #B9B3A9; }
+    .f10-rlab { position: absolute; left: 20px; width: 170px; text-align: right; font: 700 28px/1 "Inter"; letter-spacing: 1.5px; color: #77726B; }
+    #f10-ph { position: absolute; left: 222px; top: 1046px; width: 768px; height: 5px; background: #D97757; box-shadow: 0 0 18px rgba(217,119,87,.45); transform-origin: 0 50%; }
+    #f10-phd { position: absolute; left: 210px; top: 1033px; width: 30px; height: 30px; border-radius: 50%; background: #D97757; }
+
+    /* la marque */
+    #f10-mark { position: absolute; left: 0; top: 500px; width: 1080px; text-align: center; }
+    .f10-ln { display: block; font: 900 150px/1 "InterD"; letter-spacing: -4px; white-space: nowrap; color: #1B1A18; }
+    #f10-l2 { color: #D97757; }
+    .f10-c { display: inline-block; opacity: 0; }
+    #f10-tag { position: absolute; left: 0; width: 1080px; top: 830px; text-align: center; font: 600 40px/1 "Inter"; letter-spacing: 1px; color: #5A554E; opacity: 0; }
+
+    /* sous-titre : trait de pointe sous « Levye Dijital. » */
+    .f10-peak { position: relative; display: inline-block; }
+    .f10-peak-st { position: absolute; left: -4px; right: -4px; bottom: -8px; height: 11px; background: #D97757;
+      clip-path: polygon(0 70%, 100% 0, 100% 45%, 0 100%); transform-origin: 0 50%; transform: scaleX(0); }
+  </style>
+
+  <div id="root" data-composition-id="10-levye-dijital" data-width="1080" data-height="1920" data-duration="2.25">
+    <div id="f10-bg" class="clip" data-start="0" data-duration="2.25" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f10-floorw" style="position:absolute; left:0; top:0; width:1080px; height:1920px;"><div class="lv-floor"></div></div>
+        <div id="f10-giant" class="lv-giant" style="left:-60px; top:1080px;">LEVYE</div>
+      </div>
+      <div id="f10-pale"></div>
+      <div id="f10-bloom"></div>
+    </div>
+
+    <div id="f10-stage" class="clip" data-start="0" data-duration="2.25" data-track-index="1">
+      <div id="f10-cam">
+        <div id="f10-mask">
+          <div id="f10-world">
+            <div class="f10-strip"></div>
+            <div id="f10-ruler"></div>
+            <div id="f10-m1" class="f10-rlab" style="top:1266px; opacity:0;">MODIL 1</div>
+            <div class="f10-rlab" style="top:2306px;">MODIL 2</div>
+            <div id="f10-ph" style="opacity:0;"></div>
+            <div id="f10-phd" style="opacity:0;"></div>
+          </div>
+        </div>
+
+        <!-- tuiles de profondeur -->
+        <div id="f10-t1" class="lv-tile" style="left:80px; top:220px; opacity:0;"><svg viewBox="0 0 24 24" width="72" height="72"><path id="f10-star" fill="#D97757" d=""/></svg></div>
+        <div id="f10-t2" class="lv-tile" style="left:868px; top:250px; opacity:0;"><svg viewBox="0 0 24 24" width="66" height="66"><path d="M8 5.5v13l10.5-6.5z" fill="#1B1A18"/></svg></div>
+
+        <div id="f10-mark">
+          <span id="f10-l1" class="f10-ln"></span>
+          <span id="f10-l2" class="f10-ln"></span>
+        </div>
+        <div id="f10-tag">Fòmasyon · Pratik · Pwojè</div>
+      </div>
+      <div id="f10-halo"></div>
+      <div class="f10-ray"></div><div class="f10-ray"></div><div class="f10-ray"></div><div class="f10-ray"></div>
+      <div id="f10-pt"></div>
+    </div>
+
+    <div id="f10-text" class="clip" data-start="0" data-duration="2.25" data-track-index="2">
+      <div id="f10-s1" class="lv-sub"></div>
+      <div id="f10-wm" class="lv-wm" style="opacity:0;">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f10-grainc" class="clip" data-start="0" data-duration="2.25" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "10-levye-dijital", T = 2.25;
+      var $ = function (id) { return document.getElementById(id); };
+      var Q = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+      /* logo Claude officiel (assets/icons/claude.svg, Simple Icons CC0) */
+      var CLAUDE = "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z";
+      $("f10-star").setAttribute("d", CLAUDE);
+
+      /* règle : un tick tous les 60 px, un long tous les 240 px */
+      var ru = $("f10-ruler"), i, y, d;
+      for (i = 0, y = 1030; y < 3560; y += 60, i++) {
+        d = document.createElement("div"); d.className = "f10-tick" + (i % 4 === 0 ? " big" : "");
+        d.style.cssText = "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px";
+        ru.appendChild(d);
+      }
+      /* la marque, lettre par lettre */
+      function letters(host, txt) {
+        return txt.split("").map(function (c) {
+          var sp = document.createElement("span"); sp.className = "f10-c"; sp.textContent = c; host.appendChild(sp); return sp;
+        });
+      }
+      var L1 = letters($("f10-l1"), "LEVYE"), L2 = letters($("f10-l2"), "DIJITAL");
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f10-s1"), [["Se", 0.05], ["sa", 0.39], ["n", 0.53], ["ap", 0.64], ["montre", 0.78], ["w", 1.08], ["nan", 1.19], ["Levye", 1.38], ["Dijital.", 1.63]]);
+      /* [trait : Levye Dijital.] : on enveloppe les deux derniers mots, le trait effilé se dessine dessous */
+      var pk = document.createElement("span"); pk.className = "f10-peak";
+      $("f10-s1").insertBefore(pk, S1[7].el);
+      pk.appendChild(S1[7].el); pk.appendChild(document.createTextNode(" ")); pk.appendChild(S1[8].el);
+      var st = document.createElement("span"); st.className = "f10-peak-st"; pk.appendChild(st);
+      $("f10-s1").insertBefore(document.createElement("br"), pk);
+
+      var tl = gsap.timeline({ paused: true });
+
+      /* --- caméra : dérive permanente --- */
+      tl.fromTo("#f10-cam", { y: 0, scale: 1 }, { y: -24, scale: 1.03, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f10-floorw", { y: 0 }, { y: -50, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f10-giant", { x: 30 }, { x: -70, duration: T, ease: "none" }, 0);
+
+      /* --- 0.05 le point s'ouvre en lumière blanche (0,35 s expo.out, étincelle) --- */
+      tl.fromTo("#f10-pt", { scale: 1.3 }, { scale: 5, opacity: 0, duration: 0.3, ease: "expo.out" }, 0.05);
+      tl.fromTo("#f10-halo", { scale: 1.25 }, { scale: 7, opacity: 0, duration: 0.35, ease: "expo.out" }, 0.05);
+      tl.fromTo("#f10-bloom", { scale: 0.03, opacity: 0 }, { scale: 2.4, opacity: 1, duration: 0.35, ease: "expo.out" }, 0.05);
+      Q(".f10-ray").forEach(function (r, k) {
+        tl.fromTo(r, { opacity: 0, scaleX: 0.1, rotation: k * 45 }, { opacity: 1, scaleX: 1.6, rotation: k * 45 + 30, duration: 0.18, ease: "expo.out" }, 0.05 + k * 0.02);
+        tl.to(r, { opacity: 0, scaleX: 2.4, duration: 0.2, ease: "power2.in" }, 0.25 + k * 0.02);
+      });
+      /* sous la lumière, le papier pâle laisse place au décor ; la lumière s'adoucit sans s'éteindre */
+      tl.to("#f10-pale", { opacity: 0, duration: 0.1, ease: "none" }, 0.30);
+      tl.to("#f10-bloom", { opacity: 0.35, scale: 2.8, duration: 0.7, ease: "power2.inOut" }, 0.42);
+      tl.fromTo("#f10-wm", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.50);
+
+      /* --- 0.40 la bande claire est là (monte du bas, floue → posée) --- */
+      tl.fromTo("#f10-world", { opacity: 0, y: 240, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 0.40);
+      tl.to("#f10-world", { y: -30, duration: 1.3, ease: "none" }, 0.70);
+      /* 0.78 « montre » : la tête de lecture se tend sur la bande */
+      tl.fromTo("#f10-phd", { opacity: 0, scale: 2, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 0.76);
+      tl.fromTo("#f10-ph", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.3, ease: "expo.out" }, 0.78);
+      /* 1.08 « w » : les tuiles de profondeur */
+      tl.fromTo("#f10-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 1.06);
+      tl.fromTo("#f10-t2", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.9, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 1.16);
+      tl.to("#f10-t1", { y: -14, rotation: -5, duration: 0.9, ease: "none" }, 1.22);
+      tl.fromTo("#f10-star", { rotation: 0 }, { rotation: 90, duration: 0.9, ease: "expo.out", transformOrigin: "50% 50%" }, 1.06);
+      tl.to("#f10-t2", { y: 12, rotation: 4, duration: 0.8, ease: "none" }, 1.32);
+
+      /* --- 1.38 « Levye » : LEVYE s'assemble lettre par lettre (0,03 s d'écart, de y +40) --- */
+      L1.forEach(function (c, k) {
+        tl.fromTo(c, { opacity: 0, y: 40, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.36 + k * 0.03);
+      });
+      /* --- 1.63 « Dijital. » : DIJITAL en accent --- */
+      L2.forEach(function (c, k) {
+        tl.fromTo(c, { opacity: 0, y: 40, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.61 + k * 0.03);
+      });
+      /* 1.70 « Fòmasyon · Pratik · Pwojè » */
+      tl.fromTo("#f10-tag", { opacity: 0, y: 20, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.70);
+      tl.fromTo("#f10-m1", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.16, ease: "expo.out" }, 1.80);
+      tl.fromTo("#f10-mark", { scale: 1 }, { scale: 1.03, duration: 0.3, ease: "none", transformOrigin: "540px 150px" }, 1.70);
+
+      /* --- 2.00 descente : la marque remonte hors du cadre, la bande et « MODIL 1 » arrivent --- */
+      tl.to(["#f10-mark", "#f10-tag"], { y: -620, opacity: 0, filter: "blur(8px)", duration: 0.25, ease: "power2.in" }, 2.00);
+      tl.to(["#f10-t1", "#f10-t2"], { y: -300, opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power2.in" }, 2.00);
+      tl.to("#f10-world", { y: -340, duration: 0.25, ease: "power2.in" }, 2.00);
+      tl.to(["#f10-ph", "#f10-phd"], { y: 120, duration: 0.25, ease: "power1.in" }, 2.00);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 2.10);
+      tl.fromTo(st, { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.35, ease: "power2.out" }, 1.38);
+      tl.to(st, { opacity: 0, duration: 0.12, ease: "power2.in" }, 2.10);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

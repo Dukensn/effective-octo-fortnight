@@ -1,0 +1,285 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+    @font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+      background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+                  radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
+    .lv-floor { position: absolute; left: -400px; top: 980px; width: 1880px; height: 1300px; transform-origin: 50% 0;
+      transform: perspective(1100px) rotateX(62deg);
+      background: linear-gradient(rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px,
+                  linear-gradient(90deg, rgba(27,26,24,.075) 2px, transparent 2px) 0 0 / 120px 120px;
+      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 0%, #000 45%); }
+    .lv-giant { position: absolute; font: 900 300px/1 "InterD"; letter-spacing: -10px; color: transparent;
+      -webkit-text-stroke: 2px rgba(27,26,24,.07); white-space: nowrap; }
+    .lv-grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .05; mix-blend-mode: multiply; pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+    .lv-glass { position: absolute; background: linear-gradient(165deg, rgba(255,255,255,.96), rgba(255,255,255,.80));
+      border: 1px solid rgba(255,255,255,.9); border-radius: 40px;
+      box-shadow: 0 50px 90px rgba(60,45,30,.16), 0 8px 18px rgba(60,45,30,.08), inset 0 1px 0 #fff; }
+    .lv-tile { position: absolute; width: 132px; height: 132px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(165deg, #fff, #F7F4EF); box-shadow: 0 26px 50px rgba(60,45,30,.16), inset 0 1px 0 #fff; }
+    .lv-sub { position: absolute; left: 60px; width: 960px; top: 1460px; text-align: center; font: 600 62px/1.25 "Inter";
+      letter-spacing: -0.6px; color: #1B1A18; text-shadow: 0 2px 22px rgba(243,240,234,.95); }
+    .lv-sw { display: inline-block; opacity: 0; }
+    .lv-box { position: relative; display: inline-block; font-weight: 800; color: #fff; }
+    .lv-box-bg { position: absolute; left: -14px; right: -14px; top: 2px; bottom: -2px; border-radius: 14px; background: #C4613F;
+      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 10px 24px rgba(217,119,87,.35); }
+    .lv-box-tx { position: relative; }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
+    /* ===== fin du décor commun ===== */
+
+    /* ===== la bande (monde, coordonnées de STORYBOARD.md, acte I : mêmes que 05) ===== */
+    #f04-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 760px; }
+    #f04-world { position: absolute; left: 0; top: 0; width: 1080px; height: 4100px; transform-origin: 0 0; }
+    .f04-strip { position: absolute; left: 250px; top: 740px; width: 740px; height: 3300px; border-radius: 30px;
+      background: linear-gradient(165deg, #FFFFFF, #F8F6F2); box-shadow: 0 30px 70px rgba(60,45,30,.13), 0 0 0 1px rgba(27,26,24,.04); }
+    .f04-tick { position: absolute; height: 3px; background: #D9D4CC; }
+    .f04-tick.big { background: #B9B3A9; }
+    .f04-rlab { position: absolute; left: 20px; width: 170px; text-align: right; font: 700 28px/1 "Inter"; letter-spacing: 1.5px; color: #77726B; }
+    .f04-lhead { position: absolute; top: 780px; width: 120px; text-align: center; font: 600 22px/1 "Inter"; letter-spacing: 2px; text-transform: uppercase; color: #77726B; }
+    .f04-hdot { position: absolute; top: 808px; width: 40px; height: 5px; border-radius: 3px; background: #D97757; opacity: 0; }
+    .f04-lane { position: absolute; top: 830px; width: 120px; height: 900px; border-radius: 18px; background: #EDE9E2; }
+    .f04-clip { position: absolute; width: 120px; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      font: 800 26px/1 "Inter"; color: #fff; box-shadow: 0 14px 30px rgba(40,30,20,.16); }
+    .f04-new { opacity: 0; }
+    #f04-vwa { position: absolute; left: 290px; top: 1770px; width: 664px; height: 120px; border-radius: 18px; background: #EDE9E2; overflow: hidden; }
+    #f04-vwal { position: absolute; left: 18px; top: 14px; font: 700 20px/1 "Inter"; letter-spacing: 2px; color: #5A554E; }
+    .f04-wv { position: absolute; width: 6px; border-radius: 3px; background: #1B1A18; }
+    #f04-ph { position: absolute; left: 222px; top: 858px; width: 768px; height: 5px; background: #D97757; box-shadow: 0 0 18px rgba(217,119,87,.45); }
+    #f04-ph::before { content: ""; position: absolute; left: -12px; top: -13px; width: 30px; height: 30px; border-radius: 50%; background: #D97757; }
+
+    /* moniteur 9:16 (world x 360, y 60) : la pub prend forme (état final = premier image de 05) */
+    #f04-mon { position: absolute; left: 360px; top: 60px; width: 360px; height: 640px; border-radius: 28px; background: #1B1A18; overflow: hidden;
+      transform-origin: 50% 50%; box-shadow: 0 40px 80px rgba(40,30,20,.26), 0 6px 14px rgba(40,30,20,.12); }
+    #f04-rec { position: absolute; left: 20px; top: 40px; font: 700 22px "Inter"; color: #fff; background: rgba(255,255,255,.14); padding: 6px 14px; border-radius: 20px; }
+    .f04-sil { position: absolute; background: #2C2926; }
+    .f04-scene { position: absolute; left: 0; top: 0; width: 360px; height: 640px; }
+    #f04-img { position: absolute; left: 30px; top: 110px; width: 300px; height: 220px; border-radius: 18px; background: linear-gradient(160deg, #4A4540, #2C2926); overflow: hidden; opacity: 0; }
+    #f04-sun { position: absolute; left: 196px; top: 40px; width: 60px; height: 60px; border-radius: 50%; background: #8C877F; }
+    #f04-hill { position: absolute; left: -40px; top: 130px; width: 260px; height: 200px; border-radius: 50%; background: #5A554E; }
+    .f04-tl { position: absolute; left: 30px; height: 16px; border-radius: 8px; background: #fff; transform-origin: 0 50%; transform: scaleX(0); }
+    #f04-mwave { opacity: 0; }
+    .f04-mw { position: absolute; bottom: 60px; width: 5px; border-radius: 3px; background: rgba(255,255,255,.7); }
+    #f04-sweep { position: absolute; left: 0; top: 0; width: 360px; height: 640px; background: #F3F0EA; clip-path: inset(0% 100% 0% 0%); }
+  </style>
+
+  <div id="root" data-composition-id="04-teks-imaj-tranzisyon-s" data-width="1080" data-height="1920" data-duration="6.10">
+    <div id="f04-bg" class="clip" data-start="0" data-duration="6.10" data-track-index="0" data-layout-ignore>
+      <div class="lv-ground">
+        <div id="f04-floorw" style="position:absolute; left:0; top:0; width:1080px; height:1920px;"><div class="lv-floor"></div></div>
+        <div id="f04-giant" class="lv-giant" style="left:-40px; top:1110px;">TÈKS IMAJ SON</div>
+      </div>
+    </div>
+
+    <div id="f04-stage" class="clip" data-start="0" data-duration="6.10" data-track-index="1">
+      <div id="f04-cam">
+        <!-- tuiles de profondeur (à droite de la bande) -->
+        <div id="f04-t1" class="lv-tile" style="left:930px; top:270px; opacity:0; font:900 58px InterD; color:#1B1A18;">Aa</div>
+        <div id="f04-t2" class="lv-tile" style="left:930px; top:1120px; opacity:0;">
+          <svg viewBox="0 0 24 24" width="70" height="70"><rect x="3" y="4.5" width="18" height="15" rx="3" fill="none" stroke="#1B1A18" stroke-width="2"/><circle cx="15.5" cy="9.5" r="1.9" fill="#1B1A18"/><path d="M4 18l5.5-6 4 4.5 2.5-2.5L20 18" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linejoin="round"/></svg></div>
+
+        <div id="f04-world">
+          <div class="f04-strip"></div>
+          <div id="f04-ruler"></div>
+          <div class="f04-rlab" style="top:846px">00:00</div>
+          <div class="f04-rlab" style="top:1086px">00:04</div>
+          <div class="f04-rlab" style="top:1326px">00:08</div>
+          <div class="f04-rlab" style="top:1566px">00:12</div>
+          <div class="f04-rlab" style="top:1806px">00:16</div>
+
+          <div class="f04-lhead" style="left:290px">Tèks</div><div class="f04-lhead" style="left:426px">Imaj</div>
+          <div class="f04-lhead" style="left:562px">Tranz.</div><div class="f04-lhead" style="left:698px">Son</div>
+          <div class="f04-lhead" style="left:834px">Mizik</div>
+          <div class="f04-hdot" style="left:330px"></div><div class="f04-hdot" style="left:466px"></div>
+          <div class="f04-hdot" style="left:602px"></div><div class="f04-hdot" style="left:738px"></div>
+          <div class="f04-hdot" style="left:874px"></div>
+          <div class="f04-lane" style="left:290px"></div><div class="f04-lane" style="left:426px"></div>
+          <div class="f04-lane" style="left:562px"></div><div class="f04-lane" style="left:698px"></div>
+          <div class="f04-lane" style="left:834px"></div>
+
+          <div id="f04-c1" class="f04-clip f04-new" style="left:290px; top:850px; height:200px; background:#1B1A18;">Tèks</div>
+          <div id="f04-c2" class="f04-clip" style="left:426px; top:850px; height:180px; background:#5A554E;">Zouti</div>
+          <div id="f04-c3" class="f04-clip f04-new" style="left:426px; top:1060px; height:220px; background:#5A554E;">Imaj</div>
+          <div id="f04-c4" class="f04-clip" style="left:562px; top:870px; height:200px; background:#77726B; font-size:22px;">Lojisyèl</div>
+          <div id="f04-c5" class="f04-clip f04-new" style="left:562px; top:1110px; height:170px; background:#77726B;">Tranz.</div>
+          <div id="f04-c6" class="f04-clip f04-new" style="left:698px; top:1280px; height:240px; background:#5A554E;">Son</div>
+          <div id="f04-vwa"><div id="f04-vwal">VWA</div></div>
+
+          <div id="f04-ph"></div>
+
+          <div id="f04-mon">
+            <div id="f04-s-img" class="f04-sil" style="left:30px; top:110px; width:300px; height:220px; border-radius:18px;"></div>
+            <div id="f04-s-l1" class="f04-sil" style="left:30px; top:370px; width:300px; height:16px; border-radius:8px; background:#3A3632;"></div>
+            <div id="f04-s-l2" class="f04-sil" style="left:30px; top:402px; width:210px; height:16px; border-radius:8px; background:#3A3632;"></div>
+            <div id="f04-s-w" class="f04-sil" style="left:40px; top:520px; width:280px; height:60px; border-radius:10px; background:#262321;"></div>
+            <div id="f04-draft" class="f04-scene">
+              <div id="f04-img"><div id="f04-sun"></div><div id="f04-hill"></div></div>
+              <div id="f04-tl1" class="f04-tl" style="top:370px; width:300px;"></div>
+              <div id="f04-tl2" class="f04-tl" style="top:402px; width:210px; opacity:.6;"></div>
+              <div id="f04-mwave"></div>
+            </div>
+            <div id="f04-sweep"></div>
+            <div id="f04-rec">● REC</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="f04-text" class="clip" data-start="0" data-duration="6.10" data-track-index="2">
+      <div id="f04-s1" class="lv-sub"></div>
+      <div id="f04-s2" class="lv-sub"></div>
+      <div id="f04-s3" class="lv-sub"></div>
+      <div class="lv-wm">LEVYE DIJITAL</div>
+    </div>
+
+    <div id="f04-grainc" class="clip" data-start="0" data-duration="6.10" data-track-index="3" data-layout-ignore>
+      <div class="lv-grain"></div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      var FID = "04-teks-imaj-tranzisyon-s", T = 6.10;
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* règle : un tick tous les 60 px, un long tous les 240 px (comme 05) */
+      var ru = $("f04-ruler"), i, y, d;
+      for (i = 0, y = 760; y < 4020; y += 60, i++) {
+        d = document.createElement("div"); d.className = "f04-tick" + (i % 4 === 0 ? " big" : "");
+        d.style.cssText = "left:" + (i % 4 === 0 ? 202 : 214) + "px;top:" + y + "px;width:" + (i % 4 === 0 ? 28 : 16) + "px";
+        ru.appendChild(d);
+      }
+      /* forme d'onde de la voix (déterministe, mêmes barres que 03 et 05), mini-onde dans le moniteur */
+      var vw = $("f04-vwa");
+      for (i = 0; i < 70; i++) {
+        var h = 14 + Math.abs(Math.sin(i * 0.61) * 34 + Math.sin(i * 1.73) * 18 + Math.sin(i * 0.17) * 12);
+        d = document.createElement("div"); d.className = "f04-wv";
+        d.style.cssText = "left:" + (90 + i * 8.2).toFixed(1) + "px;top:" + (60 - h / 2).toFixed(1) + "px;height:" + h.toFixed(1) + "px";
+        vw.appendChild(d);
+      }
+      var mw = $("f04-mwave");
+      for (i = 0; i < 24; i++) {
+        d = document.createElement("div"); d.className = "f04-mw";
+        d.style.cssText = "left:" + (40 + i * 12) + "px;height:" + (8 + Math.abs(Math.sin(i * 0.9) * 26 + Math.sin(i * 2.1) * 10)).toFixed(1) + "px";
+        mw.appendChild(d);
+      }
+
+      /* sous-titres mot à mot (temps locaux de onsets.json) */
+      function sub(host, words) {
+        var out = [];
+        words.forEach(function (w, i) {
+          var sp = document.createElement("span"); sp.className = "lv-sw";
+          if (w[2] === "box") sp.innerHTML = '<span class="lv-box"><span class="lv-box-bg"></span><span class="lv-box-tx">' + w[0] + "</span></span>";
+          else sp.textContent = w[0];
+          host.appendChild(sp); if (i < words.length - 1) host.appendChild(document.createTextNode(" "));
+          out.push({ el: sp, t: w[1], box: w[2] === "box" });
+        });
+        return out;
+      }
+      var S1 = sub($("f04-s1"), [["Epi", 0.17], ["li", 0.40], ["fè", 0.71], ["tout", 1.02], ["lòt", 1.35], ["bagay", 1.55], ["yo.", 1.86]]);
+      var S2 = sub($("f04-s2"), [["Li", 2.06], ["ajoute", 2.22], ["tèks,", 2.61], ["li", 3.14], ["ajoute", 3.30], ["imaj,", 3.63]]);
+      var S3 = sub($("f04-s3"), [["li", 3.91], ["fè", 4.20], ["tranzisyon,", 4.35], ["li", 5.18], ["ajoute", 5.30], ["son.", 5.56, "box"]]);
+
+      var tl = gsap.timeline({ paused: true });
+      /* caméra monde : amène le point (X, Y) au centre de scène (540, 760) à l'échelle s */
+      function C(X, Y, s, b) { return { x: 540 - X * s, y: 760 - Y * s, scale: s, filter: "blur(" + b + "px)" }; }
+      function at(o, d, e) { return Object.assign(o, { duration: d, ease: e }); }
+
+      /* --- caméra : dérive permanente (reprise de 03), finit au repos exact où 05 commence --- */
+      tl.fromTo("#f04-cam", { y: -105, scale: 0.97 }, { y: 0, scale: 1, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f04-floorw", { y: 0 }, { y: 70, duration: T, ease: "none" }, 0);
+      tl.fromTo("#f04-giant", { x: 0 }, { x: -120, duration: T, ease: "none" }, 0);
+      /* 0.00 fin de la descente : arrivée sur les couloirs */
+      tl.fromTo("#f04-world", C(540, 1150, 0.85, 6), at(C(540, 980, 0.74, 0), 0.32, "expo.out"), 0);
+      /* crans vers chaque couloir */
+      tl.to("#f04-world", at(C(500, 990, 0.75, 0), 0.18, "expo.out"), 2.40);
+      tl.to("#f04-world", at(C(525, 995, 0.75, 0), 0.18, "expo.out"), 3.45);
+      tl.to("#f04-world", at(C(555, 1000, 0.75, 0), 0.18, "expo.out"), 4.17);
+      tl.to("#f04-world", at(C(585, 1005, 0.75, 0), 0.18, "expo.out"), 5.38);
+      /* 5.70 → 6.10 recul : tout le montage visible (handoff_out = premier image de 05) */
+      tl.to("#f04-world", at(C(540, 1100, 0.72, 0), 0.40, "power1.in"), 5.70);
+
+      /* --- 0.71 « fè » : la tête de lecture revient à 00:00 --- */
+      tl.fromTo("#f04-ph", { y: 60 }, { y: 0, duration: 0.3, ease: "expo.inOut" }, 0.66);
+      tl.to("#f04-rec", { opacity: 0.55, duration: 0.2, ease: "power1.inOut", yoyo: true, repeat: 3 }, 0.4);
+
+      /* --- 1.02 « tout » : les 5 en-têtes de couloirs clignent --- */
+      document.querySelectorAll(".f04-lhead").forEach(function (hd, k) {
+        tl.fromTo(hd, { scale: 1 }, { scale: 1.3, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.02 + k * 0.05);
+      });
+      document.querySelectorAll(".f04-hdot").forEach(function (hd, k) {
+        tl.fromTo(hd, { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.08, ease: "expo.out" }, 1.02 + k * 0.05);
+        tl.to(hd, { opacity: 0, duration: 0.2, ease: "power1.in" }, 1.30 + k * 0.05);
+      });
+
+      /* --- 1.55 tuiles de profondeur --- */
+      tl.fromTo("#f04-t1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.85, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 1.55);
+      tl.to("#f04-t1", { y: -14, rotation: -4, duration: 1.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.71);
+      tl.fromTo("#f04-t2", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 0.85, scale: 1, filter: "blur(2px)", duration: 0.16, ease: "expo.out" }, 1.86);
+      tl.to("#f04-t2", { y: 12, rotation: 4, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.02);
+
+      /* clip qui tombe (signature 1) : trop grand ×1,6, flou 8 → posé en 0,14 s, rebond 4 px, actif orange puis encre */
+      function drop(id, t, base, back) {
+        tl.fromTo(id, { opacity: 0, scale: 1.6, filter: "blur(8px)", backgroundColor: "#C4613F" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, t - 0.02);
+        tl.to(id, { y: 4, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, t + 0.12);
+        tl.to(id, { backgroundColor: base, duration: 0.3, ease: "power1.out" }, t + (back || 0.45));
+      }
+
+      /* --- 2.61 « tèks » : clip Tèks ; dans le moniteur, les lignes de texte blanches --- */
+      drop("#f04-c1", 2.61, "#1B1A18");
+      tl.to("#f04-tl1", { scaleX: 1, duration: 0.3, ease: "expo.out" }, 2.63);
+      tl.to("#f04-tl2", { scaleX: 1, duration: 0.3, ease: "expo.out" }, 2.71);
+      tl.to(["#f04-s-l1", "#f04-s-l2"], { opacity: 0, duration: 0.2, ease: "none" }, 2.75);
+      tl.to("#f04-t1", { scale: 1.12, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 2.61);
+
+      /* --- 3.63 « imaj » : clip Imaj ; dans le moniteur, le rectangle image --- */
+      drop("#f04-c3", 3.63, "#5A554E");
+      tl.fromTo("#f04-img", { opacity: 0, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 3.63);
+      tl.fromTo("#f04-sun", { y: 30 }, { y: 0, duration: 0.5, ease: "expo.out" }, 3.66);
+      tl.to("#f04-s-img", { opacity: 0, duration: 0.1, ease: "none" }, 3.80);
+      tl.to("#f04-t2", { scale: 1.12, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 3.63);
+
+      /* --- 4.35 « tranzisyon » : clip Tranz. ; le moniteur fait un balayage --- */
+      drop("#f04-c5", 4.35, "#77726B");
+      tl.fromTo("#f04-sweep", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.16, ease: "power2.in" }, 4.35);
+      tl.to("#f04-sweep", { clipPath: "inset(0% 0% 0% 100%)", duration: 0.2, ease: "power2.out" }, 4.51);
+      tl.fromTo("#f04-img", { scale: 1 }, { scale: 1.04, duration: 0.4, ease: "expo.out", yoyo: true, repeat: 1, immediateRender: false }, 4.51);
+
+      /* --- 4.80 la tête de lecture vérifie le montage (passage rapide sur les clips, retour à 00:00) --- */
+      tl.to("#f04-ph", { y: 40, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 }, 4.80);
+
+      /* --- 5.56 « son » : clip Son ; une petite onde dans le moniteur --- */
+      drop("#f04-c6", 5.56, "#5A554E", 0.16);
+      tl.fromTo("#f04-mwave", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 0.4, duration: 0.14, ease: "expo.out", transformOrigin: "50% 100%" }, 5.56);
+      tl.to("#f04-s-w", { opacity: 0, duration: 0.12, ease: "none" }, 5.62);
+
+      /* tuiles : sortent avant la couture */
+      tl.to(["#f04-t1", "#f04-t2"], { opacity: 0, filter: "blur(10px)", duration: 0.3, ease: "power2.in" }, 5.72);
+
+      /* --- sous-titres --- */
+      function words(list, out) {
+        list.forEach(function (w) {
+          tl.fromTo(w.el, { opacity: 0, y: 18, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.12, ease: "expo.out" }, Math.max(0, w.t - 0.03));
+          if (w.box) tl.fromTo(w.el.querySelector(".lv-box-bg"), { scaleX: 0 }, { scaleX: 1, duration: 0.14, ease: "expo.out" }, w.t - 0.04);
+        });
+        tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
+      }
+      words(S1, 1.94);
+      words(S2, 3.79);
+      words(S3, 5.95);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines[FID] = tl;
+    })();
+  </script>
+</template>

@@ -75,7 +75,7 @@
     #f03-vtrack { position: absolute; left: 36px; right: 36px; top: 184px; height: 14px; border-radius: 7px; background: #D9D4CC; overflow: hidden; }
     #f03-vfill { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #8C877F; transform-origin: 0 50%; transform: scaleX(0); }
     #f03-vx { position: absolute; left: -16px; right: -16px; top: 118px; height: 10px; border-radius: 5px; background: #D97757;
-      transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 6px 16px rgba(217,119,87,.4); }
+      transform-origin: 0 50%; box-shadow: 0 6px 16px rgba(217,119,87,.4); }
   </style>
 
   <div id="root" data-composition-id="03-pa-veo-3" data-width="1080" data-height="1920" data-duration="4.45">
@@ -89,7 +89,7 @@
     <div id="f03-stage" class="clip" data-start="0" data-duration="4.45" data-track-index="1">
       <div id="f03-cam">
         <!-- tuile de profondeur : le micro (la voix) -->
-        <div id="f03-t1" class="lv-tile" style="left:40px; top:360px; opacity:0;">
+        <div id="f03-t1" class="lv-tile" style="left:30px; top:1170px; opacity:0;">
           <svg viewBox="0 0 24 24" width="70" height="70"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="#1B1A18"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M8.5 21.5h7" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linecap="round"/></svg></div>
 
         <div id="f03-world">
@@ -215,7 +215,7 @@
       tl.to("#f03-veo", { y: 0, rotation: -6, duration: 0.14, ease: "expo.out" }, 1.03);
       tl.to("#f03-veo", { y: 5, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 1.17);
       /* 1.75 « Veo 3 » : un trait accent la barre */
-      tl.to("#f03-vx", { scaleX: 1, duration: 0.25, ease: "power2.out" }, 1.75);
+      tl.fromTo("#f03-vx", { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "power2.out" }, 1.75);
       tl.to("#f03-veo", { x: -8, duration: 0.04, ease: "power1.inOut", yoyo: true, repeat: 3 }, 1.95);
       /* 2.10 elle bascule et tombe hors du cadre à gauche */
       tl.to("#f03-veo", { rotation: -25, duration: 0.12, ease: "power2.out" }, 2.10);

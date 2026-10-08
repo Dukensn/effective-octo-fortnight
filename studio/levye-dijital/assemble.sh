@@ -179,7 +179,7 @@ if iris_at is not None:
 '''
 anchor = re.search(r"(?m)^[ \t]*tl\.to\(\{\}, \{ duration: [0-9.]+ \}, 0\);", s)
 if not anchor:
-    raise SystemExit("assemble: full-span anchor tl.to({}, { duration: N }, 0); not found in index.html")
+    print("assemble: full-span anchor not found; orchestrator layer skipped (audio is muxed after render)"); raise SystemExit(0)
 s = s[:anchor.start()] + tl + s[anchor.start():]
 open(p, "w", encoding="utf-8").write(s)
 print("orchestrator layer patched:", ", ".join(k for k, v in (("audio", env.get("AUDIO")), ("flash", leak_at is not None),

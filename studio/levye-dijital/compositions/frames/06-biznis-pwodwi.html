@@ -243,7 +243,7 @@
       tl.fromTo("#f06-cam", { y: -26, scale: 1.03 }, { y: -10, scale: 1.015, duration: T, ease: "none" }, 0);
       tl.fromTo("#f06-floorw", { y: 70 }, { y: 40, duration: T, ease: "none" }, 0);
       tl.fromTo("#f06-giant0", { x: -110, opacity: 1 }, { x: -150, opacity: 0, duration: 0.8, ease: "power1.in" }, 0);
-      tl.fromTo("#f06-giant", { x: 40, opacity: 0 }, { x: -60, opacity: 1, duration: T, ease: "none" }, 0.3);
+      tl.fromTo("#f06-giant", { x: 40, opacity: 0 }, { x: -60, opacity: 1, duration: T - 0.3, ease: "none" }, 0.3);
       /* fin de la descente (handoff_in : cam(540, 2700, 0.9), flou 8) puis dérive de la bande (+12 px/s) */
       tl.fromTo("#f06-world", C(540, 2700, 0.9, 8), Object.assign(C(540, 2985, 1, 0), { duration: 0.55, ease: "power2.out" }), 0);
       tl.to("#f06-world", Object.assign(C(540, 3050, 1, 0), { duration: T - 0.55, ease: "none" }), 0.55);
