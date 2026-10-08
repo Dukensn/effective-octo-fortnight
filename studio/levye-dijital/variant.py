@@ -23,7 +23,8 @@ LS = (LINK_TAKE[1] - LINK_TAKE[0]) - (LINK_CUT[1] - LINK_CUT[0])                
 
 F19 = 90.40                        # frame 19 (the dates) start
 F24 = 115.70                       # frame 24 (form + end card) start
-TOTAL = round(124.39 + DS + LS, 2)
+END_HOLD = 5.40                    # end card held longer: the price stays 8 s on screen
+TOTAL = round(124.39 + DS + LS + END_HOLD, 2)
 
 # frame 19, variant B: old local time -> new local time (piecewise linear on the spoken words)
 F19_ANCHORS = [(0, 0), (0.25, 0.25), (0.90, 0.70), (1.17, 1.15), (1.56, 2.27), (1.84, 2.46), (2.67, 3.57), (3.40, 4.65), (3.80, 5.05)]
@@ -44,6 +45,8 @@ def f24(t):
         return 2.70                # typing starts with the URL
     if abs(t - 4.70) < 0.05:
         return 4.41                # the pill click
+    if t >= 7.4:
+        return t + LS + END_HOLD   # iris and its whoosh, after the long hold
     return t + LS if t >= 3.5 else t
 
 

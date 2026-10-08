@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """1-minute WhatsApp status cut of the full film: whole frames only, cuts in voice silences.
 Keeps: 01 hook, 03 not-Veo / my voice, 05 (first 2.9 s, "li ba m piblisite m"), 10-11 brand + Facebook Ads,
-13 AI agents + WhatsApp automation, 19-24 date, hours, venue, 30 seats, WhatsApp, form + end card (the price badge is on screen all along).
-DAT=A|B python3 cut-60s.py (variant.py): A 58.4 s, B 59.7 s.
+19-24 date, hours, venue, 30 seats, WhatsApp, form + end card (the price badge is on screen all along).
+The AI-agents module (56.95-64.40) is left out to make room for the 8 s price hold.
+DAT=A|B python3 cut-60s.py (variant.py): A 56.4 s, B 57.6 s.
 Video from renders/video.mp4; audio rebuilt: same voice ranges + one continuous funk bed (ducked) + a whoosh per cut."""
 import subprocess, numpy as np
 from variant import SUFFIX, TOTAL
 from scipy.ndimage import uniform_filter1d
-R = [(0.00, 3.20), (9.75, 14.20), (20.30, 23.20), (44.90, 50.95), (56.95, 64.40), (90.40, TOTAL)]
+R = [(0.00, 3.20), (9.75, 14.20), (20.30, 23.20), (44.90, 50.95), (90.40, TOTAL)]
 SR = 48000
 def load(p):
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", p, "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"], capture_output=True, check=True).stdout
@@ -19,6 +20,7 @@ subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", f"renders/video{SUFFIX}.mp4
                 "-map", "[v]", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", f"renders/video-60s{SUFFIX}.mp4"], check=True)
 # audio
 voice = load(f"assets/audio/voix-montage-atelye{SUFFIX}.wav")
+voice = np.pad(voice, ((0, max(0, int(TOTAL * SR) - len(voice))), (0, 0)))   # silent end-card hold
 F = int(0.01 * SR); segs = []
 for a, b in R:
     s = voice[int(a * SR):int(b * SR)].copy(); s[:F] *= np.linspace(0, 1, F)[:, None]; s[-F:] *= np.linspace(1, 0, F)[:, None]; segs.append(s)

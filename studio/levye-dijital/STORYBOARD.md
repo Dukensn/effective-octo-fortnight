@@ -1,12 +1,12 @@
 ---
 format: 1080x1920
-duration: 124.80s
+duration: 130.20s
 message: "Claude te fè pub sa a ; aprann fè l ou menm nan Atelye Dijital : 2 jou fòmasyon, samdi 17 ak 24 oktòb 2026, Sassou's Lamadone Club."
 arc: Preuve (la pub se monte devant nous) → Gag muet → Diagnostic (biznis, pwodwi, kreyatè) → Pivot → Marque → Programme (5 modules) → Infos (date, lè, lokal, plas) → CTA WhatsApp + lyen
 audience: entrepreneurs, vendeurs et créateurs de contenu en Haïti, non techniques, sur WhatsApp
 mode: autonomous
 captions: disabled
-voice: "assets/audio/voix-montage-atelye.wav (124.80 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
+voice: "assets/audio/voix-montage-atelye.wav (130.20 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
 direction: "B · Liy tan an (la bande de montage verticale), avec la fin de C (l'épingle qui se plante sur le Sassou's)"
 patterns: ../patterns/STORYBOARD-CRAFT.md, ../patterns/PATTERNS.md
 ---
@@ -657,7 +657,7 @@ Scene 1 (0.00 à 8.55 s)
 ## Frame 24 : Fòmilè + fen
 
 - scene: Le lien « atelyedijital.vercel.app » se tape dans une pilule ; le curseur clique ; recul final : carte de fin (ATELYE DIJITAL, Samdi 17 & 24 oktòb 2026, Sassou's Lamadone Club, bouton WhatsApp, lien) ; les 5 pistes pleines en miniature ; tenue vivante puis iris.
-- duration: 9.10s
+- duration: 14.50s
 - start: 115.70
 - transition_in: cut
 - status: storyboard
@@ -669,7 +669,7 @@ Scene 1 (0.00 à 8.55 s)
 - rules: cursor-click-ripple, viewport-change
 - world: light
 - handoff_in: à 8.55 local (115.70 global) : caméra cam(540, 900, 1.0), bouton WhatsApp avec le numéro, curseur posé à côté
-- handoff_out: fin du film (124.80) : iris fermé
+- handoff_out: fin du film (130.20) : iris fermé
 
 Word cues: Ou@0.13 ka@0.42 ranpli@0.60 fòmilè@0.94 enskripsyon@1.33 an@1.97 tou,@2.14 lè@2.40 w@2.60 ale@2.73 sou@2.94 atelyedijital.vercel.app@2.70
 

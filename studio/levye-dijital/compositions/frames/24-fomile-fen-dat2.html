@@ -113,17 +113,18 @@
     /* trait de crête (sous-titre) */
     .f24-pk { position: relative; display: inline-block; }
     .f24-pk-s { position: absolute; left: -6px; width: calc(100% + 12px); bottom: -8px; height: 16px; clip-path: inset(0% 100% 0% 0%); }
+    .lv-wm { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font: 800 24px "Inter"; letter-spacing: 6px; color: rgba(27,26,24,.55); }
   </style>
 
-  <div id="root" data-composition-id="24-fomile-fen-dat2" data-width="1080" data-height="1920" data-duration="9.10">
-    <div id="f24-bg" class="clip" data-start="0" data-duration="9.10" data-track-index="0" data-layout-ignore>
+  <div id="root" data-composition-id="24-fomile-fen-dat2" data-width="1080" data-height="1920" data-duration="14.50">
+    <div id="f24-bg" class="clip" data-start="0" data-duration="14.50" data-track-index="0" data-layout-ignore>
       <div class="lv-ground">
         <div id="f24-floor" class="lv-floor"></div>
         <div id="f24-giant" class="lv-giant" style="left:-60px; top:1080px;">LYEN</div>
       </div>
     </div>
 
-    <div id="f24-stage" class="clip" data-start="0" data-duration="9.10" data-track-index="1">
+    <div id="f24-stage" class="clip" data-start="0" data-duration="14.50" data-track-index="1">
       <div id="f24-iris">
         <div id="f24-cam">
           <!-- ===== Scène 1 : formulaire + lien ===== -->
@@ -199,13 +200,13 @@
       </div>
     </div>
 
-    <div id="f24-text" class="clip" data-start="0" data-duration="9.10" data-track-index="2">
+    <div id="f24-text" class="clip" data-start="0" data-duration="14.50" data-track-index="2">
       <div id="f24-s1" class="lv-sub"></div>
       <div id="f24-s2" class="lv-sub"></div>
       <div id="f24-wmk" class="lv-wm">ATELYE DIJITAL</div>
     </div>
 
-    <div id="f24-grainc" class="clip" data-start="0" data-duration="9.10" data-track-index="3" data-layout-ignore>
+    <div id="f24-grainc" class="clip" data-start="0" data-duration="14.50" data-track-index="3" data-layout-ignore>
       <div class="lv-grain"></div>
     </div>
   </div>
@@ -213,7 +214,7 @@
   <script src="assets/vendor/gsap.min.js"></script>
   <script>
     (function () {
-      var FID = "24-fomile-fen-dat2", T = 9.10;
+      var FID = "24-fomile-fen-dat2", T = 14.50;
       var $ = function (id) { return document.getElementById(id); };
       /* logo WhatsApp officiel (assets/icons/whatsapp.svg, Simple Icons CC0) */
       var WA = "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z";
@@ -266,7 +267,7 @@
       /* --- caméra : dérive permanente (poussée lente), recul à l'assemblage de la carte de fin, dérive jusqu'à l'iris --- */
       tl.fromTo("#f24-cam", { y: 0, scale: 1 }, { y: -28, scale: 1.03, duration: 4.81, ease: "none" }, 0);
       tl.to("#f24-cam", { y: 0, scale: 0.98, duration: 0.5, ease: "expo.inOut" }, 4.81);
-      tl.to("#f24-cam", { y: -24, scale: 1.02, duration: 3.79, ease: "none" }, 5.31);
+      tl.to("#f24-cam", { y: -24, scale: 1.02, duration: 9.19, ease: "none" }, 5.31);
       tl.fromTo("#f24-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 240px", duration: T, ease: "none" }, 0);
       tl.fromTo("#f24-giant", { x: 0 }, { x: -150, duration: T, ease: "none" }, 0);
       tl.to("#f24-map", { x: 44, duration: 4.81, ease: "none" }, 0);
@@ -353,9 +354,18 @@
       tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 7.66);
       tl.to("#f24-ebtn", { scale: 1.03, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 8.03);
 
+      /* tenue longue (8 s de prix à l'écran) : le prix et le bouton marquent le coup à tour de rôle, vies finies */
+      for (var k = 0; k < 4; k++) {
+        var t0 = 8.90 + k * 1.20;
+        tl.to("#f24-price", { scale: 1.05, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t0);
+        tl.fromTo("#f24-pring", { opacity: 0.9, scale: 1 }, { opacity: 0, scale: 1.12, duration: 0.6, ease: "expo.out", immediateRender: false }, t0 + 0.04);
+        tl.fromTo("#f24-psheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, t0 + 0.6);
+      }
+      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 13.00);
+
       /* ===== 7.90 → 8.69 iris vers le bouton WhatsApp, puis papier nu ===== */
-      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 1142px)" }, { clipPath: "circle(0px at 540px 1142px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 8.31);
-      tl.to(["#f24-floor", "#f24-giant", "#f24-wmk"], { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 8.51);
+      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 1142px)" }, { clipPath: "circle(0px at 540px 1142px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 13.71);
+      tl.to(["#f24-floor", "#f24-giant", "#f24-wmk"], { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 13.91);
 
       /* --- sous-titres --- */
       function words(list, out) {
