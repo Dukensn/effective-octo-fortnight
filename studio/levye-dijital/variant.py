@@ -21,10 +21,12 @@ LINK_CUT = (118.31, 120.10)        # mispronounced "levyedijital.vercel.app"
 LINK_TAKE = (0.20, 2.40)           # lyen_an.m4a
 LS = (LINK_TAKE[1] - LINK_TAKE[0]) - (LINK_CUT[1] - LINK_CUT[0])                                    # 0.41
 
+STUTTER = (85.84, 86.42)           # "...gwoup WhatsApp pou kontinye | pou nou kontinye asiste": the first "pou kontinye" goes (both cuts)
+SH = STUTTER[1] - STUTTER[0]       # 0.58
 F19 = 90.40                        # frame 19 (the dates) start
 F24 = 115.70                       # frame 24 (form + end card) start
 END_HOLD = 5.40                    # end card held longer: the price stays 8 s on screen
-TOTAL = round(124.39 + DS + LS + END_HOLD, 2)
+TOTAL = round(124.39 - SH + DS + LS + END_HOLD, 2)
 
 # frame 19, variant B: old local time -> new local time (piecewise linear on the spoken words)
 F19_ANCHORS = [(0, 0), (0.25, 0.25), (0.90, 0.70), (1.17, 1.15), (1.56, 2.27), (1.84, 2.46), (2.67, 3.57), (3.40, 4.65), (3.80, 5.05)]
@@ -52,6 +54,12 @@ def f24(t):
 
 def remap(t):
     """original montage time -> time in this cut"""
+    if t < STUTTER[0]:
+        return t
+    return _remap(max(t, STUTTER[1])) - SH
+
+
+def _remap(t):
     if t < F19:
         return t
     if t < F19 + 3.80:

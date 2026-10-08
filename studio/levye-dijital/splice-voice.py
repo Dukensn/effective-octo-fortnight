@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Atelye Dijital voice: splice the client's corrective takes into the voice montage (see variant.py).
 
+  - the stutter "pou kontinye | pou nou kontinye" in the WhatsApp-group sentence is cut;
   - link take (lyen_an.m4a, "atelyedijital.vercel.app") replaces the mispronounced "levyedijital.vercel.app";
   - DAT=B only: the new date take (nouvo_dat.m4a) replaces the old date sentence.
 New takes go through the same cleaning chain as prep-voice.py and are level-matched to the montage.
@@ -8,7 +9,7 @@ Usage: DAT=A|B python3 splice-voice.py LYEN.m4a [NOUVO_DAT.m4a]  -> assets/audio
 """
 import subprocess, sys
 import numpy as np
-from variant import DAT, SUFFIX, DATE_CUT, DATE_TAKE, DATE_PAD, LINK_CUT, LINK_TAKE, TOTAL
+from variant import DAT, SUFFIX, STUTTER, DATE_CUT, DATE_TAKE, DATE_PAD, LINK_CUT, LINK_TAKE, TOTAL
 
 SR = 44100
 SRC = "assets/audio/voix-montage.wav"
@@ -42,12 +43,13 @@ def at(t):
 v = load(SRC)
 ref = speech_rms(v[at(90):at(118)])
 link = load(sys.argv[1], CHAIN); link *= ref / speech_rms(link)
-parts = []
+parts = [v[:at(STUTTER[0])]]
+v0 = at(STUTTER[1])   # the rest of the montage is taken from here
 if DAT == "B":
     date = load(sys.argv[2], CHAIN); date *= ref / speech_rms(date)
-    parts += [v[:at(DATE_CUT[0])], np.zeros(at(DATE_PAD), np.float32), cut(date, *DATE_TAKE), v[at(DATE_CUT[1]):at(LINK_CUT[0])]]
+    parts += [v[v0:at(DATE_CUT[0])], np.zeros(at(DATE_PAD), np.float32), cut(date, *DATE_TAKE), v[at(DATE_CUT[1]):at(LINK_CUT[0])]]
 else:
-    parts += [v[:at(LINK_CUT[0])]]
+    parts += [v[v0:at(LINK_CUT[0])]]
 parts += [cut(link, *LINK_TAKE), v[at(LINK_CUT[1]):]]
 out = np.concatenate(parts)
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-",

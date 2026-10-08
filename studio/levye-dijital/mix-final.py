@@ -8,9 +8,11 @@ Music (user-provided track assets/music/funk.mp3, 111 BPM, bar 2.162 s, main dro
      repeated on downbeats with 40 ms crossfades, fade out over the end card
 Ducking: music gain follows the voice envelope (-12 dB under speech, 0.25 s attack, 0.6 s release).
 SFX: names from ../.claude/skills/media-use/audio/assets/sfx/, events in assets/audio/sfx-events.json ([name, t, gain]).
+SFX (louder since the client could not hear them): events at their own gain, the music ducks under each effect;
+heartbeat/hit are synthesised by make-sfx.py.
 Usage: DAT=A|B python3 mix-final.py  -> assets/audio/mix-final[-dat2].wav (variant.py)
 """
-import json, subprocess
+import json, os, subprocess
 from variant import SUFFIX, TOTAL, remap
 import numpy as np
 from scipy.ndimage import uniform_filter1d
@@ -73,6 +75,7 @@ music *= (gain * 10 ** (-8 / 20))[:, None]   # base level under the voice
 
 # sound effects
 fx = np.zeros((N, 2), np.float32)
+hb = np.zeros((N, 2), np.float32)   # heartbeats: kept in the pivot silence
 try:
     events = json.load(open("assets/audio/sfx-events.json"))
 except Exception:
@@ -80,19 +83,25 @@ except Exception:
 cache = {}
 for name, t, g in events:
     t = remap(t)   # sfx-events.json is on the original montage timeline
-    if name not in cache:
-        cache[name] = load(f"{SFXDIR}/{name}.mp3")
+    if name not in cache:   # local synthesised sfx (make-sfx.py) first, then the library
+        local = f"assets/audio/sfx/{name}.wav"
+        cache[name] = load(local if os.path.exists(local) else f"{SFXDIR}/{name}.mp3")
     s = cache[name] * float(g)
     if name == "riser":  # crests at its end: cut hard on the pivot
         s = s[:max(0, int((43.20 - t) * SR))].copy()
     if name.startswith("impact"):  # the hit only: 0.5 s then a 0.3 s fade, the pivot stays a silence
         s = s[:int(0.8 * SR)].copy(); k = int(0.3 * SR); s[-k:] *= np.linspace(1, 0, k)[:, None]
     i = int(t * SR); j = min(N, i + len(s))
-    if i < N: fx[i:j] += s[:j - i]
+    if i < N: (hb if name == "heartbeat" else fx)[i:j] += s[:j - i]
 
 fx[int(43.20 * SR) + int(0.8 * SR):int(44.95 * SR)] = 0  # nothing but the hit in the pivot
 fx[int(44.20 * SR):int(44.95 * SR)] *= np.linspace(1, 0, int(44.95 * SR) - int(44.20 * SR))[:, None] ** 2  # impact tail dies before the drop
-mix = voice * 1.0 + music + fx * 0.6
+fx += hb
+# the music steps aside under every effect (-7 dB max, 10 ms in, 300 ms out) so the effects are heard on a phone
+fenv = uniform_filter1d(np.abs(fx).max(1), int(0.01 * SR))
+fenv = uniform_filter1d(fenv, int(0.3 * SR))
+music *= (1 - 0.55 * np.clip(fenv / 0.08, 0, 1))[:, None]
+mix = voice * 1.0 + music + fx * 1.0
 peak = np.abs(mix).max()
 if peak > 0.98: mix *= 0.98 / peak
 tmp = "assets/audio/_mix_raw.wav"

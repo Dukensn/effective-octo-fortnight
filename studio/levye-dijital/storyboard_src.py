@@ -21,7 +21,7 @@ for w in json.load(open("onsets.json"))["words"]:
         w["w"] = "atelyedijital.vercel.app"
     W.append(w)
 if DAT == "B":
-    W += [{"w": a, "s": round(F19 + t, 2)} for a, t in [("Dat", .25), ("la", .47), ("se", .70), ("samdi", .82), ("24", 1.15),
+    W += [{"w": a, "s": round(remap(F19) + t, 2)} for a, t in [("Dat", .25), ("la", .47), ("se", .70), ("samdi", .82), ("24", 1.15),
           ("oktòb", 1.78), ("ak", 2.27), ("31", 2.46), ("oktòb", 3.09), ("2026", 3.57), ("la.", 4.32)]]
     W.sort(key=lambda w: w["s"])
 
