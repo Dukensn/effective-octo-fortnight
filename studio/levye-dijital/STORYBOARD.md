@@ -1,12 +1,12 @@
 ---
 format: 1080x1920
-duration: 130.20s
-message: "Claude te fè pub sa a ; aprann fè l ou menm nan Atelye Dijital : 2 jou fòmasyon, samdi 17 ak 24 oktòb 2026, Sassou's Lamadone Club."
+duration: 131.45s
+message: "Claude te fè pub sa a ; aprann fè l ou menm nan Atelye Dijital : 2 jou fòmasyon, samdi 24 ak 31 oktòb 2026, Sassou's Lamadone Club."
 arc: Preuve (la pub se monte devant nous) → Gag muet → Diagnostic (biznis, pwodwi, kreyatè) → Pivot → Marque → Programme (5 modules) → Infos (date, lè, lokal, plas) → CTA WhatsApp + lyen
 audience: entrepreneurs, vendeurs et créateurs de contenu en Haïti, non techniques, sur WhatsApp
 mode: autonomous
 captions: disabled
-voice: "assets/audio/voix-montage-atelye.wav (130.20 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
+voice: "assets/audio/voix-montage-atelye-dat2.wav (131.45 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
 direction: "B · Liy tan an (la bande de montage verticale), avec la fin de C (l'épingle qui se plante sur le Sassou's)"
 patterns: ../patterns/STORYBOARD-CRAFT.md, ../patterns/PATTERNS.md
 ---
@@ -537,13 +537,13 @@ Scene 1 (0.00 à 5.95 s)
 
 ## Frame 19 : Dat la
 
-- scene: La règle devient le calendrier : « SAM 17 OKT » puis « SAM 24 OKT » s'allument ; « 2026 ».
-- duration: 3.80s
+- scene: La règle devient le calendrier : « SAM 24 OKT » puis « SAM 31 OKT » s'allument ; « 2026 ».
+- duration: 5.05s
 - start: 90.40
 - transition_in: cut
 - status: storyboard
-- src: compositions/frames/19-dat-la.html
-- voiceover: "Dat la se 17 ak 24 oktòb 2026."
+- src: compositions/frames/19-dat-la-dat2.html
+- voiceover: "Dat la se samdi 24 oktòb ak 31 oktòb 2026 la."
 - type: info
 - blueprint: titlecard-reveal (Adapt)
 - focal: les deux dates
@@ -552,18 +552,18 @@ Scene 1 (0.00 à 5.95 s)
 - handoff_in: à 5.95 local (90.40 global) : caméra cam(620, 9300, 1.0) en descente (+250 px/s) flou 6 px ; le groupe remonte ; la règle commence à porter des jours
 - handoff_out: à 3.80 local (94.20 global) : caméra cam(620, 10000, 1.0) en descente flou 6 px ; dates posées remontent
 
-Word cues: Dat@0.25 la@0.59 se@0.90 17@1.17 ak@1.56 24@1.84 oktòb@2.13 2026.@2.67
+Word cues: Dat@0.25 la@0.47 se@0.70 samdi@0.82 24@1.15 oktòb@1.78 ak@2.27 31@2.46 oktòb@3.09 2026@3.57 la.@4.32
 
 Scene 1 (0.00 à 3.80 s)
-  TEXTE ÉCRAN : « Dat la se [boîte : 17] ak [trait : 24] oktòb 2026. »
-  ÉTAPES : 0.30 station calendrier s'ouvre ; 1.17 « 17 » : « SAM 17 » + gros « 17 OKT » ; 1.84 « 24 » : « SAM 24 » + gros « 24 OKT » ; 2.67 « 2026 » ; 3.40 descente.
+  TEXTE ÉCRAN : « Dat la se samdi [boîte : 24] oktòb » puis « ak [trait : 31] oktòb 2026 la. »
+  ÉTAPES : 0.30 station calendrier s'ouvre ; 1.15 « 24 » : « SAM 24 » + gros « 24 OKT » ; 2.46 « 31 » : « SAM 31 » + gros « 31 OKT » ; 3.57 « 2026 » ; 4.65 descente.
   SON : whoosh court 90.55.
 
 ## Frame 20 : Lè a
 
 - scene: La tête de lecture devient l'aiguille d'une horloge (HTML) : de 10h00 à 4h00, l'arc se remplit en accent.
 - duration: 2.40s
-- start: 94.20
+- start: 95.45
 - transition_in: cut
 - status: storyboard
 - src: compositions/frames/20-le-a.html
@@ -586,7 +586,7 @@ Scene 1 (0.00 à 2.40 s)
 
 - scene: La bande se replie et devient une carte vue de dessus ; l'épingle tombe et se plante sur la photo du Sassou's Lamadone Club ; « Plas Anacaona » sur la carte, à côté.
 - duration: 4.45s
-- start: 96.60
+- start: 97.85
 - transition_in: cut
 - status: storyboard
 - src: compositions/frames/21-lokal-la.html
@@ -610,7 +610,7 @@ Scene 1 (0.00 à 4.45 s)
 
 - scene: Une grille de 30 places (6x5) ; les places s'allument une à une jusqu'à 30 ; « si w rive an reta » : une petite porte se ferme sur le côté.
 - duration: 6.10s
-- start: 101.05
+- start: 102.30
 - transition_in: cut
 - status: storyboard
 - src: compositions/frames/22-30-plas.html
@@ -634,7 +634,7 @@ Scene 1 (0.00 à 6.10 s)
 
 - scene: Le bouton vert « Kontakte nou sou WhatsApp » arrive ; la tête de lecture devenue curseur arrive en courbe et clique ; le numéro « 31 43 3938 » s'imprime chiffre par chiffre.
 - duration: 8.55s
-- start: 107.15
+- start: 108.40
 - transition_in: cut
 - status: storyboard
 - src: compositions/frames/23-whatsapp.html
@@ -656,12 +656,12 @@ Scene 1 (0.00 à 8.55 s)
 
 ## Frame 24 : Fòmilè + fen
 
-- scene: Le lien « atelyedijital.vercel.app » se tape dans une pilule ; le curseur clique ; recul final : carte de fin (ATELYE DIJITAL, Samdi 17 & 24 oktòb 2026, Sassou's Lamadone Club, bouton WhatsApp, lien) ; les 5 pistes pleines en miniature ; tenue vivante puis iris.
+- scene: Le lien « atelyedijital.vercel.app » se tape dans une pilule ; le curseur clique ; recul final : carte de fin (ATELYE DIJITAL, Samdi 24 & 31 oktòb 2026, Sassou's Lamadone Club, bouton WhatsApp, lien) ; les 5 pistes pleines en miniature ; tenue vivante puis iris.
 - duration: 14.50s
-- start: 115.70
+- start: 116.95
 - transition_in: cut
 - status: storyboard
-- src: compositions/frames/24-fomile-fen.html
+- src: compositions/frames/24-fomile-fen-dat2.html
 - voiceover: "Ou ka ranpli fòmilè enskripsyon an tou, lè w ale sou atelyedijital.vercel.app"
 - type: end
 - blueprint: cta-morph-press (Adapt)
@@ -669,14 +669,14 @@ Scene 1 (0.00 à 8.55 s)
 - rules: cursor-click-ripple, viewport-change
 - world: light
 - handoff_in: à 8.55 local (115.70 global) : caméra cam(540, 900, 1.0), bouton WhatsApp avec le numéro, curseur posé à côté
-- handoff_out: fin du film (130.20) : iris fermé
+- handoff_out: fin du film (131.45) : iris fermé
 
-Word cues: Ou@0.13 ka@0.42 ranpli@0.60 fòmilè@0.94 enskripsyon@1.33 an@1.97 tou,@2.14 lè@2.40 w@2.60 ale@2.73 sou@2.94 atelyedijital.vercel.app@2.70
+Word cues: Ou@0.13 ka@0.42 ranpli@0.60 fòmilè@0.94 enskripsyon@1.33 an@1.97 tou,@2.14 lè@2.40 w@2.60 atelyedijital.vercel.app@2.70 ale@2.73 sou@2.94
 
 Scene 1 (0.00 à 4.40 s) : le lien
   TEXTE ÉCRAN : « Ou ka ranpli fòmilè enskripsyon an tou, » puis « lè w ale sou [trait : atelyedijital.vercel.app] »
   ÉTAPES : 0.94 « fòmilè » : une carte formulaire (3 champs HTML : Non, Telefòn, Klike) arrive ; 2.73 « ale » : la pilule de lien ; 3.18 l'URL se tape (0,9 s, typing) ; 4.00 le curseur clique la pilule.
 Scene 2 (4.40 à 8.69 s) : carte de fin
-  TEXTE ÉCRAN : aucun sous-titre ; la carte : ATELYE DIJITAL, « Samdi 17 & 24 oktòb 2026 · 10:00 AM – 4:00 PM », « Sassou's Lamadone Club · anfas Plas Anacaona », bouton WhatsApp « 31 43 3938 », lien.
+  TEXTE ÉCRAN : aucun sous-titre ; la carte : ATELYE DIJITAL, « Samdi 24 & 31 oktòb 2026 · 10:00 AM – 4:00 PM », « Sassou's Lamadone Club · anfas Plas Anacaona », bouton WhatsApp « 31 43 3938 », lien.
   ÉTAPES : 4.40 recul : tout le film se ramasse (implosion 0,5 s) puis la carte de fin s'assemble (0,3 s, cascade) ; 5.20 la miniature des 5 pistes pleines (rime) ; 5.60 → 7.90 tenue vivante (dérive, l'anneau du bouton respire) ; 7.90 → 8.69 iris vers le bouton WhatsApp.
   SON : typing 118.40 → 120.10, clic 120.11, whoosh-cinematic 123.61 (temps de la variante A).
