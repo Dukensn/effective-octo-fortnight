@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-Regular.otf"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-Medium.otf"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-SemiBold.otf"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-Bold.otf"); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url("../fonts/Inter-ExtraBold.otf"); font-weight: 800; }
+@font-face { font-family: "InterD"; src: url("../fonts/InterDisplay-Black.otf"); font-weight: 900; }
+@page { size: 91.6mm 60mm; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 91.6mm; height: 60mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet { position: relative; width: 91.6mm; height: 60mm; overflow: hidden; page-break-after: always; }
+.card { position: absolute; left: 3mm; top: 3mm; width: 85.6mm; height: 54mm; }   /* the trim box */
+body { font-family: "Inter"; }
+.png .sheet { background: transparent !important; } .png .card { border-radius: 3.2mm; overflow: hidden; }
+.png .back .card { box-shadow: inset 0 0 0 .15mm rgba(27,26,24,.12); }
+
+.front, .front .card { background: radial-gradient(120% 140% at 100% 0%, #2E2717 0%, #14120D 55%), #14120D; color: #F3EFE8; }
+.front .frame { position: absolute; inset: 2.2mm; border: 0.18mm solid #CDA552; border-radius: 2.2mm; opacity: .45; }
+.front .mark { position: absolute; right: -6mm; bottom: -9mm; width: 48mm; height: 48mm; opacity: .07; }
+.front .mark svg { width: 100%; height: 100%; }
+.front .mark svg rect:first-child { fill: none; }
+.front .mark svg path { stroke: #CDA552; }
+.front .mark svg rect:last-child { fill: #CDA552; }
+.front .brand { position: absolute; left: 5.2mm; top: 5.2mm; display: flex; align-items: center; gap: 1.6mm;
+  font: 700 2.25mm/1 "Inter"; letter-spacing: .5mm; color: #F3EFE8; }
+.front .brand .lg svg { display: block; width: 5.6mm; height: 5.6mm; }
+.front .brand .lg svg rect:first-child { fill: #F3EFE8; }
+.front .brand .lg svg path { stroke: #14120D; }
+.front .vip { position: absolute; right: 5.2mm; top: 6.3mm; font: 600 1.9mm/1 "Inter"; letter-spacing: .7mm; color: #CDA552; }
+.front .tier { position: absolute; left: 5mm; top: 15.5mm; font: 900 9.4mm/1 "InterD"; letter-spacing: -.15mm; color: #CDA552; }
+.front .rule { position: absolute; left: 5.2mm; top: 27.6mm; width: 12mm; height: .35mm; background: #CDA552; opacity: .8; }
+.front .deal { position: absolute; left: 4.6mm; bottom: 4.9mm; display: flex; align-items: baseline; gap: 2mm; }
+.front .pct { font: 900 15.5mm/0.74 "InterD"; letter-spacing: -.5mm; color: #F3EFE8; white-space: nowrap; }
+.front .pct span { font-size: 8mm; margin-left: .5mm; color: #CDA552; }
+.front .off { font: 800 3mm/1 "Inter"; letter-spacing: .8mm; color: #CDA552; }
+.front .tag { position: absolute; left: 5.2mm; top: 29.6mm; font: 500 1.75mm/1 "Inter"; letter-spacing: .15mm; color: rgba(243,239,232,.62); }
+
+.back, .back .card { background: #F7F5F0; color: #1B1A18; }
+.back .band { position: absolute; left: 0; top: 0; width: 85.6mm; height: 1.4mm; background: linear-gradient(90deg, #CDA552, #F0D99A, #CDA552); }
+.back .brand { position: absolute; left: 5.2mm; top: 4.4mm; display: flex; align-items: center; gap: 1.4mm; font: 700 2mm/1 "Inter"; letter-spacing: .45mm; }
+.back .brand .lg svg { display: block; width: 4.6mm; height: 4.6mm; }
+.back .chip { position: absolute; right: 5.2mm; top: 4.6mm; height: 4.2mm; padding: 0 2mm; border-radius: 2.1mm; background: #14120D;
+  color: #CDA552; font: 700 1.7mm/4.2mm "Inter"; letter-spacing: .3mm; }
+.back .txt { position: absolute; left: 5.2mm; right: 5.2mm; top: 11.2mm; font: 400 2mm/1.42 "Inter"; color: #3D3A35; }
+.back .txt b { font-weight: 700; color: #1B1A18; }
+.back .field { position: absolute; left: 5.2mm; right: 5.2mm; display: flex; align-items: flex-end; gap: 2mm; height: 5mm; }
+.back .field span { font: 700 1.7mm/1 "Inter"; letter-spacing: .3mm; text-transform: uppercase; color: #5A554E; width: 11mm; flex: none; padding-bottom: .4mm; }
+.back .field i { flex: 1; border-bottom: .2mm solid #8C877F; height: 100%; }
+.back .f1 { top: 19.6mm; } .back .f2 { top: 26.2mm; }
+.back .sig-lab { position: absolute; left: 5.2mm; top: 34.6mm; font: 600 1.45mm/1 "Inter"; letter-spacing: .35mm; text-transform: uppercase; color: #8C877F; }
+.back .sig { position: absolute; top: 37.6mm; width: 34mm; text-align: center; }
+.back .sig i { display: block; height: 5.4mm; border-bottom: .2mm solid #1B1A18; }
+.back .sig b { display: block; margin-top: .9mm; font: 700 1.85mm/1 "Inter"; color: #1B1A18; }
+.back .sig span { display: block; margin-top: .5mm; font: 500 1.4mm/1 "Inter"; color: #77726B; }
+.back .s1 { left: 5.2mm; } .back .s2 { right: 5.2mm; }
+.back .foot { position: absolute; left: 0; right: 0; bottom: 2.6mm; text-align: center; font: 500 1.4mm/1 "Inter"; letter-spacing: .15mm; color: #8C877F; }
+</style></head><body>
+<div class="sheet front"><div class="card">
+  <div class="frame"></div>
+  <div class="mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+</div>
+  <div class="brand"><span class="lg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+</span>ATELYE DIJITAL</div>
+  <div class="vip">KAT VIP</div>
+  <div class="tier">GOLD</div>
+  <div class="rule"></div>
+  <div class="deal"><div class="pct">100<span>%</span></div><div class="off">RABÈ</div></div>
+  <div class="tag">Fòmasyon · Pratik · Pwojè</div>
+</div></div>
+<div class="sheet back"><div class="card">
+  <div class="band"></div>
+  <div class="brand"><span class="lg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+</span>ATELYE DIJITAL</div>
+  <div class="chip">VIP GOLD · 100% RABÈ</div>
+  <p class="txt">Kat pèsonèl. Li bay moun ki non l ekri sou li a dwa patisipe nan fòmasyon Atelye Dijital la
+    ak <b>100% rabè</b>. Prezante l lè w ap enskri.</p>
+  <div class="field f1"><span>Non</span><i></i></div>
+  <div class="field f2"><span>Nimewo</span><i></i></div>
+  <div class="sig-lab">Siyati otorize</div>
+  <div class="sig s1"><i></i><b>Felemps Cimilien</b><span>Fòmatè</span></div>
+  <div class="sig s2"><i></i><b>Duke Mathieu</b><span>Fòmatè</span></div>
+  <div class="foot">atelyedijital.vercel.app · WhatsApp 31 43 3938</div>
+</div></div></body></html>
