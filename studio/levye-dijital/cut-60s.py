@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """1-minute WhatsApp status cut of the full film: whole frames only, cuts in voice silences.
 Keeps: 01 hook, 03 not-Veo / my voice, 05 (first 2.9 s, "li ba m piblisite m"), 10-11 brand + Facebook Ads,
-13 AI agents + WhatsApp automation, 19-24 date, hours, venue, 30 seats, WhatsApp, form + end card.
+13 AI agents + WhatsApp automation, 19-24 date, hours, venue, 30 seats, price, WhatsApp, form + end card
+(end card held 1.45 s shorter than the full film, then a 0.5 s fade to the paper colour, to stay under 60 s).
 Video from renders/video.mp4; audio rebuilt: same voice ranges + one continuous funk bed (ducked) + a whoosh per cut."""
 import subprocess, numpy as np
 from scipy.ndimage import uniform_filter1d
-R = [(0.00, 3.20), (9.75, 14.20), (20.30, 23.20), (44.90, 50.95), (56.95, 64.40), (90.40, 124.39)]
+R = [(0.00, 3.20), (9.75, 14.20), (20.30, 23.20), (44.90, 50.95), (56.95, 64.40), (90.40, 126.35)]
 SR = 48000
 def load(p):
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", p, "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"], capture_output=True, check=True).stdout
@@ -13,10 +14,10 @@ def load(p):
 # video
 parts = "".join(f"[0:v]trim={a}:{b},setpts=PTS-STARTPTS[v{i}];" for i, (a, b) in enumerate(R))
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "renders/video.mp4", "-filter_complex",
-                parts + "".join(f"[v{i}]" for i in range(len(R))) + f"concat=n={len(R)}:v=1:a=0[v]",
+                parts + "".join(f"[v{i}]" for i in range(len(R))) + f"concat=n={len(R)}:v=1:a=0,fade=t=out:st={sum(b - a for a, b in R) - 0.5:.2f}:d=0.5:color=0xF3F0EA[v]",
                 "-map", "[v]", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "renders/video-60s.mp4"], check=True)
 # audio
-voice = load("assets/audio/voix-montage.wav")
+voice = load("assets/audio/voix-montage-atelye.wav")
 F = int(0.01 * SR); segs = []
 for a, b in R:
     s = voice[int(a * SR):int(b * SR)].copy(); s[:F] *= np.linspace(0, 1, F)[:, None]; s[-F:] *= np.linspace(1, 0, F)[:, None]; segs.append(s)

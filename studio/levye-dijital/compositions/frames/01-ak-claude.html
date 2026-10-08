@@ -9,7 +9,7 @@
 
     #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    /* ===== ATELYE clair-riche (frame.md) : décor commun ===== */
     .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
       background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
                   radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
@@ -98,7 +98,7 @@
     <div id="f01-text" class="clip" data-start="0" data-duration="3.20" data-track-index="2">
       <div id="f01-s1" class="lv-sub"></div>
       <div id="f01-s2" class="lv-sub"></div>
-      <div class="lv-wm">LEVYE DIJITAL</div>
+      <div class="lv-wm">ATELYE DIJITAL</div>
     </div>
 
     <div id="f01-grainc" class="clip" data-start="0" data-duration="3.20" data-track-index="3" data-layout-ignore>
@@ -153,7 +153,7 @@
       tl.to("#f01-tfg", { y: -30, rotation: 6, duration: 2.6, ease: "none" }, 0.3);
 
       /* --- 0.20 → 1.00 la demande se tape (caret accent) --- */
-      var TXT = "Fè yon pub videyo 9:16 pou Levye Dijital, ak vwa m.";
+      var TXT = "Fè yon pub videyo 9:16 pou Atelye Dijital, ak vwa m.";
       var typed = { n: 0 };
       tl.fromTo(typed, { n: 0 }, { n: TXT.length, duration: 0.78, ease: "none", onUpdate: function () { $("f01-type").textContent = TXT.slice(0, Math.round(typed.n)); } }, 0.20);
       tl.fromTo("#f01-caret", { opacity: 1 }, { opacity: 0, duration: 0.08, ease: "none" }, 1.0);

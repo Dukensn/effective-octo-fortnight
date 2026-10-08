@@ -15,7 +15,7 @@ export HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 HYPERFRAMES_SKIP_SKILLS=1 HYPER
 # ---- settings (times in seconds on the final timeline, see STORYBOARD.md) ------------------------------------------
 FIRST_FRAME="01-ak-claude"      # id of the first frame (basename of its src, without .html)
 END_CARD="24-fomile-fen"          # id of the end card frame (the iris opens it)
-TOTAL="${TOTAL:-124.39}"               # final duration = STORYBOARD duration = TOTAL in build-audio.sh
+TOTAL="${TOTAL:-127.80}"               # final duration = STORYBOARD duration = TOTAL in build-audio.sh
 AUDIO="assets/audio/${MIX:-mix.wav}"   # mix from build-audio.sh or build-music-options.py (MIX=mix-M2.wav bash assemble.sh); empty = silent
 
 # Light flash, dark world -> light world (empty LEAK_AT = no flash). The flash covers the screen from

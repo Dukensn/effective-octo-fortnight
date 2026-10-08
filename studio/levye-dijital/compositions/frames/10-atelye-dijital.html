@@ -9,7 +9,7 @@
 
     #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    /* ===== ATELYE clair-riche (frame.md) : décor commun ===== */
     .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
       background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
                   radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
@@ -70,17 +70,17 @@
     .f10-c { display: inline-block; opacity: 0; }
     #f10-tag { position: absolute; left: 0; width: 1080px; top: 830px; text-align: center; font: 600 40px/1 "Inter"; letter-spacing: 1px; color: #5A554E; opacity: 0; }
 
-    /* sous-titre : trait de pointe sous « Levye Dijital. » */
+    /* sous-titre : trait de pointe sous « Atelye Dijital. » */
     .f10-peak { position: relative; display: inline-block; }
     .f10-peak-st { position: absolute; left: -4px; right: -4px; bottom: -8px; height: 11px; background: #D97757;
       clip-path: polygon(0 70%, 100% 0, 100% 45%, 0 100%); transform-origin: 0 50%; transform: scaleX(0); }
   </style>
 
-  <div id="root" data-composition-id="10-levye-dijital" data-width="1080" data-height="1920" data-duration="2.25">
+  <div id="root" data-composition-id="10-atelye-dijital" data-width="1080" data-height="1920" data-duration="2.25">
     <div id="f10-bg" class="clip" data-start="0" data-duration="2.25" data-track-index="0" data-layout-ignore>
       <div class="lv-ground">
         <div id="f10-floorw" style="position:absolute; left:0; top:0; width:1080px; height:1920px;"><div class="lv-floor"></div></div>
-        <div id="f10-giant" class="lv-giant" style="left:-60px; top:1080px;">LEVYE</div>
+        <div id="f10-giant" class="lv-giant" style="left:-60px; top:1080px;">ATELYE</div>
       </div>
       <div id="f10-pale"></div>
       <div id="f10-bloom"></div>
@@ -116,7 +116,7 @@
 
     <div id="f10-text" class="clip" data-start="0" data-duration="2.25" data-track-index="2">
       <div id="f10-s1" class="lv-sub"></div>
-      <div id="f10-wm" class="lv-wm" style="opacity:0;">LEVYE DIJITAL</div>
+      <div id="f10-wm" class="lv-wm" style="opacity:0;">ATELYE DIJITAL</div>
     </div>
 
     <div id="f10-grainc" class="clip" data-start="0" data-duration="2.25" data-track-index="3" data-layout-ignore>
@@ -127,7 +127,7 @@
   <script src="assets/vendor/gsap.min.js"></script>
   <script>
     (function () {
-      var FID = "10-levye-dijital", T = 2.25;
+      var FID = "10-atelye-dijital", T = 2.25;
       var $ = function (id) { return document.getElementById(id); };
       var Q = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
       /* logo Claude officiel (assets/icons/claude.svg, Simple Icons CC0) */
@@ -147,7 +147,7 @@
           var sp = document.createElement("span"); sp.className = "f10-c"; sp.textContent = c; host.appendChild(sp); return sp;
         });
       }
-      var L1 = letters($("f10-l1"), "LEVYE"), L2 = letters($("f10-l2"), "DIJITAL");
+      var L1 = letters($("f10-l1"), "ATELYE"), L2 = letters($("f10-l2"), "DIJITAL");
 
       /* sous-titres mot à mot (temps locaux de onsets.json) */
       function sub(host, words) {
@@ -161,8 +161,8 @@
         });
         return out;
       }
-      var S1 = sub($("f10-s1"), [["Se", 0.05], ["sa", 0.39], ["n", 0.53], ["ap", 0.64], ["montre", 0.78], ["w", 1.08], ["nan", 1.19], ["Levye", 1.38], ["Dijital.", 1.63]]);
-      /* [trait : Levye Dijital.] : on enveloppe les deux derniers mots, le trait effilé se dessine dessous */
+      var S1 = sub($("f10-s1"), [["Se", 0.05], ["sa", 0.39], ["n", 0.53], ["ap", 0.64], ["montre", 0.78], ["w", 1.08], ["nan", 1.19], ["Atelye", 1.38], ["Dijital.", 1.63]]);
+      /* [trait : Atelye Dijital.] : on enveloppe les deux derniers mots, le trait effilé se dessine dessous */
       var pk = document.createElement("span"); pk.className = "f10-peak";
       $("f10-s1").insertBefore(pk, S1[7].el);
       pk.appendChild(S1[7].el); pk.appendChild(document.createTextNode(" ")); pk.appendChild(S1[8].el);
@@ -202,7 +202,7 @@
       tl.fromTo("#f10-star", { rotation: 0 }, { rotation: 90, duration: 0.9, ease: "expo.out", transformOrigin: "50% 50%" }, 1.06);
       tl.to("#f10-t2", { y: 12, rotation: 4, duration: 0.8, ease: "none" }, 1.32);
 
-      /* --- 1.38 « Levye » : LEVYE s'assemble lettre par lettre (0,03 s d'écart, de y +40) --- */
+      /* --- 1.38 « Atelye » : ATELYE s'assemble lettre par lettre (0,03 s d'écart, de y +40) --- */
       L1.forEach(function (c, k) {
         tl.fromTo(c, { opacity: 0, y: 40, scale: 1.3, filter: "blur(8px)" }, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 1.36 + k * 0.03);
       });

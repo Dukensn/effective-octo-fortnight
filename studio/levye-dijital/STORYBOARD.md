@@ -1,12 +1,12 @@
 ---
 format: 1080x1920
-duration: 124.39s
-message: "Claude te fè pub sa a ; aprann fè l ou menm nan Levye Dijital : 2 jou fòmasyon, samdi 17 ak 24 oktòb 2026, Sassou's Lamadone Club."
+duration: 127.80s
+message: "Claude te fè pub sa a ; aprann fè l ou menm nan Atelye Dijital : 2 jou fòmasyon, samdi 17 ak 24 oktòb 2026, Sassou's Lamadone Club."
 arc: Preuve (la pub se monte devant nous) → Gag muet → Diagnostic (biznis, pwodwi, kreyatè) → Pivot → Marque → Programme (5 modules) → Infos (date, lè, lokal, plas) → CTA WhatsApp + lyen
 audience: entrepreneurs, vendeurs et créateurs de contenu en Haïti, non techniques, sur WhatsApp
 mode: autonomous
 captions: disabled
-voice: "assets/audio/voix-montage.wav (124.39 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
+voice: "assets/audio/voix-montage-atelye.wav (127.80 s, créole haïtien, voix du client) ; minutage dans onsets.json ; le mix est monté par l'orchestrateur sur l'image"
 direction: "B · Liy tan an (la bande de montage verticale), avec la fin de C (l'épingle qui se plante sur le Sassou's)"
 patterns: ../patterns/STORYBOARD-CRAFT.md, ../patterns/PATTERNS.md
 ---
@@ -78,12 +78,12 @@ acte III une station par idée ; acte IV posé et lisible (les infos doivent se 
 silence), musique « élan » qui attaque sur « Se » 44.95 et s'éteint en fondu sur la carte de fin. Bruitages : pop sur
 chaque clip qui tombe (6.44, 7.63, 12.94, 16.81, 17.83, 18.55, 19.76, 20.80) · whoosh court sur chaque cran de station
 (47.30, 57.00, 64.55, 76.00, 81.00, 90.55) · notification à deux tons 22.66 (la pub est prête, LA signature) · clic
-23.40 (lecture) · sparkle 45.00 · chime 46.28 (Levye Dijital) · ticks 103.00 → 104.00 (les places s'allument) ·
+23.40 (lecture) · sparkle 45.00 · chime 46.28 (Atelye Dijital) · ticks 103.00 → 104.00 (les places s'allument) ·
 clic 110.10 et 111.70 · chime 115.10 (numéro) · typing 118.90 → 119.80 (l'URL) · clic 120.40 · whoosh-cinematic 123.60.
 
 ## Frame 1 : Ak Claude
 
-- scene: La vraie fenêtre de l'app Claude (reconstruite en HTML) occupe la scène : la demande « Fè yon pub videyo 9:16 pou Levye Dijital, ak vwa m. » est tapée ; l'étoile Claude pulse.
+- scene: La vraie fenêtre de l'app Claude (reconstruite en HTML) occupe la scène : la demande « Fè yon pub videyo 9:16 pou Atelye Dijital, ak vwa m. » est tapée ; l'étoile Claude pulse.
 - duration: 3.20s
 - start: 0.00
 - transition_in: cut
@@ -318,15 +318,15 @@ Scene 2 (2.10 à 3.80 s) : noir
   ÉTAPES : 2.10 coupe franche au noir (43.20 global, impact grave) ; 2.10 → 3.40 noir vivant (grain) ; 3.40 un point de lumière accent naît au centre.
   SON : riser 40.20 → 43.20, impact 43.20, silence.
 
-## Frame 10 : Levye Dijital
+## Frame 10 : Atelye Dijital
 
-- scene: La lumière : le point s'ouvre en cercle sur le papier ; la bande réapparaît, claire, et la marque « LEVYE DIJITAL » s'assemble au-dessus d'elle.
+- scene: La lumière : le point s'ouvre en cercle sur le papier ; la bande réapparaît, claire, et la marque « ATELYE DIJITAL » s'assemble au-dessus d'elle.
 - duration: 2.25s
 - start: 44.90
 - transition_in: cut
 - status: storyboard
-- src: compositions/frames/10-levye-dijital.html
-- voiceover: "Se sa n ap montre w nan Levye Dijital."
+- src: compositions/frames/10-atelye-dijital.html
+- voiceover: "Se sa n ap montre w nan Atelye Dijital."
 - type: brand
 - blueprint: logo-assemble-lockup (Adapt)
 - focal: la marque
@@ -338,10 +338,10 @@ Scene 2 (2.10 à 3.80 s) : noir
 Word cues: Se@0.05 sa@0.39 n@0.53 ap@0.64 montre@0.78 w@1.08 nan@1.19 Levye@1.38 Dijital.@1.63
 
 Scene 1 (0.00 à 2.25 s)
-  TEXTE ÉCRAN : sous-titre « Se sa n ap montre w nan [trait : Levye Dijital.] »
-  ÉTAPES : 0.05 le point s'ouvre en cercle jusqu'à couvrir le cadre (0,35 s expo.out, sparkle) ; 0.40 la bande claire est là ; 1.38 « Levye » : LEVYE s'assemble lettre par lettre (0,03 s d'écart, de y +40) ; 1.63 « Dijital. » : DIJITAL en accent ; 1.70 « Fòmasyon · Pratik · Pwojè » ; 2.00 descente.
+  TEXTE ÉCRAN : sous-titre « Se sa n ap montre w nan [trait : Atelye Dijital.] »
+  ÉTAPES : 0.05 le point s'ouvre en cercle jusqu'à couvrir le cadre (0,35 s expo.out, sparkle) ; 0.40 la bande claire est là ; 1.38 « Atelye » : ATELYE s'assemble lettre par lettre (0,03 s d'écart, de y +40) ; 1.63 « Dijital. » : DIJITAL en accent ; 1.70 « Fòmasyon · Pratik · Pwojè » ; 2.00 descente.
   SON : sparkle 45.00, chime 46.28.
-  IMAGE CLÉ : 1.90 : LEVYE DIJITAL sur le papier, la bande claire dessous, le trait accent sous « Levye Dijital. »
+  IMAGE CLÉ : 1.90 : ATELYE DIJITAL sur le papier, la bande claire dessous, le trait accent sous « Atelye Dijital. »
 
 ## Frame 11 : Facebook Ads
 
@@ -513,7 +513,7 @@ Scene 1 (0.00 à 3.50 s)
 
 ## Frame 18 : Gwoup WhatsApp, yon mwa
 
-- scene: Le dossier se range ; une conversation de groupe WhatsApp « Levye Dijital · Patisipan » s'ouvre (HTML) ; la règle à côté s'étire sur 30 jours avec « 1 MWA ».
+- scene: Le dossier se range ; une conversation de groupe WhatsApp « Atelye Dijital · Patisipan » s'ouvre (HTML) ; la règle à côté s'étire sur 30 jours avec « 1 MWA ».
 - duration: 5.95s
 - start: 84.45
 - transition_in: cut
@@ -630,11 +630,35 @@ Scene 1 (0.00 à 6.10 s)
   ÉTAPES : 0.98 « plas » : la grille vide arrive ; 1.89 « 30 » : « 30 » en gros, les places s'allument une à une (0,03 s d'écart, ticks) ; 3.61 « rive an reta » : petite horloge qui dépasse ; 4.90 « dezole » : la porte se ferme doucement ; 5.80 dérive.
   SON : ticks 103.00 → 104.00.
 
-## Frame 23 : WhatsApp
+## Frame 23 : Pri
+
+- scene: Une carte-ticket blanche arrive devant la grille des 30 places (floue, en retrait) : « PRI » puis « 95 dola » en très gros ; anneau accent au mot « 95 » ; la carte s'efface et la grille revient nette.
+- duration: 3.00s
+- start: 107.15
+- transition_in: cut
+- status: storyboard
+- src: compositions/frames/22b-pri.html
+- voiceover: "Pou patisipe, w ap peye 95 dola."
+- type: info
+- blueprint: stat-hero (Adapt)
+- focal: le prix 95 dola
+- rules: spring-pop-entrance, depth-of-field-blur
+- world: light
+- handoff_in: à 6.10 local (107.15 global) : caméra cam(540, 900, 1.0) ; grille 30/30 allumée, la carte et l'épingle floues derrière
+- handoff_out: à 3.00 local (110.15 global) : caméra cam(540, 900, 1.0) ; grille 30/30 allumée, la carte et l'épingle floues derrière
+
+Word cues: Pou@0.12 patisipe,@0.28 w@0.97 ap@1.08 peye@1.30 95@1.56 dola.@2.10
+
+Scene 1 (0.00 à 3.00 s)
+  TEXTE ÉCRAN : « Pou patisipe, » puis « w ap peye [boîte : 95 dola.] »
+  ÉTAPES : 0.10 la grille recule et se floute ; 0.28 « patisipe » : la carte-ticket arrive trop grande et floue, se pose ; 1.56 « 95 » : le chiffre tombe, anneau accent ; 2.10 « dola » ; 2.60 la carte s'efface, la grille revient nette.
+  SON : pop 108.71, chime 108.75.
+
+## Frame 24 : WhatsApp
 
 - scene: Le bouton vert « Kontakte nou sou WhatsApp » arrive ; la tête de lecture devenue curseur arrive en courbe et clique ; le numéro « 31 43 3938 » s'imprime chiffre par chiffre.
 - duration: 8.55s
-- start: 107.15
+- start: 110.15
 - transition_in: cut
 - status: storyboard
 - src: compositions/frames/23-whatsapp.html
@@ -644,7 +668,7 @@ Scene 1 (0.00 à 6.10 s)
 - focal: le bouton WhatsApp et le numéro
 - rules: cursor-click-ripple, press-release-spring
 - world: light
-- handoff_in: à 6.10 local (107.15 global) : caméra cam(540, 900, 1.0) ; grille 30/30 allumée, la carte et l'épingle floues derrière
+- handoff_in: à 3.00 local (110.15 global) : caméra cam(540, 900, 1.0) ; grille 30/30 allumée, la carte et l'épingle floues derrière
 - handoff_out: à 8.55 local (115.70 global) : caméra cam(540, 900, 1.0), bouton WhatsApp avec le numéro, curseur posé à côté
 
 Word cues: Pou@0.13 rezève@0.31 plas@0.61 ou,@0.83 tanpri@1.28 kontakte@1.63 nou@2.07 kounye@2.28 a@2.59 sou@2.70 WhatsApp,@2.91 oswa@3.47 klike@3.70 sou@4.06 lyen@4.26 WhatsApp@4.48 ki@5.31 anba@5.43 videyo@5.67 sa@5.97 a,@6.11 oubyen@6.41 ekri@6.73 nou@6.95 sou@7.15 31@7.55 43@7.70 3938.@7.95
@@ -652,31 +676,31 @@ Word cues: Pou@0.13 rezève@0.31 plas@0.61 ou,@0.83 tanpri@1.28 kontakte@1.63 no
 Scene 1 (0.00 à 8.55 s)
   TEXTE ÉCRAN : « Pou rezève plas ou, » puis « tanpri kontakte nou kounye a sou [boîte : WhatsApp,] » puis « oswa klike sou lyen WhatsApp ki anba videyo sa a, » puis « oubyen ekri nou sou 31 43 3938. »
   ÉTAPES : 0.31 « rezève » : une place de la grille se détache et vole vers le haut ; 1.63 « kontakte » : le bouton WhatsApp arrive trop grand et flou, se pose ; 2.91 « WhatsApp » : le curseur arrive en courbe (0,45 s) et clique (anneau accent) ; 4.26 « lyen » : une flèche pointe vers le bas (vers le lien sous la vidéo) ; 4.48 deuxième clic ; 7.55 « 31 » : le numéro s'imprime en gros sous le bouton, chiffre par chiffre, jusqu'à 3938 (8.20) ; 8.40 recul.
-  SON : clic 110.10, clic 111.70, chime 115.10.
+  SON : clic 113.10, clic 114.70, chime 118.10.
 
-## Frame 24 : Fòmilè + fen
+## Frame 25 : Fòmilè + fen
 
-- scene: Le lien « levyedijital.vercel.app » se tape dans une pilule ; le curseur clique ; recul final : carte de fin (LEVYE DIJITAL, Samdi 17 & 24 oktòb 2026, Sassou's Lamadone Club, bouton WhatsApp, lien) ; les 5 pistes pleines en miniature ; tenue vivante puis iris.
-- duration: 8.69s
-- start: 115.70
+- scene: Le lien « atelyedijital.vercel.app » se tape dans une pilule ; le curseur clique ; recul final : carte de fin (ATELYE DIJITAL, Samdi 17 & 24 oktòb 2026, Sassou's Lamadone Club, bouton WhatsApp, lien) ; les 5 pistes pleines en miniature ; tenue vivante puis iris.
+- duration: 9.10s
+- start: 118.70
 - transition_in: cut
 - status: storyboard
 - src: compositions/frames/24-fomile-fen.html
-- voiceover: "Ou ka ranpli fòmilè enskripsyon an tou, lè w ale sou levyedijital.vercel.app"
+- voiceover: "Ou ka ranpli fòmilè enskripsyon an tou, lè w ale sou atelyedijital.vercel.app"
 - type: end
 - blueprint: cta-morph-press (Adapt)
 - focal: le lien, puis la carte de fin
 - rules: cursor-click-ripple, viewport-change
 - world: light
 - handoff_in: à 8.55 local (115.70 global) : caméra cam(540, 900, 1.0), bouton WhatsApp avec le numéro, curseur posé à côté
-- handoff_out: fin du film (124.39) : iris fermé
+- handoff_out: fin du film (127.80) : iris fermé
 
-Word cues: Ou@0.13 ka@0.42 ranpli@0.60 fòmilè@0.94 enskripsyon@1.33 an@1.97 tou,@2.14 lè@2.40 w@2.60 ale@2.73 sou@2.94 levyedijital.vercel.app@3.18
+Word cues: Ou@0.13 ka@0.42 ranpli@0.60 fòmilè@0.94 enskripsyon@1.33 an@1.97 tou,@2.14 lè@2.40 w@2.60 ale@2.73 sou@2.94 atelyedijital.vercel.app@2.69
 
 Scene 1 (0.00 à 4.40 s) : le lien
-  TEXTE ÉCRAN : « Ou ka ranpli fòmilè enskripsyon an tou, » puis « lè w ale sou [trait : levyedijital.vercel.app] »
+  TEXTE ÉCRAN : « Ou ka ranpli fòmilè enskripsyon an tou, » puis « lè w ale sou [trait : atelyedijital.vercel.app] »
   ÉTAPES : 0.94 « fòmilè » : une carte formulaire (3 champs HTML : Non, Telefòn, Klike) arrive ; 2.73 « ale » : la pilule de lien ; 3.18 l'URL se tape (0,9 s, typing) ; 4.00 le curseur clique la pilule.
 Scene 2 (4.40 à 8.69 s) : carte de fin
-  TEXTE ÉCRAN : aucun sous-titre ; la carte : LEVYE DIJITAL, « Samdi 17 & 24 oktòb 2026 · 10:00 AM – 4:00 PM », « Sassou's Lamadone Club · anfas Plas Anacaona », bouton WhatsApp « 31 43 3938 », lien.
+  TEXTE ÉCRAN : aucun sous-titre ; la carte : ATELYE DIJITAL, « Samdi 17 & 24 oktòb 2026 · 10:00 AM – 4:00 PM », « Sassou's Lamadone Club · anfas Plas Anacaona », bouton WhatsApp « 31 43 3938 », lien.
   ÉTAPES : 4.40 recul : tout le film se ramasse (implosion 0,5 s) puis la carte de fin s'assemble (0,3 s, cascade) ; 5.20 la miniature des 5 pistes pleines (rime) ; 5.60 → 7.90 tenue vivante (dérive, l'anneau du bouton respire) ; 7.90 → 8.69 iris vers le bouton WhatsApp.
-  SON : typing 118.90 → 119.80, clic 120.40, whoosh-cinematic 123.60.
+  SON : typing 121.40 → 123.10, clic 123.40, whoosh-cinematic 127.00.

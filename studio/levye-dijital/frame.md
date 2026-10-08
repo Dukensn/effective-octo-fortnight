@@ -1,13 +1,13 @@
 ---
-name: "Levye Dijital: launch frame"
+name: "Atelye Dijital: launch frame"
 description: >
-  Video-first frame spec for the Levye Dijital WhatsApp-status ad (9:16, 1080x1920, 30 fps, 124.39 s, Haitian Creole
+  Video-first frame spec for the Atelye Dijital WhatsApp-status ad (9:16, 1080x1920, 30 fps, 127.80 s, Haitian Creole
   voice). Metaphor: the ad is BUILT under our eyes on a vertical editing strip (la bande), and that same strip becomes
   the workshop program, then the calendar, then folds into a map whose pin lands on Sassou's Lamadone Club.
   Light paper world everywhere except the pivot (warm black). One accent only, Claude orange, kept for what matters.
 ---
 
-# Levye Dijital: frame spec
+# Atelye Dijital: frame spec
 
 ## Canvas and safe zones (9:16)
 
@@ -47,7 +47,7 @@ accent, Imaj #5B8DEF, Tranzisyon #9B7BE8, Son #4CB98A, Mizik #E2B23C, Vwa #1B1A1
 - Subtitle: Inter 500, 60 px, line-height 1.28, letter-spacing -0.5 px, ink-dark, max 2 lines (≈ 26 characters/line),
   soft paper halo behind (linear-gradient band, never a box).
 - Labels / ruler: Inter 600 26 px uppercase, letter-spacing 2 px, ink-mute.
-- Wordmark: "LEVYE" ink-dark + "DIJITAL" accent, InterDisplay 900, 150 px, letter-spacing -4 px.
+- Wordmark: "ATELYE" ink-dark + "DIJITAL" accent, InterDisplay 900, 150 px, letter-spacing -4 px.
 
 ## Subtitle and its two highlights
 
@@ -56,7 +56,7 @@ accent, Imaj #5B8DEF, Tranzisyon #9B7BE8, Son #4CB98A, Mizik #E2B23C, Vwa #1B1A1
 - **[boîte : mot]** key-word box: accent-pale fill, accent-deep bold text, radius 12 px, padding 0 12 px; the box
   grows from scaleX 0 (origin left) in 0.12 s expo.out 0.02 s before the word. ONE per sentence.
 - **[trait : mot]** peak stroke: a tapered accent stroke 9 px under the word, drawn left→right in 0.35 s power2.out.
-  Only 4 in the film: 22.66 "piblisite m", 46.28 "Levye Dijital", 92.24 "24", 118.88 the URL.
+  Only 4 in the film: 22.66 "piblisite m", 46.28 "Atelye Dijital", 92.24 "24", 118.88 the URL.
 - Typographic moments (the sentence IS the image, centered at y 860, 84 px max, InterDisplay 900 for the key word):
   frame 9 (pivot "Ebyen, se yon konpetans."), and nothing else.
 
@@ -104,7 +104,7 @@ Written once in `reference/bande.html` (CSS, templates, camera kit, `bande()` bu
   #D9FDD3 outgoing, blue ticks #53BDEB).
 - **cta-wa**: green pill #25D366, WhatsApp logo white, "Kontakte nou sou WhatsApp" Inter 700 40 px + "31 43 3938"
   Inter 800 64 px; accent ring pulse on click.
-- **link-pill**: white pill, globe glyph, "levyedijital.vercel.app" Inter 700 44 px in ink-dark.
+- **link-pill**: white pill, globe glyph, "atelyedijital.vercel.app" Inter 700 44 px in ink-dark.
 - **seat**: 56x56 rounded square, lane color → accent when lit; 30 in a 6x5 grid.
 - **cursor**: black arrow with white outline, 64 px; arrives in ONE curved move (x and y on two eases, 0.45 s) and clicks
   directly (scale .85 yoyo 0.06 s, ring wave).
@@ -126,10 +126,10 @@ seam, no element in the subtitle band, no frozen hold > 0.5 s, no hesitating cur
 
 Le pilote `compositions/frames/01-ak-claude.html` est LA référence de style, validée par le client (« fond clair,
 proprement, pas trop de couleur », riche en profondeur). Chaque séquence en reprend :
-- **le bloc CSS « LEVYE clair-riche : décor commun »** mot pour mot (`.lv-ground`, `.lv-floor`, `.lv-giant`, `.lv-grain`,
+- **le bloc CSS « ATELYE clair-riche : décor commun »** mot pour mot (`.lv-ground`, `.lv-floor`, `.lv-giant`, `.lv-grain`,
   `.lv-glass`, `.lv-tile`, `.lv-sub`, `.lv-sw`, `.lv-box*`, `.lv-wm`) et la même structure de pistes : track 0 = fond
   (`.lv-ground` + `.lv-floor` + un mot géant en filigrane propre à la séquence), track 1 = scène (`#fNN-cam` qui dérive),
-  track 2 = sous-titre + filigrane LEVYE DIJITAL, track 3 = grain ;
+  track 2 = sous-titre + filigrane ATELYE DIJITAL, track 3 = grain ;
 - la fonction `sub()` et la fonction `words()` du pilote pour le sous-titre mot à mot (boîte orange #C4613F, texte blanc) ;
 - `<script src="assets/vendor/gsap.min.js"></script>` (JAMAIS le CDN) et l'enregistrement `window.__timelines[FID]` ;
 - les entrées « trop grand + flou → posé » en 0,14 à 0,18 s expo.out, la dérive permanente de `#fNN-cam`, les vies finies

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Final mix: voice montage + funk music (tension / pivot / drop on the brand / 10-bar loop) + SFX, ducked, -16 LUFS.
+"""Final mix: voice montage (Atelye Dijital: price + link takes spliced, see splice-voice.py) + funk music (tension / pivot / drop on the brand / 10-bar loop) + SFX, ducked, -16 LUFS.
 
 Music (user-provided track assets/music/funk.mp3, 111 BPM, bar 2.162 s, main drop at 39.9 s):
   A  film 0.00 -> 43.20 : track 4.73 -> 47.93 (first energy entry at frame 0), low-passed 1.4 kHz, -3 dB (tension)
      riser 40.20 -> 43.20, impact-bass at 43.20, then silence (pivot)
-  B  film 44.95 -> end  : track 39.90 (the drop, on "Se sa n ap montre w nan Levye Dijital") -> 61.51, a 10-bar loop
+  B  film 44.95 -> end  : track 39.90 (the drop, on "Se sa n ap montre w nan Atelye Dijital") -> 61.51, a 10-bar loop
      repeated on downbeats with 40 ms crossfades, fade out over the end card
 Ducking: music gain follows the voice envelope (-12 dB under speech, 0.25 s attack, 0.6 s release).
 SFX: names from ../.claude/skills/media-use/audio/assets/sfx/, events in assets/audio/sfx-events.json ([name, t, gain]).
@@ -16,7 +16,7 @@ from scipy.ndimage import uniform_filter1d
 from scipy.signal import butter, sosfilt
 
 SR = 48000
-TOTAL = 124.39
+TOTAL = 127.80
 SFXDIR = "../.claude/skills/media-use/audio/assets/sfx"
 
 
@@ -27,7 +27,7 @@ def load(path, ch=2):
 
 
 N = int(TOTAL * SR)
-voice = load("assets/audio/voix-montage.wav")[:N]
+voice = load("assets/audio/voix-montage-atelye.wav")[:N]
 voice = np.pad(voice, ((0, N - len(voice)), (0, 0)))
 track = load("assets/music/funk.mp3")
 

@@ -9,7 +9,7 @@
 
     #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-    /* ===== LEVYE clair-riche (frame.md) : décor commun ===== */
+    /* ===== ATELYE clair-riche (frame.md) : décor commun ===== */
     .lv-ground { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
       background: radial-gradient(900px 760px at 72% 16%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
                   radial-gradient(1000px 900px at 18% 88%, #E9E3DA 0%, rgba(233,227,218,0) 60%), #F3F0EA; }
@@ -110,15 +110,15 @@
     .f24-pk-s { position: absolute; left: -6px; width: calc(100% + 12px); bottom: -8px; height: 16px; clip-path: inset(0% 100% 0% 0%); }
   </style>
 
-  <div id="root" data-composition-id="24-fomile-fen" data-width="1080" data-height="1920" data-duration="8.69">
-    <div id="f24-bg" class="clip" data-start="0" data-duration="8.69" data-track-index="0" data-layout-ignore>
+  <div id="root" data-composition-id="24-fomile-fen" data-width="1080" data-height="1920" data-duration="9.10">
+    <div id="f24-bg" class="clip" data-start="0" data-duration="9.10" data-track-index="0" data-layout-ignore>
       <div class="lv-ground">
         <div id="f24-floor" class="lv-floor"></div>
         <div id="f24-giant" class="lv-giant" style="left:-60px; top:1080px;">LYEN</div>
       </div>
     </div>
 
-    <div id="f24-stage" class="clip" data-start="0" data-duration="8.69" data-track-index="1">
+    <div id="f24-stage" class="clip" data-start="0" data-duration="9.10" data-track-index="1">
       <div id="f24-iris">
         <div id="f24-cam">
           <!-- ===== Scène 1 : formulaire + lien ===== -->
@@ -165,7 +165,7 @@
           <!-- ===== Scène 2 : carte de fin ===== -->
           <div id="f24-g2">
             <div id="f24-end" class="lv-glass" style="opacity:0;">
-              <div id="f24-wm1" style="opacity:0;">LEVYE</div>
+              <div id="f24-wm1" style="opacity:0;">ATELYE</div>
               <div id="f24-wm2" style="opacity:0;">DIJITAL</div>
               <div id="f24-d1" class="f24-info f24-i1" style="top:390px; opacity:0;">Samdi 17 &amp; 24 oktòb 2026</div>
               <div id="f24-d2" class="f24-info f24-i2" style="top:454px; opacity:0;">10:00 AM – 4:00 PM</div>
@@ -180,7 +180,7 @@
               </div>
               <div id="f24-epill" style="opacity:0;">
                 <svg viewBox="0 0 24 24" width="48" height="48"><g fill="none" stroke="#1B1A18" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.7 3.9 5.9 3.9 9.5s-1.3 6.8-3.9 9.5M12 2.5C9.4 5.2 8.1 8.4 8.1 12s1.3 6.8 3.9 9.5"/></g></svg>
-                levyedijital.vercel.app
+                atelyedijital.vercel.app
               </div>
               <div id="f24-mini" style="opacity:0;">
                 <div class="f24-ml" style="left:20px;"><div class="f24-mf" style="background:#1B1A18;"></div></div>
@@ -196,13 +196,13 @@
       </div>
     </div>
 
-    <div id="f24-text" class="clip" data-start="0" data-duration="8.69" data-track-index="2">
+    <div id="f24-text" class="clip" data-start="0" data-duration="9.10" data-track-index="2">
       <div id="f24-s1" class="lv-sub"></div>
       <div id="f24-s2" class="lv-sub"></div>
-      <div id="f24-wmk" class="lv-wm">LEVYE DIJITAL</div>
+      <div id="f24-wmk" class="lv-wm">ATELYE DIJITAL</div>
     </div>
 
-    <div id="f24-grainc" class="clip" data-start="0" data-duration="8.69" data-track-index="3" data-layout-ignore>
+    <div id="f24-grainc" class="clip" data-start="0" data-duration="9.10" data-track-index="3" data-layout-ignore>
       <div class="lv-grain"></div>
     </div>
   </div>
@@ -210,7 +210,7 @@
   <script src="assets/vendor/gsap.min.js"></script>
   <script>
     (function () {
-      var FID = "24-fomile-fen", T = 8.69;
+      var FID = "24-fomile-fen", T = 9.10;
       var $ = function (id) { return document.getElementById(id); };
       /* logo WhatsApp officiel (assets/icons/whatsapp.svg, Simple Icons CC0) */
       var WA = "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z";
@@ -248,9 +248,9 @@
         return out;
       }
       function brk(list, i) { list[i].el.parentNode.insertBefore(document.createElement("br"), list[i].el); }
-      var S1 = sub($("f24-s1"), [["Ou", 0.13], ["ka", 0.42], ["ranpli", 0.60], ["fòmilè", 0.94, "box"], ["enskripsyon", 1.33], ["an", 1.97], ["tou,", 2.14]]);
+      var S1 = sub($("f24-s1"), [["Ou", 0.13], ["ka", 0.42], ["ranpli", 0.60], ["fòmilè", 0.94, "box"], ["enskripsyon", 1.33], ["an", 1.72], ["tou,", 1.85]]);
       brk(S1, 4);
-      var S2 = sub($("f24-s2"), [["lè", 2.40], ["w", 2.60], ["ale", 2.73], ["sou", 2.94], ["levyedijital.vercel.app", 3.18, "peak"]]);
+      var S2 = sub($("f24-s2"), [["lè", 2.07], ["w", 2.17], ["ale", 2.27], ["sou", 2.47], ["atelyedijital.vercel.app", 2.70, "peak"]]);
       brk(S2, 4);
 
       /* état de départ = dernière image de la frame 23 */
@@ -261,12 +261,12 @@
       var tl = gsap.timeline({ paused: true });
 
       /* --- caméra : dérive permanente (poussée lente), recul à l'assemblage de la carte de fin, dérive jusqu'à l'iris --- */
-      tl.fromTo("#f24-cam", { y: 0, scale: 1 }, { y: -28, scale: 1.03, duration: 4.40, ease: "none" }, 0);
-      tl.to("#f24-cam", { y: 0, scale: 0.98, duration: 0.5, ease: "expo.inOut" }, 4.40);
-      tl.to("#f24-cam", { y: -24, scale: 1.02, duration: 3.79, ease: "none" }, 4.90);
+      tl.fromTo("#f24-cam", { y: 0, scale: 1 }, { y: -28, scale: 1.03, duration: 4.81, ease: "none" }, 0);
+      tl.to("#f24-cam", { y: 0, scale: 0.98, duration: 0.5, ease: "expo.inOut" }, 4.81);
+      tl.to("#f24-cam", { y: -24, scale: 1.02, duration: 3.79, ease: "none" }, 5.31);
       tl.fromTo("#f24-floor", { backgroundPosition: "0px 0px" }, { backgroundPosition: "0px 240px", duration: T, ease: "none" }, 0);
       tl.fromTo("#f24-giant", { x: 0 }, { x: -150, duration: T, ease: "none" }, 0);
-      tl.to("#f24-map", { x: 44, duration: 4.4, ease: "none" }, 0);
+      tl.to("#f24-map", { x: 44, duration: 4.81, ease: "none" }, 0);
 
       /* --- 0.13 « Ou » : les emplacements du numéro s'effacent, le curseur se décale --- */
       tl.to(".f24-sl", { opacity: 0, scaleX: 0, duration: 0.2, ease: "power2.in", stagger: 0.02 }, 0.13);
@@ -302,54 +302,54 @@
       tl.to("#f24-cur", { x: 120, y: -230, duration: 0.3, ease: "power2.out" }, 2.42);
 
       /* --- 2.73 « ale » : la pilule du lien arrive --- */
-      tl.fromTo("#f24-pill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.71);
-      tl.fromTo("#f24-globe", { rotation: -90 }, { rotation: 0, duration: 0.5, ease: "expo.out" }, 2.71);
-      tl.fromTo("#f24-ucaret", { opacity: 1 }, { opacity: 0, duration: 0.06, ease: "none", yoyo: true, repeat: 3, repeatDelay: 0.08 }, 2.86);
+      tl.fromTo("#f24-pill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 2.50);
+      tl.fromTo("#f24-globe", { rotation: -90 }, { rotation: 0, duration: 0.5, ease: "expo.out" }, 2.50);
+      tl.fromTo("#f24-ucaret", { opacity: 1 }, { opacity: 0, duration: 0.06, ease: "none", yoyo: true, repeat: 3, repeatDelay: 0.08 }, 2.58);
       /* --- 3.18 → 4.08 l'URL se tape --- */
-      var URL = "levyedijital.vercel.app", ty = { n: 0 };
-      tl.fromTo(ty, { n: 0 }, { n: URL.length, duration: 0.90, ease: "none", onUpdate: function () { $("f24-url").textContent = URL.slice(0, Math.round(ty.n)); } }, 3.18);
+      var URL = "atelyedijital.vercel.app", ty = { n: 0 };
+      tl.fromTo(ty, { n: 0 }, { n: URL.length, duration: 1.70, ease: "none", onUpdate: function () { $("f24-url").textContent = URL.slice(0, Math.round(ty.n)); } }, 2.70);
       /* --- 3.50 → 4.00 le curseur arrive en UNE courbe et clique la pilule --- */
-      tl.to("#f24-cur", { x: -38, duration: 0.45, ease: "power3.out" }, 3.50);
-      tl.to("#f24-cur", { y: 492, duration: 0.45, ease: "power2.inOut" }, 3.50);
-      tl.to("#f24-cur", { scale: 0.85, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.00);
-      tl.to("#f24-pill", { scale: 0.96, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.00);
-      tl.fromTo("#f24-ring1", { opacity: 1, scale: 0.3 }, { opacity: 0, scale: 2.6, duration: 0.5, ease: "expo.out" }, 4.02);
-      tl.to("#f24-ucaret", { opacity: 0, duration: 0.06, ease: "none" }, 4.10);
+      tl.to("#f24-cur", { x: -38, duration: 0.45, ease: "power3.out" }, 3.91);
+      tl.to("#f24-cur", { y: 492, duration: 0.45, ease: "power2.inOut" }, 3.91);
+      tl.to("#f24-cur", { scale: 0.85, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.41);
+      tl.to("#f24-pill", { scale: 0.96, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1 }, 4.41);
+      tl.fromTo("#f24-ring1", { opacity: 1, scale: 0.3 }, { opacity: 0, scale: 2.6, duration: 0.5, ease: "expo.out" }, 4.43);
+      tl.to("#f24-ucaret", { opacity: 0, duration: 0.06, ease: "none" }, 4.51);
 
       /* ===== 4.40 → 4.90 tout le film se ramasse (implosion) ===== */
-      tl.to("#f24-g1", { scale: 0.18, opacity: 0, filter: "blur(12px)", duration: 0.50, ease: "power3.in" }, 4.40);
+      tl.to("#f24-g1", { scale: 0.18, opacity: 0, filter: "blur(12px)", duration: 0.50, ease: "power3.in" }, 4.81);
 
       /* ===== 4.85 → 5.20 la carte de fin s'assemble en cascade ===== */
-      tl.fromTo("#f24-end", { opacity: 0, scale: 1.2, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 4.84);
-      tl.fromTo("#f24-wm1", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.88);
-      tl.fromTo("#f24-wm2", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 4.94);
+      tl.fromTo("#f24-end", { opacity: 0, scale: 1.2, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out" }, 5.25);
+      tl.fromTo("#f24-wm1", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.29);
+      tl.fromTo("#f24-wm2", { opacity: 0, scale: 1.5, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.35);
       ["#f24-d1", "#f24-d2", "#f24-v1", "#f24-v2"].forEach(function (id, i) {
-        tl.fromTo(id, { opacity: 0, y: 22, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 5.00 + i * 0.04);
+        tl.fromTo(id, { opacity: 0, y: 22, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.14, ease: "expo.out" }, 5.41 + i * 0.04);
       });
-      tl.fromTo("#f24-hr2", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.2, ease: "expo.out" }, 5.04);
-      tl.fromTo("#f24-ebtn", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.10);
-      tl.fromTo("#f24-epill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.16);
+      tl.fromTo("#f24-hr2", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.2, ease: "expo.out" }, 5.45);
+      tl.fromTo("#f24-ebtn", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.51);
+      tl.fromTo("#f24-epill", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.57);
       /* --- 5.20 la miniature des 5 pistes, toutes pleines (rime du début) --- */
-      tl.fromTo("#f24-mini", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.20);
+      tl.fromTo("#f24-mini", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.16, ease: "expo.out" }, 5.61);
       document.querySelectorAll(".f24-mf").forEach(function (f, i) {
-        tl.fromTo(f, { scaleY: 0 }, { scaleY: 1, duration: 0.24, ease: "expo.out" }, 5.26 + i * 0.05);
+        tl.fromTo(f, { scaleY: 0 }, { scaleY: 1, duration: 0.24, ease: "expo.out" }, 5.67 + i * 0.05);
       });
 
       /* ===== 5.60 → 7.90 tenue vivante ===== */
       /* l'anneau du bouton respire (vie finie) */
-      tl.fromTo("#f24-ering", { opacity: 0, scale: 0.98 }, { opacity: 0.9, scale: 1, duration: 0.2, ease: "expo.out" }, 5.56);
-      tl.to("#f24-ering", { opacity: 0.25, scale: 1.05, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: 3 }, 5.76);
+      tl.fromTo("#f24-ering", { opacity: 0, scale: 0.98 }, { opacity: 0.9, scale: 1, duration: 0.2, ease: "expo.out" }, 5.97);
+      tl.to("#f24-ering", { opacity: 0.25, scale: 1.05, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: 3 }, 6.17);
       /* reflets sur le bouton, la tête de lecture parcourt la miniature, le globe tourne */
-      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut" }, 6.05);
-      tl.fromTo("#f24-mph", { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.1, ease: "none" }, 6.45);
-      tl.to("#f24-mph", { y: 95, duration: 1.0, ease: "none" }, 6.55);
-      tl.to("#f24-epill", { scale: 1.04, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 6.95);
-      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 7.25);
-      tl.to("#f24-ebtn", { scale: 1.03, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 7.62);
+      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut" }, 6.46);
+      tl.fromTo("#f24-mph", { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.1, ease: "none" }, 6.86);
+      tl.to("#f24-mph", { y: 95, duration: 1.0, ease: "none" }, 6.96);
+      tl.to("#f24-epill", { scale: 1.04, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 7.36);
+      tl.fromTo("#f24-esheen", { x: -300 }, { x: 980, duration: 0.6, ease: "power2.inOut", immediateRender: false }, 7.66);
+      tl.to("#f24-ebtn", { scale: 1.03, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, 8.03);
 
       /* ===== 7.90 → 8.69 iris vers le bouton WhatsApp, puis papier nu ===== */
-      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 972px)" }, { clipPath: "circle(0px at 540px 972px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 7.90);
-      tl.to(["#f24-floor", "#f24-giant", "#f24-wmk"], { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 8.10);
+      tl.fromTo("#f24-iris", { clipPath: "circle(1300px at 540px 972px)" }, { clipPath: "circle(0px at 540px 972px)", duration: 0.72, ease: "power3.inOut", immediateRender: false }, 8.31);
+      tl.to(["#f24-floor", "#f24-giant", "#f24-wmk"], { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 8.51);
 
       /* --- sous-titres --- */
       function words(list, out) {
@@ -360,8 +360,8 @@
         });
         tl.to(list.map(function (w) { return w.el; }), { opacity: 0, y: -10, duration: 0.12, ease: "power2.in" }, out);
       }
-      words(S1, 2.25);
-      words(S2, 4.40);
+      words(S1, 2.05);
+      words(S2, 4.81);
 
       window.__timelines = window.__timelines || {};
       window.__timelines[FID] = tl;
