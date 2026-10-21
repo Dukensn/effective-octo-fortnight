@@ -1,0 +1,100 @@
+<template>
+  <style>
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+@font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+#sc1_10 { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter"; color: #1B1A18; -webkit-font-smoothing: antialiased; }
+#sc1_10 .bg { position: absolute; inset: -40px; background: radial-gradient(70% 90% at 75% 10%, #FBF9F5 0%, #F3F0EA 60%, #ECE7DF 100%); }
+#sc1_10 .dots { position: absolute; inset: -60px; background: radial-gradient(circle, rgba(27,26,24,.07) 1.6px, transparent 2px) 0 0 / 44px 44px; }
+#sc1_10 .stage { position: absolute; inset: 0; }
+#sc1_10 .top { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; align-items: center; justify-content: space-between; }
+#sc1_10 .chip-ep { display: flex; align-items: center; gap: 14px; font: 700 22px/1 "Inter"; letter-spacing: 3px; color: #8C877F; }
+#sc1_10 .chip-ep b { color: #fff; background: #1B1A18; border-radius: 18px; padding: 8px 14px; letter-spacing: 2px; font-size: 18px; }
+#sc1_10 .brand { display: flex; align-items: center; gap: 12px; font: 800 20px/1 "Inter"; letter-spacing: 4px; color: #5A554E; }
+#sc1_10 .brand svg { width: 38px; height: 38px; }
+#sc1_10 .sub { position: absolute; left: 200px; right: 200px; bottom: 46px; min-height: 120px; display: flex; align-items: flex-end; justify-content: center; }
+#sc1_10 .sub span { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font: 600 42px/1.3 "Inter"; color: #1B1A18; opacity: 0;
+  text-shadow: 0 0 18px #F3F0EA, 0 0 30px #F3F0EA; }
+#sc1_10 .h1 { font: 900 84px/1.02 "InterD"; letter-spacing: -2px; }
+#sc1_10 .h2 { font: 800 50px/1.1 "Inter"; letter-spacing: -1px; }
+#sc1_10 .lab { font: 700 22px/1 "Inter"; letter-spacing: 3px; text-transform: uppercase; color: #8C877F; }
+#sc1_10 .card { position: absolute; background: #fff; border-radius: 28px; box-shadow: 0 30px 60px rgba(40,30,20,.10), 0 4px 12px rgba(40,30,20,.06); }
+#sc1_10 .acc { color: #D97757; } #sc1_10 .good { color: #2F9E6B; } #sc1_10 .bad { color: #D2503C; }
+#sc1_10 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font: 700 26px/1 "Inter"; }
+#sc1_10 .num { font-variant-numeric: tabular-nums; }
+
+    #sc1_10 .ttl { position: absolute; left: 160px; top: 170px; font-size: 44px; }
+    #sc1_10 .l, #sc1_10 .r { top: 290px; width: 760px; height: 480px; padding: 40px; } #sc1_10 .l { left: 160px; } #sc1_10 .r { left: 1000px; }
+    #sc1_10 .map { position: relative; height: 290px; }
+    #sc1_10 .ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 4px dashed #D97757; transform: translate(-50%,-50%); }
+    #sc1_10 .r1 { width: 170px; height: 170px; background: rgba(217,119,87,.10); } #sc1_10 .r2 { width: 290px; height: 290px; opacity: .5; }
+    #sc1_10 .pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-70%); }
+    #sc1_10 .nm { text-align: center; font: 700 30px/1 "Inter"; }
+    #sc1_10 .glob { display: flex; justify-content: center; margin: 10px 0; }
+    #sc1_10 .cs { display: flex; gap: 14px; justify-content: center; } #sc1_10 .cs .pill { background: #F2EEE7; font-size: 26px; }
+    #sc1_10 .warn { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); background: #D9A23A; color: #fff; font-size: 26px; white-space: nowrap; }</style>
+  <div id="sc1_10" data-composition-id="sc1_10" data-width="1920" data-height="1080" data-duration="31.88">
+    <div class="clip" data-start="0" data-duration="31.88" data-track-index="0" style="position:absolute;inset:0">
+      <div class="bg"></div><div class="dots"></div>
+      <div class="stage">
+    <div class="h2 ttl">Kote moun ki ka <span class="acc">achte</span> ou yo ye · kote ou ka <span class="acc">delivre</span></div>
+    <div class="card l"><div class="lab">Pwodwi fizik</div><div class="map"><div class="ring r2"></div><div class="ring r1"></div><div class="pin"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#D97757" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+  <circle cx="12" cy="10" r="3" />
+</svg></div></div>
+      <div class="nm">Pòtoprens + zòn livrezon</div></div>
+    <div class="card r"><div class="lab">Pwodwi dijital</div><div class="glob"><svg viewBox="0 0 24 24" width="170" height="170" fill="none" stroke="#D9D4CC" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg></div>
+      <div class="cs"><span class="pill x0">Ozetazini</span><span class="pill x1">Kanada</span><span class="pill x2">Lafrans</span></div>
+      <div class="warn pill"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+  <path d="M12 18V6" />
+</svg> Pi chè pou yo wè w</div></div></div>
+      <div class="top"><div class="chip-ep"><b>VIDEYO 1</b>KÒMAN YON VANT FÈT, AK KÒMAN MACHE PIBLISITE A MACHE</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+ATELYE DIJITAL</div></div>
+      <div class="sub"><span class="s0">Dènye kesyon an:</span><span class="s1">ki kote pou w fè piblisite a?</span><span class="s2">Règ la senp.</span><span class="s3">Fè l kote moun ki ka ACHTE ou yo</span><span class="s4">ye, epi kote ou ka DELIVRE.</span><span class="s5">Si w vann yon pwodwi fizik nan Pòtoprens,</span><span class="s6">vize Pòtoprens ak zòn kote w ka livre.</span><span class="s7">Si w vann yon pwodwi dijital,</span><span class="s8">tankou yon fòmasyon oswa yon liv elektwonik,</span><span class="s9">ou ka vize dyaspora a, Ozetazini,</span><span class="s10">Kanada oswa Lafrans.</span><span class="s11">Men konnen sa:</span><span class="s12">la, pou moun yo wè w ap koute pi chè.</span></div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+  (function () {
+    var SID = "sc1_10", T = 31.88;
+    
+var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
+var tl = gsap.timeline({ paused: true });
+function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
+function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
+function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
+function pulse(s, t) { tl.to(s, { scale: 1.06, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t); }
+function count(s, a, b, t, d, fmt) {
+  var o = { v: a }, el = typeof s === "string" ? q(s) : s;
+  tl.fromTo(o, { v: a }, { v: b, duration: d || 0.9, ease: "power2.out", onUpdate: function () { el.textContent = fmt ? fmt(o.v) : Math.round(o.v).toLocaleString("fr-FR"); } }, t);
+}
+function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ? p.getTotalLength() : 1000;
+  tl.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d || 0.8, ease: "power2.inOut" }, t); }); }
+
+    tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
+    tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
+    up(q(".ttl"), 4.32);
+    pop(q(".l"), 11.28); tl.fromTo(q(".pin"), { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: "bounce.out" }, 12.63);
+    tl.fromTo(qa(".ring"), { scale: 0 }, { scale: 1, duration: .7, ease: "expo.out", stagger: .12 }, 14.92);
+    pop(q(".r"), 17.69); pop(q(".x0"), 24.33); pop(q(".x1"), 25.2); pop(q(".x2"), 26.15);
+    pop(q(".warn"), 30.43);
+    tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 1.7999999999999998);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 1.94);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 4.180000000000001);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.32);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 5.21);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 5.35);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 7.82);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 7.96);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 10.03);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 10.17);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 13.36);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.5);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 16.439999999999998);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 16.58);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 18.81);tl.fromTo(q(".sub .s8"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 18.95);tl.to(q(".sub .s8"), {opacity:0, duration:.1}, 22.37);tl.fromTo(q(".sub .s9"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 22.51);tl.to(q(".sub .s9"), {opacity:0, duration:.1}, 25.06);tl.fromTo(q(".sub .s10"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 25.2);tl.to(q(".sub .s10"), {opacity:0, duration:.1}, 26.73);tl.fromTo(q(".sub .s11"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 26.87);tl.to(q(".sub .s11"), {opacity:0, duration:.1}, 27.91);tl.fromTo(q(".sub .s12"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 28.05);tl.to(q(".sub .s12"), {opacity:0, duration:.1}, 31.28);
+    tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
+    window.__timelines = window.__timelines || {};
+    window.__timelines[SID] = tl;
+  })();
+  </script>
+</template>

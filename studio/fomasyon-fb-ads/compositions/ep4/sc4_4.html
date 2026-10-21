@@ -1,0 +1,112 @@
+<template>
+  <style>
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+@font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+#sc4_4 { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter"; color: #1B1A18; -webkit-font-smoothing: antialiased; }
+#sc4_4 .bg { position: absolute; inset: -40px; background: radial-gradient(70% 90% at 75% 10%, #FBF9F5 0%, #F3F0EA 60%, #ECE7DF 100%); }
+#sc4_4 .dots { position: absolute; inset: -60px; background: radial-gradient(circle, rgba(27,26,24,.07) 1.6px, transparent 2px) 0 0 / 44px 44px; }
+#sc4_4 .stage { position: absolute; inset: 0; }
+#sc4_4 .top { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; align-items: center; justify-content: space-between; }
+#sc4_4 .chip-ep { display: flex; align-items: center; gap: 14px; font: 700 22px/1 "Inter"; letter-spacing: 3px; color: #8C877F; }
+#sc4_4 .chip-ep b { color: #fff; background: #1B1A18; border-radius: 18px; padding: 8px 14px; letter-spacing: 2px; font-size: 18px; }
+#sc4_4 .brand { display: flex; align-items: center; gap: 12px; font: 800 20px/1 "Inter"; letter-spacing: 4px; color: #5A554E; }
+#sc4_4 .brand svg { width: 38px; height: 38px; }
+#sc4_4 .sub { position: absolute; left: 200px; right: 200px; bottom: 46px; min-height: 120px; display: flex; align-items: flex-end; justify-content: center; }
+#sc4_4 .sub span { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font: 600 42px/1.3 "Inter"; color: #1B1A18; opacity: 0;
+  text-shadow: 0 0 18px #F3F0EA, 0 0 30px #F3F0EA; }
+#sc4_4 .h1 { font: 900 84px/1.02 "InterD"; letter-spacing: -2px; }
+#sc4_4 .h2 { font: 800 50px/1.1 "Inter"; letter-spacing: -1px; }
+#sc4_4 .lab { font: 700 22px/1 "Inter"; letter-spacing: 3px; text-transform: uppercase; color: #8C877F; }
+#sc4_4 .card { position: absolute; background: #fff; border-radius: 28px; box-shadow: 0 30px 60px rgba(40,30,20,.10), 0 4px 12px rgba(40,30,20,.06); }
+#sc4_4 .acc { color: #D97757; } #sc4_4 .good { color: #2F9E6B; } #sc4_4 .bad { color: #D2503C; }
+#sc4_4 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font: 700 26px/1 "Inter"; }
+#sc4_4 .num { font-variant-numeric: tabular-nums; }
+
+    #sc4_4 .rules { position: absolute; left: 160px; top: 170px; display: flex; gap: 14px; } #sc4_4 .rules .pill { background: #fff; font-size: 28px; box-shadow: 0 10px 24px rgba(40,30,20,.08); }
+    #sc4_4 .ps { top: 290px; width: 420px; padding: 22px; } #sc4_4 .s0 { left: 160px; } #sc4_4 .s1 { left: 620px; } #sc4_4 .s2 { left: 1080px; }
+    #sc4_4 .im { height: 260px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+    #sc4_4 .hl { font: 800 30px/1.15 "Inter"; margin: 18px 0 10px; } #sc4_4 .pr { font: 900 48px/1 "InterD"; color: #D97757; }
+    #sc4_4 .bt { margin-top: 14px; background: #0866FF; color: #fff; font: 700 22px/1 "Inter"; padding: 14px; border-radius: 12px; text-align: center; }
+    #sc4_4 .win { position: absolute; right: 16px; top: 16px; display: flex; gap: 8px; align-items: center; background: #2F9E6B; color: #fff; padding: 10px 16px; border-radius: 24px; font: 800 22px/1 "Inter"; opacity: 0; }
+    #sc4_4 .fmt { position: absolute; left: 1560px; top: 470px; background: #1B1A18; color: #fff; font-size: 28px; }</style>
+  <div id="sc4_4" data-composition-id="sc4_4" data-width="1920" data-height="1080" data-duration="18.81">
+    <div class="clip" data-start="0" data-duration="18.81" data-track-index="0" style="position:absolute;inset:0">
+      <div class="bg"></div><div class="dots"></div>
+      <div class="stage"><div class="rules"><span class="pill r0">1 sèl mesaj</span><span class="pill r1">Imaj klè</span><span class="pill r2">Pa twòp tèks</span><span class="pill r3">Pri / òf vizib</span></div><div class="card ps s0"><div class="im" style="background:#D97757"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg></div><div class="hl">Sak an kwi, fèt a la men</div><div class="pr">25 $</div><div class="bt">Voye mesaj</div><div class="win"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2" />
+  <path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2" />
+  <path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3" />
+  <path d="M4 22h16" />
+  <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+  <path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3" />
+</svg> Pi bon</div></div><div class="card ps s1"><div class="im" style="background:#5A554E"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg></div><div class="hl">Sak pou chak okazyon</div><div class="pr">25 $</div><div class="bt">Voye mesaj</div><div class="win"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2" />
+  <path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2" />
+  <path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3" />
+  <path d="M4 22h16" />
+  <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+  <path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3" />
+</svg> Pi bon</div></div><div class="card ps s2"><div class="im" style="background:#2F9E6B"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg></div><div class="hl">-20 % semèn sa a</div><div class="pr">25 $</div><div class="bt">Voye mesaj</div><div class="win"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2" />
+  <path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2" />
+  <path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3" />
+  <path d="M4 22h16" />
+  <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+  <path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3" />
+</svg> Pi bon</div></div><div class="fmt pill">Kare 1:1 · 4:5</div></div>
+      <div class="top"><div class="chip-ep"><b>VIDEYO 4</b>KREYE EPI LANSE PREMYE PIBLISITE OU</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+ATELYE DIJITAL</div></div>
+      <div class="sub"><span class="s0">Pou yon afich:</span><span class="s1">yon sèl mesaj, yon imaj klè,</span><span class="s2">pa twòp tèks sou imaj la,</span><span class="s3">epi pri a oswa òf la byen vizib.</span><span class="s4">Fòma kare, oswa kat sou senk.</span><span class="s5">Prepare de oswa twa vèsyon diferan:</span><span class="s6">se Facebook ki pral montre w kiyès ki pi bon.</span></div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+  (function () {
+    var SID = "sc4_4", T = 18.81;
+    
+var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
+var tl = gsap.timeline({ paused: true });
+function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
+function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
+function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
+function pulse(s, t) { tl.to(s, { scale: 1.06, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t); }
+function count(s, a, b, t, d, fmt) {
+  var o = { v: a }, el = typeof s === "string" ? q(s) : s;
+  tl.fromTo(o, { v: a }, { v: b, duration: d || 0.9, ease: "power2.out", onUpdate: function () { el.textContent = fmt ? fmt(o.v) : Math.round(o.v).toLocaleString("fr-FR"); } }, t);
+}
+function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ? p.getTotalLength() : 1000;
+  tl.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d || 0.8, ease: "power2.inOut" }, t); }); }
+
+    tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
+    tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
+    up(q(".r0"), 1.81); up(q(".r1"), 3.35); up(q(".r2"), 4.16); up(q(".r3"), 6.59);
+    pop(q(".s0"), 1.81); pop(q(".fmt"), 8.93);
+    pop(q(".s1"), 12.01); pop(q(".s2"), 12.01 + .25);
+    pop(q(".s2 .win"), 16.62); tl.to(qa(".s0, .s1"), { opacity: .5, duration: .4 }, 16.62);
+    tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 1.67);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 1.81);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 4.0200000000000005);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.16);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 6.12);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.26);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 8.79);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 8.93);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 11.219999999999999);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 11.36);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 14.129999999999999);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 14.27);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 18.21);
+    tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
+    window.__timelines = window.__timelines || {};
+    window.__timelines[SID] = tl;
+  })();
+  </script>
+</template>

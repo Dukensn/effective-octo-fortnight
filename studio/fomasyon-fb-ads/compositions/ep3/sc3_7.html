@@ -1,0 +1,105 @@
+<template>
+  <style>
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+@font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+#sc3_7 { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter"; color: #1B1A18; -webkit-font-smoothing: antialiased; }
+#sc3_7 .bg { position: absolute; inset: -40px; background: radial-gradient(70% 90% at 75% 10%, #FBF9F5 0%, #F3F0EA 60%, #ECE7DF 100%); }
+#sc3_7 .dots { position: absolute; inset: -60px; background: radial-gradient(circle, rgba(27,26,24,.07) 1.6px, transparent 2px) 0 0 / 44px 44px; }
+#sc3_7 .stage { position: absolute; inset: 0; }
+#sc3_7 .top { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; align-items: center; justify-content: space-between; }
+#sc3_7 .chip-ep { display: flex; align-items: center; gap: 14px; font: 700 22px/1 "Inter"; letter-spacing: 3px; color: #8C877F; }
+#sc3_7 .chip-ep b { color: #fff; background: #1B1A18; border-radius: 18px; padding: 8px 14px; letter-spacing: 2px; font-size: 18px; }
+#sc3_7 .brand { display: flex; align-items: center; gap: 12px; font: 800 20px/1 "Inter"; letter-spacing: 4px; color: #5A554E; }
+#sc3_7 .brand svg { width: 38px; height: 38px; }
+#sc3_7 .sub { position: absolute; left: 200px; right: 200px; bottom: 46px; min-height: 120px; display: flex; align-items: flex-end; justify-content: center; }
+#sc3_7 .sub span { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font: 600 42px/1.3 "Inter"; color: #1B1A18; opacity: 0;
+  text-shadow: 0 0 18px #F3F0EA, 0 0 30px #F3F0EA; }
+#sc3_7 .h1 { font: 900 84px/1.02 "InterD"; letter-spacing: -2px; }
+#sc3_7 .h2 { font: 800 50px/1.1 "Inter"; letter-spacing: -1px; }
+#sc3_7 .lab { font: 700 22px/1 "Inter"; letter-spacing: 3px; text-transform: uppercase; color: #8C877F; }
+#sc3_7 .card { position: absolute; background: #fff; border-radius: 28px; box-shadow: 0 30px 60px rgba(40,30,20,.10), 0 4px 12px rgba(40,30,20,.06); }
+#sc3_7 .acc { color: #D97757; } #sc3_7 .good { color: #2F9E6B; } #sc3_7 .bad { color: #D2503C; }
+#sc3_7 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font: 700 26px/1 "Inter"; }
+#sc3_7 .num { font-variant-numeric: tabular-nums; }
+
+    #sc3_7 .ex { position: absolute; left: 160px; right: 160px; top: 130px; display: flex; gap: 14px; }
+    #sc3_7 .x { flex: 1; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.7); border-radius: 16px; padding: 12px 16px; font: 600 20px/1 "Inter"; color: #8C877F; }
+    #sc3_7 .x b { margin-left: auto; font: 800 24px/1 "Inter"; color: #5A554E; } #sc3_7 .x.on { background: #fff; box-shadow: 0 0 0 3px #D97757; } #sc3_7 .x.on b { color: #1B1A18; }
+    #sc3_7 .mc { left: 160px; top: 250px; width: 900px; padding: 46px 52px; }
+    #sc3_7 .mc .term { font: 900 96px/1 "InterD"; letter-spacing: -2px; } #sc3_7 .mc .full { font: 700 26px/1 "Inter"; color: #B5532F; letter-spacing: 1px; margin: 12px 0 18px; }
+    #sc3_7 .mc .def { font: 500 32px/1.35 "Inter"; color: #5A554E; }
+    #sc3_7 .fm { margin-top: 30px; display: flex; align-items: center; flex-wrap: wrap; gap: 14px; font: 800 38px/1 "Inter"; }
+    #sc3_7 .fm .op { color: #8C877F; } #sc3_7 .fm .rs { background: #1B1A18; color: #fff; padding: 14px 22px; border-radius: 18px; }
+    #sc3_7 .side { position: absolute; left: 1120px; top: 250px; width: 640px; }
+    #sc3_7 .cv { padding: 36px; } #sc3_7 .pp { display: grid; grid-template-columns: repeat(20, 1fr); gap: 8px; margin: 24px 0; }
+    #sc3_7 .pp i { height: 22px; border-radius: 6px; background: #E6E1D8; } #sc3_7 .r { font: 600 30px/1 "Inter"; color: #5A554E; } #sc3_7 .r b { color: #1B1A18; font-weight: 900; }</style>
+  <div id="sc3_7" data-composition-id="sc3_7" data-width="1920" data-height="1080" data-duration="21.50">
+    <div class="clip" data-start="0" data-duration="21.50" data-track-index="0" style="position:absolute;inset:0">
+      <div class="bg"></div><div class="dots"></div>
+      <div class="stage"><div class="ex"><div class="x"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#8C877F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+  <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+</svg><span>Depans</span><b>20 $</b></div><div class="x"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#8C877F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+  <circle cx="12" cy="12" r="3" />
+</svg><span>Enpresyon</span><b>5 000</b></div><div class="x"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#8C877F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <circle cx="9" cy="7" r="4" />
+</svg><span>Moun touche</span><b>4 000</b></div><div class="x"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#8C877F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M14 4.1 12 6" />
+  <path d="m5.1 8-2.9-.8" />
+  <path d="m6 12-1.9 2" />
+  <path d="M7.2 2.2 8 5.1" />
+  <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" />
+</svg><span>Klik</span><b>100</b></div><div class="x on"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18" />
+  <path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25" />
+  <circle cx="18" cy="20" r="2" />
+  <circle cx="8" cy="20" r="2" />
+</svg><span>Vant</span><b>4</b></div></div><div class="card mc"><div class="term">CPA</div><div class="full">KOU PA REZILTA</div><div class="def">Konbyen sa koute w pou chak rezilta: yon vant, yon mesaj, yon enskripsyon.</div><div class="fm"><span class="f0">20 $</span><span class="f1 op">÷</span><span class="f2">4 vant</span><span class="f3 op">=</span><span class="rs">5 $</span></div></div><div class="side"><div class="card cv"><div class="lab">To konvèsyon</div><div class="pp"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="r"><b>4</b> sou 100 klik = <b>4 %</b></div></div></div></div>
+      <div class="top"><div class="chip-ep"><b>VIDEYO 3</b>CHIF YO: CPM, CPC, CTR AK LÒT</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+ATELYE DIJITAL</div></div>
+      <div class="sub"><span class="s0">KONVÈSYON: aksyon final ou vle a.</span><span class="s1">Yon acha, yon mesaj, oswa yon enskripsyon.</span><span class="s2">San moun klike, kat achte:</span><span class="s3">to konvèsyon an se kat pousan.</span><span class="s4">Apre sa, gen KOU PA REZILTA,</span><span class="s5">ke yo rele tou CPA:</span><span class="s6">konbyen sa koute w pou chak rezilta.</span><span class="s7">Ven dola divize pa kat vant:</span><span class="s8">senk dola pa vant.</span></div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+  (function () {
+    var SID = "sc3_7", T = 21.50;
+    
+var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
+var tl = gsap.timeline({ paused: true });
+function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
+function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
+function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
+function pulse(s, t) { tl.to(s, { scale: 1.06, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t); }
+function count(s, a, b, t, d, fmt) {
+  var o = { v: a }, el = typeof s === "string" ? q(s) : s;
+  tl.fromTo(o, { v: a }, { v: b, duration: d || 0.9, ease: "power2.out", onUpdate: function () { el.textContent = fmt ? fmt(o.v) : Math.round(o.v).toLocaleString("fr-FR"); } }, t);
+}
+function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ? p.getTotalLength() : 1000;
+  tl.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d || 0.8, ease: "power2.inOut" }, t); }); }
+
+    tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
+    tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
+    pop(q(".cv"), 0.6); tl.fromTo(qa(".pp i"), { opacity: 0 }, { opacity: 1, duration: .2, stagger: .006 }, 6.35);
+    tl.to([qa(".pp i")[12], qa(".pp i")[37], qa(".pp i")[58], qa(".pp i")[83]], { backgroundColor: "#D97757", duration: .3, stagger: .1 }, 7.54);
+    pop(q(".mc"), 11.64); tl.fromTo(qa(".fm > span"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .3, stagger: .18, ease: "expo.out" }, 17.09);
+    tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 3.0);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 3.14);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 6.21);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.35);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 8.219999999999999);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 8.36);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 10.53);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 10.67);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 12.7);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 12.84);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 14.19);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 14.33);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 16.95);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 17.09);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 19.12);tl.fromTo(q(".sub .s8"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 19.26);tl.to(q(".sub .s8"), {opacity:0, duration:.1}, 20.900000000000002);
+    tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
+    window.__timelines = window.__timelines || {};
+    window.__timelines[SID] = tl;
+  })();
+  </script>
+</template>

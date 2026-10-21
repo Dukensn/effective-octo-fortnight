@@ -1,0 +1,82 @@
+<template>
+  <style>
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+@font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+#sc2_8 { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter"; color: #1B1A18; -webkit-font-smoothing: antialiased; }
+#sc2_8 .bg { position: absolute; inset: -40px; background: radial-gradient(70% 90% at 75% 10%, #FBF9F5 0%, #F3F0EA 60%, #ECE7DF 100%); }
+#sc2_8 .dots { position: absolute; inset: -60px; background: radial-gradient(circle, rgba(27,26,24,.07) 1.6px, transparent 2px) 0 0 / 44px 44px; }
+#sc2_8 .stage { position: absolute; inset: 0; }
+#sc2_8 .top { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; align-items: center; justify-content: space-between; }
+#sc2_8 .chip-ep { display: flex; align-items: center; gap: 14px; font: 700 22px/1 "Inter"; letter-spacing: 3px; color: #8C877F; }
+#sc2_8 .chip-ep b { color: #fff; background: #1B1A18; border-radius: 18px; padding: 8px 14px; letter-spacing: 2px; font-size: 18px; }
+#sc2_8 .brand { display: flex; align-items: center; gap: 12px; font: 800 20px/1 "Inter"; letter-spacing: 4px; color: #5A554E; }
+#sc2_8 .brand svg { width: 38px; height: 38px; }
+#sc2_8 .sub { position: absolute; left: 200px; right: 200px; bottom: 46px; min-height: 120px; display: flex; align-items: flex-end; justify-content: center; }
+#sc2_8 .sub span { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font: 600 42px/1.3 "Inter"; color: #1B1A18; opacity: 0;
+  text-shadow: 0 0 18px #F3F0EA, 0 0 30px #F3F0EA; }
+#sc2_8 .h1 { font: 900 84px/1.02 "InterD"; letter-spacing: -2px; }
+#sc2_8 .h2 { font: 800 50px/1.1 "Inter"; letter-spacing: -1px; }
+#sc2_8 .lab { font: 700 22px/1 "Inter"; letter-spacing: 3px; text-transform: uppercase; color: #8C877F; }
+#sc2_8 .card { position: absolute; background: #fff; border-radius: 28px; box-shadow: 0 30px 60px rgba(40,30,20,.10), 0 4px 12px rgba(40,30,20,.06); }
+#sc2_8 .acc { color: #D97757; } #sc2_8 .good { color: #2F9E6B; } #sc2_8 .bad { color: #D2503C; }
+#sc2_8 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font: 700 26px/1 "Inter"; }
+#sc2_8 .num { font-variant-numeric: tabular-nums; }
+
+    #sc2_8 .pl { top: 220px; width: 280px; height: 380px; padding: 24px; text-align: center; opacity: .35; }
+    #sc2_8 .ph { height: 260px; border-radius: 20px; border: 3px solid #EDE9E2; display: flex; align-items: center; justify-content: center; }
+    #sc2_8 .pl .t { font: 800 26px/1 "Inter"; margin-top: 20px; }
+    #sc2_8 .sw { position: absolute; left: 50%; top: 690px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; background: #fff; border-radius: 60px; padding: 18px 34px 18px 18px; box-shadow: 0 10px 30px rgba(40,30,20,.10); }
+    #sc2_8 .tg { width: 110px; height: 60px; border-radius: 30px; background: #D9D4CC; position: relative; } #sc2_8 .tg i { position: absolute; left: 6px; top: 6px; width: 48px; height: 48px; border-radius: 50%; background: #fff; }
+    #sc2_8 .sw b { font: 800 32px/1 "Inter"; } #sc2_8 .sw span { font: 500 26px/1 "Inter"; color: #5A554E; }</style>
+  <div id="sc2_8" data-composition-id="sc2_8" data-width="1920" data-height="1080" data-duration="16.88">
+    <div class="clip" data-start="0" data-duration="16.88" data-track-index="0" style="position:absolute;inset:0">
+      <div class="bg"></div><div class="dots"></div>
+      <div class="stage"><div class="card pl p0" style="left:170px"><div class="ph" style="--c:#0866FF"><svg viewBox="0 0 24 24" width="64" height="64"><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg></div><div class="t">Fil Facebook</div></div><div class="card pl p1" style="left:492px"><div class="ph" style="--c:#E1306C"><svg viewBox="0 0 24 24" width="64" height="64"><path fill="#E1306C" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg></div><div class="t">Fil Instagram</div></div><div class="card pl p2" style="left:814px"><div class="ph" style="--c:#D97757"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" />
+</svg></div><div class="t">Stories</div></div><div class="card pl p3" style="left:1136px"><div class="ph" style="--c:#1B1A18"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#1B1A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg></div><div class="t">Reels</div></div><div class="card pl p4" style="left:1458px"><div class="ph" style="--c:#0084FF"><svg viewBox="0 0 24 24" width="64" height="64"><path fill="#0084FF" d="M12 0C5.24 0 0 4.952 0 11.64c0 3.499 1.434 6.521 3.769 8.61a.96.96 0 0 1 .323.683l.065 2.135a.96.96 0 0 0 1.347.85l2.381-1.053a.96.96 0 0 1 .641-.046A13 13 0 0 0 12 23.28c6.76 0 12-4.952 12-11.64S18.76 0 12 0m6.806 7.44c.522-.03.971.567.63 1.094l-4.178 6.457a.707.707 0 0 1-.977.208l-3.87-2.504a.44.44 0 0 0-.49.007l-4.363 3.01c-.637.438-1.415-.317-.995-.966l4.179-6.457a.706.706 0 0 1 .977-.21l3.87 2.505c.15.097.344.094.491-.007l4.362-3.008a.7.7 0 0 1 .364-.13"/></svg></div><div class="t">Messenger</div></div><div class="sw"><div class="tg"><i></i></div><b>Plasman Advantage+</b><span>Facebook chwazi pou ou</span></div></div>
+      <div class="top"><div class="chip-ep"><b>VIDEYO 2</b>KÒMAN FACEBOOK ADS MACHE ANNDAN L</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+ATELYE DIJITAL</div></div>
+      <div class="sub"><span class="s0">Apre sa, gen plasman yo:</span><span class="s1">kote piblisite a ap parèt.</span><span class="s2">Fil Facebook, fil Instagram, Stories, Reels,</span><span class="s3">Messenger. Pou kòmanse, kite Facebook chwazi pou ou.</span><span class="s4">Sa rele plasman Advantage plus.</span><span class="s5">Li pral mete kòb ou kote li bay pi bon rezilta.</span></div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+  (function () {
+    var SID = "sc2_8", T = 16.88;
+    
+var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
+var tl = gsap.timeline({ paused: true });
+function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
+function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
+function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
+function pulse(s, t) { tl.to(s, { scale: 1.06, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t); }
+function count(s, a, b, t, d, fmt) {
+  var o = { v: a }, el = typeof s === "string" ? q(s) : s;
+  tl.fromTo(o, { v: a }, { v: b, duration: d || 0.9, ease: "power2.out", onUpdate: function () { el.textContent = fmt ? fmt(o.v) : Math.round(o.v).toLocaleString("fr-FR"); } }, t);
+}
+function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ? p.getTotalLength() : 1000;
+  tl.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d || 0.8, ease: "power2.inOut" }, t); }); }
+
+    tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
+    tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
+    tl.fromTo(qa(".pl"), { opacity: 0, y: 40 }, { opacity: .35, y: 0, duration: .4, stagger: .12, ease: "expo.out" }, 4.09);
+    pop(q(".sw"), 8.73); tl.to(q(".tg"), { backgroundColor: "#2F9E6B", duration: .3 }, 11.75);
+    tl.to(q(".tg i"), { x: 50, duration: .3, ease: "power2.out" }, 11.75); tl.to(qa(".pl"), { opacity: 1, duration: .4, stagger: .06 }, 11.75 + .2);
+    tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 2.1399999999999997);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 2.28);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 3.9499999999999997);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.09);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 6.970000000000001);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 7.11);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 10.53);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 10.67);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 12.68);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 12.82);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 16.28);
+    tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
+    window.__timelines = window.__timelines || {};
+    window.__timelines[SID] = tl;
+  })();
+  </script>
+</template>

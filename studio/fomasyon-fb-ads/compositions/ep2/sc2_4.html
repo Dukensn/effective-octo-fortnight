@@ -1,0 +1,106 @@
+<template>
+  <style>
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+@font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+#sc2_4 { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter"; color: #1B1A18; -webkit-font-smoothing: antialiased; }
+#sc2_4 .bg { position: absolute; inset: -40px; background: radial-gradient(70% 90% at 75% 10%, #FBF9F5 0%, #F3F0EA 60%, #ECE7DF 100%); }
+#sc2_4 .dots { position: absolute; inset: -60px; background: radial-gradient(circle, rgba(27,26,24,.07) 1.6px, transparent 2px) 0 0 / 44px 44px; }
+#sc2_4 .stage { position: absolute; inset: 0; }
+#sc2_4 .top { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; align-items: center; justify-content: space-between; }
+#sc2_4 .chip-ep { display: flex; align-items: center; gap: 14px; font: 700 22px/1 "Inter"; letter-spacing: 3px; color: #8C877F; }
+#sc2_4 .chip-ep b { color: #fff; background: #1B1A18; border-radius: 18px; padding: 8px 14px; letter-spacing: 2px; font-size: 18px; }
+#sc2_4 .brand { display: flex; align-items: center; gap: 12px; font: 800 20px/1 "Inter"; letter-spacing: 4px; color: #5A554E; }
+#sc2_4 .brand svg { width: 38px; height: 38px; }
+#sc2_4 .sub { position: absolute; left: 200px; right: 200px; bottom: 46px; min-height: 120px; display: flex; align-items: flex-end; justify-content: center; }
+#sc2_4 .sub span { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font: 600 42px/1.3 "Inter"; color: #1B1A18; opacity: 0;
+  text-shadow: 0 0 18px #F3F0EA, 0 0 30px #F3F0EA; }
+#sc2_4 .h1 { font: 900 84px/1.02 "InterD"; letter-spacing: -2px; }
+#sc2_4 .h2 { font: 800 50px/1.1 "Inter"; letter-spacing: -1px; }
+#sc2_4 .lab { font: 700 22px/1 "Inter"; letter-spacing: 3px; text-transform: uppercase; color: #8C877F; }
+#sc2_4 .card { position: absolute; background: #fff; border-radius: 28px; box-shadow: 0 30px 60px rgba(40,30,20,.10), 0 4px 12px rgba(40,30,20,.06); }
+#sc2_4 .acc { color: #D97757; } #sc2_4 .good { color: #2F9E6B; } #sc2_4 .bad { color: #D2503C; }
+#sc2_4 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font: 700 26px/1 "Inter"; }
+#sc2_4 .num { font-variant-numeric: tabular-nums; }
+
+    #sc2_4 .ad { left: 170px; top: 170px; width: 520px; padding: 24px; }
+    #sc2_4 .pg { display: flex; align-items: center; gap: 12px; font: 700 24px/1 "Inter"; } #sc2_4 .pg i { width: 46px; height: 46px; border-radius: 50%; background: #D97757; }
+    #sc2_4 .pg span { font: 500 18px/1 "Inter"; color: #8C877F; margin-left: auto; }
+    #sc2_4 .im { height: 260px; border-radius: 16px; background: #F2EEE7; margin: 20px 0; display: flex; align-items: center; justify-content: center; }
+    #sc2_4 .cta { display: flex; align-items: center; justify-content: space-between; font: 600 22px/1 "Inter"; color: #5A554E; }
+    #sc2_4 .cta b { display: inline-flex; gap: 8px; align-items: center; background: #25D366; color: #fff; padding: 12px 16px; border-radius: 12px; font: 800 22px/1 "Inter"; }
+    #sc2_4 .arw { position: absolute; left: 720px; top: 380px; }
+    #sc2_4 .wa { left: 970px; top: 170px; width: 780px; height: 470px; overflow: hidden; background: #ECE5DD; }
+    #sc2_4 .wh { display: flex; align-items: center; gap: 14px; background: #075E54; color: #fff; padding: 22px 28px; font: 800 28px/1 "Inter"; }
+    #sc2_4 .m { margin: 26px 28px 0; max-width: 560px; background: #fff; padding: 18px 22px; border-radius: 6px 20px 20px 20px; font: 500 26px/1.35 "Inter"; }
+    #sc2_4 .m.me { margin-left: auto; background: #D9FDD3; border-radius: 20px 6px 20px 20px; }
+    #sc2_4 .ch { position: absolute; left: 170px; top: 690px; display: flex; flex-direction: column; gap: 14px; } #sc2_4 .ch .pill { font-size: 26px; }</style>
+  <div id="sc2_4" data-composition-id="sc2_4" data-width="1920" data-height="1080" data-duration="27.27">
+    <div class="clip" data-start="0" data-duration="27.27" data-track-index="0" style="position:absolute;inset:0">
+      <div class="bg"></div><div class="dots"></div>
+      <div class="stage">
+    <div class="card ad"><div class="pg"><i></i><b>Boutik ou</b><span>Sponsorisé</span></div><div class="im"><svg viewBox="0 0 24 24" width="90" height="90" fill="none" stroke="#D9D4CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg></div>
+      <div class="cta"><span>Ekri nou sou WhatsApp</span><b><svg viewBox="0 0 24 24" width="26" height="26"><path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Voye mesaj</b></div></div>
+    <svg class="arw" width="220" height="60"><path d="M5 30 H190 M168 10 L195 30 L168 50" fill="none" stroke="#D97757" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="card wa"><div class="wh"><svg viewBox="0 0 24 24" width="34" height="34"><path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> <b>Kliyan</b></div>
+      <div class="m m0">Bonjou! Mwen wè piblisite a. Konbyen li koute?</div><div class="m m1 me">Bonjou! Li koute 25 dola. Ki kote w ye?</div></div>
+    <div class="ch">
+      <div class="pill k0" style="background:#2F9E6B;color:#fff"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
+</svg> WhatsApp / Messenger → Angajman + mesaj</div>
+      <div class="pill k1" style="background:#1B1A18;color:#fff"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg> Sit ki vann pou kont li → Vant</div>
+      <div class="pill k2" style="background:#D2503C;color:#fff"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg> Pou vann: evite Notoryete</div></div></div>
+      <div class="top"><div class="chip-ep"><b>VIDEYO 2</b>KÒMAN FACEBOOK ADS MACHE ANNDAN L</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+ATELYE DIJITAL</div></div>
+      <div class="sub"><span class="s0">Ki objektif pou w chwazi?</span><span class="s1">Si w vann sou WhatsApp oswa sou Messenger,</span><span class="s2">chwazi Angajman, ak mesaj kòm destinasyon.</span><span class="s3">Moun yo klike, epi yo tonbe dirèkteman nan WhatsApp</span><span class="s4">ou, pou yo pale avè w.</span><span class="s5">Si w gen yon sit ki ka vann pou</span><span class="s6">kont li, chwazi Vant.</span><span class="s7">Epi evite Notoryete si sa w vle se vann:</span><span class="s8">w ap jwenn anpil moun ki wè,</span><span class="s9">men se pa kliyan.</span></div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+  (function () {
+    var SID = "sc2_4", T = 27.27;
+    
+var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
+var tl = gsap.timeline({ paused: true });
+function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
+function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
+function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
+function pulse(s, t) { tl.to(s, { scale: 1.06, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t); }
+function count(s, a, b, t, d, fmt) {
+  var o = { v: a }, el = typeof s === "string" ? q(s) : s;
+  tl.fromTo(o, { v: a }, { v: b, duration: d || 0.9, ease: "power2.out", onUpdate: function () { el.textContent = fmt ? fmt(o.v) : Math.round(o.v).toLocaleString("fr-FR"); } }, t);
+}
+function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ? p.getTotalLength() : 1000;
+  tl.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d || 0.8, ease: "power2.inOut" }, t); }); }
+
+    tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
+    tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
+    pop(q(".ad"), 2.64); pop(q(".k0"), 6.02);
+    pulse(q(".cta b"), 9.4); draw(".arw path", 9.4 + .2, .5);
+    pop(q(".wa"), 11.13); up(q(".m0"), 11.13 + .4); up(q(".m1"), 14.35);
+    up(q(".k1"), 16.31); up(q(".k2"), 19.85);
+    tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 2.5);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 2.64);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 5.88);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.02);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 9.26);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 9.4);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 13.34);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.48);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 15.149999999999999);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 15.29);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 17.669999999999998);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 17.81);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 19.39);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 19.53);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 22.62);tl.fromTo(q(".sub .s8"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 22.76);tl.to(q(".sub .s8"), {opacity:0, duration:.1}, 24.89);tl.fromTo(q(".sub .s9"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 25.03);tl.to(q(".sub .s9"), {opacity:0, duration:.1}, 26.67);
+    tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
+    window.__timelines = window.__timelines || {};
+    window.__timelines[SID] = tl;
+  })();
+  </script>
+</template>

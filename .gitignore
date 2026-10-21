@@ -7,7 +7,14 @@ agent/
 skills-lock.json
 studio/*
 !studio/levye-dijital/
+!studio/fomasyon-fb-ads/
 # generated audio (rebuild with prep-voice.py + build-audio.sh)
 studio/levye-dijital/assets/audio/*.wav
 studio/levye-dijital/renders/
 studio/levye-dijital/snapshots/
+
+studio/fomasyon-fb-ads/renders/
+studio/fomasyon-fb-ads/snapshots/
+studio/fomasyon-fb-ads/assets/audio/
+studio/fomasyon-fb-ads/assets/music/*.wav
+studio/fomasyon-fb-ads/__pycache__/

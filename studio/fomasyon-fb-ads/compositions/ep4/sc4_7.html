@@ -1,0 +1,96 @@
+<template>
+  <style>
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Regular.otf"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Medium.otf"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-SemiBold.otf"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-Bold.otf"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-ExtraBold.otf"); font-weight: 800; font-display: block; }
+@font-face { font-family: "InterD"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; font-display: block; }
+#sc4_7 { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Inter"; color: #1B1A18; -webkit-font-smoothing: antialiased; }
+#sc4_7 .bg { position: absolute; inset: -40px; background: radial-gradient(70% 90% at 75% 10%, #FBF9F5 0%, #F3F0EA 60%, #ECE7DF 100%); }
+#sc4_7 .dots { position: absolute; inset: -60px; background: radial-gradient(circle, rgba(27,26,24,.07) 1.6px, transparent 2px) 0 0 / 44px 44px; }
+#sc4_7 .stage { position: absolute; inset: 0; }
+#sc4_7 .top { position: absolute; left: 72px; right: 72px; top: 44px; display: flex; align-items: center; justify-content: space-between; }
+#sc4_7 .chip-ep { display: flex; align-items: center; gap: 14px; font: 700 22px/1 "Inter"; letter-spacing: 3px; color: #8C877F; }
+#sc4_7 .chip-ep b { color: #fff; background: #1B1A18; border-radius: 18px; padding: 8px 14px; letter-spacing: 2px; font-size: 18px; }
+#sc4_7 .brand { display: flex; align-items: center; gap: 12px; font: 800 20px/1 "Inter"; letter-spacing: 4px; color: #5A554E; }
+#sc4_7 .brand svg { width: 38px; height: 38px; }
+#sc4_7 .sub { position: absolute; left: 200px; right: 200px; bottom: 46px; min-height: 120px; display: flex; align-items: flex-end; justify-content: center; }
+#sc4_7 .sub span { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font: 600 42px/1.3 "Inter"; color: #1B1A18; opacity: 0;
+  text-shadow: 0 0 18px #F3F0EA, 0 0 30px #F3F0EA; }
+#sc4_7 .h1 { font: 900 84px/1.02 "InterD"; letter-spacing: -2px; }
+#sc4_7 .h2 { font: 800 50px/1.1 "Inter"; letter-spacing: -1px; }
+#sc4_7 .lab { font: 700 22px/1 "Inter"; letter-spacing: 3px; text-transform: uppercase; color: #8C877F; }
+#sc4_7 .card { position: absolute; background: #fff; border-radius: 28px; box-shadow: 0 30px 60px rgba(40,30,20,.10), 0 4px 12px rgba(40,30,20,.06); }
+#sc4_7 .acc { color: #D97757; } #sc4_7 .good { color: #2F9E6B; } #sc4_7 .bad { color: #D2503C; }
+#sc4_7 .pill { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font: 700 26px/1 "Inter"; }
+#sc4_7 .num { font-variant-numeric: tabular-nums; }
+
+    #sc4_7 .st { left: 160px; top: 230px; width: 560px; padding: 40px; text-align: center; }
+    #sc4_7 .st .pill { display: flex; justify-content: center; margin: 26px auto 0; width: 360px; font-size: 32px; color: #fff; } #sc4_7 .s0 { background: #D9A23A; } #sc4_7 .s1 { background: #2F9E6B; }
+    #sc4_7 .st .d { font: 600 26px/1 "Inter"; color: #5A554E; margin-top: 26px; }
+    #sc4_7 .rj { left: 800px; top: 230px; width: 960px; padding: 40px; }
+    #sc4_7 .rw { display: flex; gap: 18px; align-items: flex-start; padding: 24px 0; border-top: 2px solid #EDE9E2; font: 500 26px/1.35 "Inter"; color: #5A554E; }
+    #sc4_7 .rw:first-of-type { margin-top: 18px; } #sc4_7 .rw b { display: block; font: 800 32px/1.2 "Inter"; color: #1B1A18; margin-bottom: 6px; }
+    #sc4_7 .ok { display: flex; gap: 12px; align-items: center; margin-top: 16px; font: 700 26px/1.3 "Inter"; color: #2F9E6B; }</style>
+  <div id="sc4_7" data-composition-id="sc4_7" data-width="1920" data-height="1080" data-duration="21.12">
+    <div class="clip" data-start="0" data-duration="21.12" data-track-index="0" style="position:absolute;inset:0">
+      <div class="bg"></div><div class="dots"></div>
+      <div class="stage">
+    <div class="card st"><div class="lab">Estati piblisite a</div><div class="s0 pill"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg> An revizyon</div><div class="s1 pill"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 6 9 17l-5-5" />
+</svg> Aktif</div>
+      <div class="d">Kèk minit → 24 è</div></div>
+    <div class="card rj"><div class="lab">Sa ki fè yo refize piblisite</div>
+      <div class="rw r0"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#D2503C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg><div><b>« Fè 1 000 $ nan yon semèn »</b>Pwomès twò fò</div></div>
+      <div class="rw r1"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#D2503C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg><div><b>« Ou twò gwo? »</b>Pale de yon karakteristik pèsonèl moun nan</div></div>
+      <div class="ok"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#2F9E6B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 6 9 17l-5-5" />
+</svg> Si yo refize l, Facebook di w poukisa: korije epi soumèt li ankò</div></div></div>
+      <div class="top"><div class="chip-ep"><b>VIDEYO 4</b>KREYE EPI LANSE PREMYE PIBLISITE OU</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
+ATELYE DIJITAL</div></div>
+      <div class="sub"><span class="s0">Facebook ap revize piblisite a, anjeneral nan kèk minit,</span><span class="s1">rive nan vennkat è.</span><span class="s2">Si li refize l, li di w poukisa.</span><span class="s3">Souvan, se yon pwomès ki twò fò,</span><span class="s4">tankou: fè mil dola nan yon semèn.</span><span class="s5">Oswa yon tèks ki pale dirèkteman de yon karakteristik</span><span class="s6">pèsonèl moun nan, tankou:</span><span class="s7">ou twò gwo?</span></div>
+    </div>
+  </div>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+  (function () {
+    var SID = "sc4_7", T = 21.12;
+    
+var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
+var tl = gsap.timeline({ paused: true });
+function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
+function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
+function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
+function pulse(s, t) { tl.to(s, { scale: 1.06, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, t); }
+function count(s, a, b, t, d, fmt) {
+  var o = { v: a }, el = typeof s === "string" ? q(s) : s;
+  tl.fromTo(o, { v: a }, { v: b, duration: d || 0.9, ease: "power2.out", onUpdate: function () { el.textContent = fmt ? fmt(o.v) : Math.round(o.v).toLocaleString("fr-FR"); } }, t);
+}
+function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ? p.getTotalLength() : 1000;
+  tl.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: d || 0.8, ease: "power2.inOut" }, t); }); }
+
+    tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
+    tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
+    pop(q(".st"), 0.6); pop(q(".s0"), 0.99); pop(q(".s1"), 5.41);
+    pop(q(".rj"), 6.65); up(q(".r0"), 9.72); up(q(".r1"), 16.5); up(q(".ok"), 7.6);
+    tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 4.62);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.76);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 6.08);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.22);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 8.479999999999999);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 8.62);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 10.889999999999999);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 11.03);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 13.44);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.58);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 17.38);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 17.52);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 19.28);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 19.42);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 20.52);
+    tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
+    window.__timelines = window.__timelines || {};
+    window.__timelines[SID] = tl;
+  })();
+  </script>
+</template>
