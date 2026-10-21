@@ -18,7 +18,7 @@ def manager(c):
     rows = "".join(f'<div class="rw w{k}"><span class="tg"></span><b>Kanpay {k + 1}</b><u></u><u></u><u></u></div>' for k in range(4))
     side = "".join(f'<i class="si"></i>' for k in range(6))
     body = f"""{window('Meta Ads Manager', f'<div class="side">{side}</div><div class="main"><div class="btn">+ Kreye</div>{rows}</div>', 'win')}
-      <div class="card boost"><div class="bb">{icon('rocket', 34, '#fff')} Boost</div><div class="d">Pratik, men <b class="bad">limite</b></div></div>
+      <div class="card gh boost"><div class="bb">{icon('rocket', 34, '#fff')} Boost</div><div class="d">Pratik, men <b class="bad">limite</b></div></div>
       <div class="full pill">{icon('sliders-horizontal', 32, '#fff')} Tout kontwòl</div>"""
     css = WIN_CSS + f"""
     & .win {{ left: 520px; top: 170px; width: 1240px; height: 640px; overflow: hidden; }}
@@ -67,7 +67,7 @@ OBJ = [("megaphone", "Notoryete", "anpil moun wè w", "Notoryete"), ("mouse-poin
 
 
 def _obj_tiles(cls="ob"):
-    return "".join(f'<div class="card {cls} o{k}" style="left:{200 + (k % 3) * 520}px; top:{260 + (k // 3) * 290}px"><div class="ic">{icon(ic, 54, INK)}</div>'
+    return "".join(f'<div class="card gh {cls} o{k}" style="left:{200 + (k % 3) * 520}px; top:{260 + (k // 3) * 290}px"><div class="ic">{icon(ic, 54, INK)}</div>'
                    f'<div class="t">{t}</div><div class="d">{d}</div></div>' for k, (ic, t, d, _) in enumerate(OBJ))
 
 
@@ -118,10 +118,10 @@ def whatsapp(c):
 def audience(c):
     body = f"""
     <div class="card pn"><div class="lab">Odyans</div>
-      <div class="fl f0">{icon('map-pin', 34, ACC)}<b>Kote</b><span class="ch">Pòtoprens · +15 km</span></div>
-      <div class="fl f1">{icon('users', 34, ACC)}<b>Laj · sèks</b><div class="rg"><div class="rk"></div><i class="h a"></i><i class="h b"></i></div><span class="ch">18 – 45 · Tout</span></div>
-      <div class="fl f2">{icon('heart', 34, ACC)}<b>Enterè</b><span class="ch c0">Bote</span><span class="ch c1">Kizin</span><span class="ch c2">Fòmasyon</span></div></div>
-    <div class="card cu"><div class="lab">Pita: moun ki deja konnen w</div>
+      <div class="fl gh f0">{icon('map-pin', 34, ACC)}<b>Kote</b><span class="ch">Pòtoprens · +15 km</span></div>
+      <div class="fl gh f1">{icon('users', 34, ACC)}<b>Laj · sèks</b><div class="rg"><div class="rk"></div><i class="h a"></i><i class="h b"></i></div><span class="ch">18 – 45 · Tout</span></div>
+      <div class="fl gh f2">{icon('heart', 34, ACC)}<b>Enterè</b><span class="ch c0">Bote</span><span class="ch c1">Kizin</span><span class="ch c2">Fòmasyon</span></div></div>
+    <div class="card gh cu"><div class="lab">Pita: moun ki deja konnen w</div>
       <div class="cr r0">{icon('message-circle', 32, INK2)} Moun ki te ekri w</div><div class="cr r1">{icon('play', 32, INK2)} Moun ki te gade videyo w</div></div>"""
     css = f"""
     & .pn {{ left: 170px; top: 170px; width: 1000px; padding: 40px 44px; }}
@@ -165,8 +165,8 @@ def broad(c):
 
 def budget(c):
     body = f"""
-    <div class="card o0"><div class="bd">{icon('calendar', 40, '#fff')} REKOMANDE</div><div class="lab">Bidjè pa jou</div><div class="v"><span class="num">5</span> $ / jou</div><div class="d">Pi fasil pou kontwole</div></div>
-    <div class="card o1"><div class="lab">Bidjè pou tout kanpay la</div><div class="v sm">Total + dat fen</div><div class="d">Facebook separe l sou jou yo</div></div>
+    <div class="card gh o0"><div class="bd">{icon('calendar', 40, '#fff')} REKOMANDE</div><div class="lab">Bidjè pa jou</div><div class="v"><span class="num">5</span> $ / jou</div><div class="d">Pi fasil pou kontwole</div></div>
+    <div class="card gh o1"><div class="lab">Bidjè pou tout kanpay la</div><div class="v sm">Total + dat fen</div><div class="d">Facebook separe l sou jou yo</div></div>
     <div class="calc"><span class="pill">5 a 10 $ / jou</span><b>×</b><span class="pill">5 jou</span><b>=</b><span class="pill res">ase chif pou aprann</span></div>"""
     css = f"""
     & .o0, & .o1 {{ top: 210px; width: 640px; height: 400px; padding: 50px; }} & .o0 {{ left: 250px; outline: 5px solid {GOOD}; outline-offset: -5px; }} & .o1 {{ left: 1030px; }}

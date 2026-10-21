@@ -63,7 +63,7 @@
   <path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25" />
   <circle cx="18" cy="20" r="2" />
   <circle cx="8" cy="20" r="2" />
-</svg><span>Vant</span><b>4</b></div></div><div class="card mc"><div class="term">ROAS</div><div class="full">KÒB KI RANTRE ÷ KÒB PIBLISITE</div><div class="def">Konbyen kòb piblisite a fè rantre pou chak dola ou mete.</div><div class="fm"><span class="f0">4 × 25 $</span><span class="f1 op">=</span><span class="f2">100 $</span><span class="f3 op">÷</span><span class="f4">20 $</span><span class="f5 op">=</span><span class="rs">5</span></div></div><div class="side"><div class="card pf"><div class="lab">ROAS se pa benefis</div>
+</svg><span>Vant</span><b>4</b></div></div><div class="card gh mc"><div class="term">ROAS</div><div class="full">KÒB KI RANTRE ÷ KÒB PIBLISITE</div><div class="def">Konbyen kòb piblisite a fè rantre pou chak dola ou mete.</div><div class="fm"><span class="f0">4 × 25 $</span><span class="f1 op">=</span><span class="f2">100 $</span><span class="f3 op">÷</span><span class="f4">20 $</span><span class="f5 op">=</span><span class="rs">5</span></div></div><div class="side"><div class="card gh pf"><div class="lab">ROAS se pa benefis</div>
         <div class="ln l0"><span>Benefis sou chak sak, anvan piblisite</span><b>10 $</b></div>
         <div class="ln l1"><span>Kou pa vant ou (CPA)</span><b>5 $</b></div>
         <div class="ok"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -81,9 +81,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -97,6 +98,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     pop(q(".mc"), 0.6); tl.fromTo(qa(".fm > span"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .3, stagger: .18, ease: "expo.out" }, 5.49); pulse(q(".rs"), 10.84);
     pop(q(".pf"), 14.33); up(q(".l0"), 22.01); up(q(".l1"), 24.65); pop(q(".ok"), 27.75);

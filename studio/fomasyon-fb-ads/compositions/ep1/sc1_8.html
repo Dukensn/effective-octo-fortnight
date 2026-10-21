@@ -77,9 +77,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -93,6 +94,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     up(q(".ttl"), 0.6); tl.fromTo(qa(".ad"), { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: .5, ease: "expo.out", stagger: .12 }, 1.05);
     grow(qa(".f0"), 13.33); grow(qa(".f1"), 14.9); grow(qa(".f2"), 17.25);

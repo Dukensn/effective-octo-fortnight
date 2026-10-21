@@ -33,25 +33,25 @@
   <div id="sc4_9" data-composition-id="sc4_9" data-width="1920" data-height="1080" data-duration="19.58">
     <div class="clip" data-start="0" data-duration="19.58" data-track-index="0" style="position:absolute;inset:0">
       <div class="bg"></div><div class="dots"></div>
-      <div class="stage"><div class="h1 ttl">Ou fèk aprann baz Facebook Ads</div><div class="card m m0" style="left:160px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="stage"><div class="h1 ttl">Ou fèk aprann baz Facebook Ads</div><div class="card gh m m0" style="left:160px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
   <circle cx="12" cy="12" r="3" />
 </svg><div class="t">Kòman yon vant fèt</div><div class="ck"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
   <path d="M20 6 9 17l-5-5" />
-</svg></div></div><div class="card m m1" style="left:570px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div></div><div class="card gh m m1" style="left:570px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
   <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
   <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
 </svg><div class="t">Kòman platfòm nan mache</div><div class="ck"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
   <path d="M20 6 9 17l-5-5" />
-</svg></div></div><div class="card m m2" style="left:980px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div></div><div class="card gh m m2" style="left:980px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 3v16a2 2 0 0 0 2 2h16" />
   <path d="M18 17V9" />
   <path d="M13 17V5" />
   <path d="M8 17v-3" />
 </svg><div class="t">Kòman pou li chif yo</div><div class="ck"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
   <path d="M20 6 9 17l-5-5" />
-</svg></div></div><div class="card m m3" style="left:1390px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div></div><div class="card gh m m3" style="left:1390px"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
   <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
   <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
@@ -71,9 +71,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -87,6 +88,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     up(q(".ttl"), 0.6);pop(q(".m0"), 2.93); pop(q(".m0 .ck"), 2.93 + .3);pop(q(".m1"), 4.39); pop(q(".m1 .ck"), 4.39 + .3);pop(q(".m2"), 6.94); pop(q(".m2 .ck"), 6.94 + .3);pop(q(".m3"), 8.84); pop(q(".m3 .ck"), 8.84 + .3);up(q(".rule .a"), 14.31); up(q(".rule .b"), 15.33); up(q(".rule .c"), 16.71);
     tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 2.79);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 2.93);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 4.25);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.39);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 6.07);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.21);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 7.680000000000001);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 7.82);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 10.889999999999999);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 11.03);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 14.17);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 14.31);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 16.28);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 16.42);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 18.98);

@@ -34,20 +34,20 @@
   <div id="sc2_11" data-composition-id="sc2_11" data-width="1920" data-height="1080" data-duration="23.04">
     <div class="clip" data-start="0" data-duration="23.04" data-track-index="0" style="position:absolute;inset:0">
       <div class="bg"></div><div class="dots"></div>
-      <div class="stage"><div class="h1 ttl">An rezime</div><div class="lst"><div class="it i0"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="stage"><div class="h1 ttl">An rezime</div><div class="lst"><div class="it gh i0"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <circle cx="12" cy="12" r="10" />
   <circle cx="12" cy="12" r="6" />
   <circle cx="12" cy="12" r="2" />
-</svg></span>Kanpay: sa w vle</div><div class="it i1"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></span>Kanpay: sa w vle</div><div class="it gh i1"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
   <path d="M16 3.128a4 4 0 0 1 0 7.744" />
   <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
   <circle cx="9" cy="7" r="4" />
-</svg></span>Ansanm: kiyès, ki kote, konbyen</div><div class="it i2"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></span>Ansanm: kiyès, ki kote, konbyen</div><div class="it gh i2"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
   <circle cx="9" cy="9" r="2" />
   <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-</svg></span>Piblisite: sa moun yo wè</div><div class="it i3"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></span>Piblisite: sa moun yo wè</div><div class="it gh i3"><span><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="10" x2="14" y1="2" y2="2" />
   <line x1="12" x2="15" y1="14" y2="11" />
   <circle cx="12" cy="14" r="8" />
@@ -64,9 +64,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -80,6 +81,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     up(q(".ttl"), 0.6);up(q(".i0"), 1.46);up(q(".i1"), 3.33);up(q(".i2"), 3.88);up(q(".i3"), 9.73);pop(q(".nx"), 18.94);
     tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 3.19);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 3.33);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 6.24);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.38);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 9.59);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 9.73);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 13.1);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.24);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 15.209999999999999);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 15.35);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 18.49);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 18.63);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 22.44);

@@ -36,16 +36,16 @@
   <div id="sc3_10" data-composition-id="sc3_10" data-width="1920" data-height="1080" data-duration="20.73">
     <div class="clip" data-start="0" data-duration="20.73" data-track-index="0" style="position:absolute;inset:0">
       <div class="bg"></div><div class="dots"></div>
-      <div class="stage"><div class="h2 ttl">Ou rekonèt lwa lavant lan?</div><div class="col k0"><div class="ci"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="stage"><div class="h2 ttl">Ou rekonèt lwa lavant lan?</div><div class="col gh k0"><div class="ci"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
   <circle cx="12" cy="12" r="3" />
-</svg></div><div class="w">WÈ</div><div class="eq">↓</div><div class="mt">CPM</div><div class="d">pou pa twò chè</div></div><div class="col k1"><div class="ci"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div><div class="w">WÈ</div><div class="eq">↓</div><div class="mt">CPM</div><div class="d">pou pa twò chè</div></div><div class="col gh k1"><div class="ci"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M14 4.1 12 6" />
   <path d="m5.1 8-2.9-.8" />
   <path d="m6 12-1.9 2" />
   <path d="M7.2 2.2 8 5.1" />
   <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" />
-</svg></div><div class="w">ENTERESE</div><div class="eq">↓</div><div class="mt">CTR</div><div class="d">nòt piblisite a</div></div><div class="col k2"><div class="ci"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div><div class="w">ENTERESE</div><div class="eq">↓</div><div class="mt">CTR</div><div class="d">nòt piblisite a</div></div><div class="col gh k2"><div class="ci"><svg viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18" />
   <path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25" />
   <circle cx="18" cy="20" r="2" />
@@ -63,9 +63,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -79,6 +80,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     up(q(".ttl"), 0.6);
     pop(q(".k0"), 2.74); pop(q(".k1"), 5.98); pop(q(".k2"), 8.12);

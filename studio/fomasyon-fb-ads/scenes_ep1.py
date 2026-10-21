@@ -37,7 +37,7 @@ def hook(c):
 def plan(c):
     items = [("1", "eye", "Kòman yon vant fèt, ak mache piblisite a", "Premye"), ("2", "layers", "Kòman Facebook Ads mache anndan l", "Dezyèm"),
              ("3", "chart-column", "Chif yo: CPM, CPC, CTR", "Twazyèm"), ("4", "rocket", "Kreye epi lanse premye piblisite ou", "Katriyèm")]
-    cards = "".join(f'<div class="card c{k}" style="left:{140 + k * 418}px"><div class="no">{n}</div><div class="ic">{icon(ic, 64, ACC)}</div><div class="t">{t}</div></div>'
+    cards = "".join(f'<div class="card gh c{k}" style="left:{140 + k * 418}px"><div class="no">{n}</div><div class="ic">{icon(ic, 64, ACC)}</div><div class="t">{t}</div></div>'
                     for k, (n, ic, t, _) in enumerate(items))
     body = f'<div class="h1 title">Seri a: 4 videyo</div>{cards}'
     css = f"""
@@ -53,8 +53,8 @@ def plan(c):
 
 
 def _steps_html(labels, icons_, top=330):
-    return "".join(f'<div class="st s{k}" style="left:{180 + k * 560}px; top:{top}px"><div class="ci">{icon(ic, 96, "#fff")}</div><div class="w">{w}</div><div class="d">{d}</div></div>'
-                   + (f'<div class="ar a{k}" style="left:{180 + k * 560 + 330}px; top:{top + 70}px"><svg width="190" height="40"><path d="M5 20 H170 M150 6 L172 20 L150 34" fill="none" stroke="{LINE}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' if k < 2 else "")
+    return "".join(f'<div class="st gh s{k}" style="left:{180 + k * 560}px; top:{top}px"><div class="ci">{icon(ic, 96, "#fff")}</div><div class="w">{w}</div><div class="d">{d}</div></div>'
+                   + (f'<div class="ar gh a{k}" style="left:{180 + k * 560 + 330}px; top:{top + 70}px"><svg width="190" height="40"><path d="M5 20 H170 M150 6 L172 20 L150 34" fill="none" stroke="{LINE}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' if k < 2 else "")
                    for k, ((w, d), ic) in enumerate(zip(labels, icons_)))
 
 
@@ -82,7 +82,7 @@ def law(c):
 
 def funnel(c):
     rows = [("10 000", "moun wè", 1180, "eye"), ("200", "klike", 760, "mouse-pointer-click"), ("10", "achte", 360, "shopping-cart")]
-    body = "".join(f'<div class="fr r{k}" style="width:{w}px">{icon(ic, 46, "#fff")}<b class="num v{k}">0</b><span>{l}</span></div>' for k, (v, l, w, ic) in enumerate(rows)) + \
+    body = "".join(f'<div class="fr gh r{k}" style="width:{w}px">{icon(ic, 46, "#fff")}<b class="num v{k}">0</b><span>{l}</span></div>' for k, (v, l, w, ic) in enumerate(rows)) + \
         '<div class="pc p0 pill">× 2 %</div><div class="pc p1 pill">× 5 %</div>' + \
         '<div class="eq">Vant = moun ki wè × % ki enterese × % ki achte</div>'
     css = f"""
@@ -94,7 +94,7 @@ def funnel(c):
     & .p0 {{ top: 330px; }} & .p1 {{ top: 520px; }}
     & .eq {{ position: absolute; left: 0; right: 0; top: 760px; text-align: center; font: 700 36px/1 "Inter"; color: {INK2}; }}"""
     js = f"""
-    growX = function (s, t) {{ tl.fromTo(s, {{ opacity: 0, scaleX: .4 }}, {{ opacity: 1, scaleX: 1, duration: .5, ease: "expo.out" }}, t); }};
+    growX = function (s, t) {{ tl.fromTo(s, {{ opacity: G, scaleX: .4 }}, {{ opacity: 1, scaleX: 1, duration: .5, ease: "expo.out" }}, t); }};
     growX(q(".r0"), {c.cue('dis mil')}); count(".v0", 0, 10000, {c.cue('dis mil')}, .8);
     pop(q(".p0"), {c.cue('de pousan')}); growX(q(".r1"), {c.cue('desan')}); count(".v1", 0, 200, {c.cue('desan')}, .6);
     pop(q(".p1"), {c.cue('senk pousan')}); growX(q(".r2"), {c.cue('dis vant')}); count(".v2", 0, 10, {c.cue('dis vant')}, .5);
@@ -104,7 +104,7 @@ def funnel(c):
 
 def levers(c):
     k3 = [("Fè plis moun WÈ", "plis moun"), ("Fè plis moun ENTERESE", "pi bon piblisite"), ("Fè plis moun ACHTE", "pi bon òf, pri, repons")]
-    dials = "".join(f'<div class="dl d{k}" style="left:{210 + k * 540}px"><svg width="260" height="260" viewBox="0 0 260 260"><circle cx="130" cy="130" r="110" fill="#fff" stroke="{LINE}" stroke-width="14"/>'
+    dials = "".join(f'<div class="dl gh d{k}" style="left:{210 + k * 540}px"><svg width="260" height="260" viewBox="0 0 260 260"><circle cx="130" cy="130" r="110" fill="#fff" stroke="{LINE}" stroke-width="14"/>'
                     f'<path class="arc" d="M52 208 A110 110 0 1 1 208 208" fill="none" stroke="{ACC}" stroke-width="14" stroke-linecap="round"/>'
                     f'<g class="nd"><line x1="130" y1="130" x2="130" y2="44" stroke="{INK}" stroke-width="12" stroke-linecap="round"/></g><circle cx="130" cy="130" r="18" fill="{INK}"/></svg>'
                     f'<div class="t">{t}</div><div class="d">{d}</div></div>' for k, (t, d) in enumerate(k3))
@@ -125,8 +125,8 @@ def levers(c):
 
 def measure(c):
     body = f"""
-    <div class="card l"><div class="ic">{icon('store', 90, INK2)}</div><div class="h2">Nan mache a</div><div class="q">? moun</div><div class="d">ou pa konnen konbyen moun ki pase</div></div>
-    <div class="card r"><div class="hd">{icon('brand-facebook', 40, FB)} <b>Facebook</b></div>
+    <div class="card gh l"><div class="ic">{icon('store', 90, INK2)}</div><div class="h2">Nan mache a</div><div class="q">? moun</div><div class="d">ou pa konnen konbyen moun ki pase</div></div>
+    <div class="card gh r"><div class="hd">{icon('brand-facebook', 40, FB)} <b>Facebook</b></div>
       <div class="row r0">{icon('eye', 40, INK2)}<span>Moun ki wè</span><b class="num v0">0</b></div>
       <div class="row r1">{icon('mouse-pointer-click', 40, INK2)}<span>Moun ki klike</span><b class="num v1">0</b></div>
       <div class="row r2">{icon('message-circle', 40, INK2)}<span>Moun ki ekri w</span><b class="num v2">0</b></div></div>
@@ -220,9 +220,9 @@ def compare(c):
 def where(c):
     body = f"""
     <div class="h2 ttl">Kote moun ki ka <span class="acc">achte</span> ou yo ye · kote ou ka <span class="acc">delivre</span></div>
-    <div class="card l"><div class="lab">Pwodwi fizik</div><div class="map"><div class="ring r2"></div><div class="ring r1"></div><div class="pin">{icon('map-pin', 70, ACC, 2.4)}</div></div>
+    <div class="card gh l"><div class="lab">Pwodwi fizik</div><div class="map"><div class="ring r2"></div><div class="ring r1"></div><div class="pin">{icon('map-pin', 70, ACC, 2.4)}</div></div>
       <div class="nm">Pòtoprens + zòn livrezon</div></div>
-    <div class="card r"><div class="lab">Pwodwi dijital</div><div class="glob">{icon('globe', 170, LINE, 1.2)}</div>
+    <div class="card gh r"><div class="lab">Pwodwi dijital</div><div class="glob">{icon('globe', 170, LINE, 1.2)}</div>
       <div class="cs"><span class="pill x0">Ozetazini</span><span class="pill x1">Kanada</span><span class="pill x2">Lafrans</span></div>
       <div class="warn pill">{icon('badge-dollar-sign', 30, '#fff')} Pi chè pou yo wè w</div></div>"""
     css = f"""
@@ -246,7 +246,7 @@ def where(c):
 
 def recap(c, items, nxt):
     """items: [(icon, text, cue)], nxt: teaser of the next video (or None)"""
-    rows = "".join(f'<div class="it i{k}"><span>{icon(ic, 40, "#fff")}</span>{t}</div>' for k, (ic, t, _) in enumerate(items))
+    rows = "".join(f'<div class="it gh i{k}"><span>{icon(ic, 40, "#fff")}</span>{t}</div>' for k, (ic, t, _) in enumerate(items))
     nx = f'<div class="card nx"><div class="lab">Pwochen videyo</div><div class="h2">{nxt[0]}</div></div>' if nxt else ""
     body = f'<div class="h1 ttl">An rezime</div><div class="lst">{rows}</div>{nx}'
     css = f"""

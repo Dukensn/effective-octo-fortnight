@@ -74,9 +74,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -90,6 +91,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     pop(q(".tb"), 0.6); fade(qa(".th > div"), 5.43);up(q(".t0 .c1"), 7.4); pop(q(".t0 .c2"), 7.4 + .1); pop(q(".t0 .c3"), 7.4 + .25);up(q(".t1 .c1"), 12.72); pop(q(".t1 .c2"), 12.72 + .1); pop(q(".t1 .c3"), 12.72 + .25);up(q(".t2 .c1"), 15.01); pop(q(".t2 .c2"), 15.01 + .1); pop(q(".t2 .c3"), 15.01 + .25);up(q(".t3 .c1"), 16.73); pop(q(".t3 .c2"), 16.73 + .1); pop(q(".t3 .c3"), 16.73 + .25);pop(q(".cap"), 19.36);
     tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 3.9);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.04);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 7.990000000000001);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 8.13);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 10.29);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 10.43);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 11.43);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 11.57);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 13.24);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.38);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 15.78);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 15.92);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 19.22);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 19.36);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 22.44);

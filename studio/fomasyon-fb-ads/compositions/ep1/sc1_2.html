@@ -35,19 +35,19 @@
   <div id="sc1_2" data-composition-id="sc1_2" data-width="1920" data-height="1080" data-duration="17.65">
     <div class="clip" data-start="0" data-duration="17.65" data-track-index="0" style="position:absolute;inset:0">
       <div class="bg"></div><div class="dots"></div>
-      <div class="stage"><div class="h1 title">Seri a: 4 videyo</div><div class="card c0" style="left:140px"><div class="no">1</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="stage"><div class="h1 title">Seri a: 4 videyo</div><div class="card gh c0" style="left:140px"><div class="no">1</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
   <circle cx="12" cy="12" r="3" />
-</svg></div><div class="t">Kòman yon vant fèt, ak mache piblisite a</div></div><div class="card c1" style="left:558px"><div class="no">2</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div><div class="t">Kòman yon vant fèt, ak mache piblisite a</div></div><div class="card gh c1" style="left:558px"><div class="no">2</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
   <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
   <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg></div><div class="t">Kòman Facebook Ads mache anndan l</div></div><div class="card c2" style="left:976px"><div class="no">3</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div><div class="t">Kòman Facebook Ads mache anndan l</div></div><div class="card gh c2" style="left:976px"><div class="no">3</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 3v16a2 2 0 0 0 2 2h16" />
   <path d="M18 17V9" />
   <path d="M13 17V5" />
   <path d="M8 17v-3" />
-</svg></div><div class="t">Chif yo: CPM, CPC, CTR</div></div><div class="card c3" style="left:1394px"><div class="no">4</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg></div><div class="t">Chif yo: CPM, CPC, CTR</div></div><div class="card gh c3" style="left:1394px"><div class="no">4</div><div class="ic"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
   <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
   <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
@@ -65,9 +65,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -81,6 +82,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     up(q(".title"), 0.6);pop(q(".c0"), 2.21);pop(q(".c1"), 6.71);pop(q(".c2"), 10.01);pop(q(".c3"), 13.24);tl.to(qa(".card:not(.c0)"), { opacity: .45, duration: .4 }, 16.27);
     tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 2.07);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 2.21);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 4.180000000000001);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 4.32);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 6.57);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 6.71);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 9.87);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 10.01);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 12.26);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 12.4);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 13.1);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.24);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 17.05);

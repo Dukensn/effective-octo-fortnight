@@ -38,7 +38,7 @@
   <div id="sc4_3" data-composition-id="sc4_3" data-width="1920" data-height="1080" data-duration="24.58">
     <div class="clip" data-start="0" data-duration="24.58" data-track-index="0" style="position:absolute;inset:0">
       <div class="bg"></div><div class="dots"></div>
-      <div class="stage"><div class="lab ttl">Estrikti yon videyo piblisite</div><div class="tl"><div class="sg g0" style="background:#D97757"><small>0 – 3 s</small><b>Kwòk</b><span>Yon fraz oswa yon imaj ki kenbe moun</span></div><div class="sg g1" style="background:#1B1A18"><small></small><b>Pwodwi an aksyon</b><span>Montre l k ap travay</span></div><div class="sg g2" style="background:#3D3A35"><small></small><b>Sou-tit</b><span>Anpil moun gade san son</span></div><div class="sg g3" style="background:#2F9E6B"><small></small><b>Aksyon klè</b><span>« Ekri nou sou WhatsApp »</span></div></div>
+      <div class="stage"><div class="lab ttl">Estrikti yon videyo piblisite</div><div class="tl"><div class="sg gh g0" style="background:#D97757"><small>0 – 3 s</small><b>Kwòk</b><span>Yon fraz oswa yon imaj ki kenbe moun</span></div><div class="sg gh g1" style="background:#1B1A18"><small></small><b>Pwodwi an aksyon</b><span>Montre l k ap travay</span></div><div class="sg gh g2" style="background:#3D3A35"><small></small><b>Sou-tit</b><span>Anpil moun gade san son</span></div><div class="sg gh g3" style="background:#2F9E6B"><small></small><b>Aksyon klè</b><span>« Ekri nou sou WhatsApp »</span></div></div>
     <div class="fmts"><div class="fm v"><div class="sh"></div><b>9:16</b><span>Reels · Stories</span></div><div class="fm p"><div class="sh"></div><b>4:5</b><span>Fil la</span></div>
       <div class="du pill"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="10" x2="14" y1="2" y2="2" />
@@ -57,9 +57,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -73,8 +74,9 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
-    up(q(".ttl"), 0.6);tl.fromTo(q(".g0"), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 4.6);tl.fromTo(q(".g1"), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 6.71);tl.fromTo(q(".g2"), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 7.92);tl.fromTo(q(".g3"), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 12.14);pop(q(".v"), 16.36); pop(q(".p"), 19.31); pop(q(".du"), 21.49);
+    up(q(".ttl"), 0.6);tl.fromTo(q(".g0"), { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 4.6);tl.fromTo(q(".g1"), { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 6.71);tl.fromTo(q(".g2"), { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 7.92);tl.fromTo(q(".g3"), { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: .45, ease: "expo.out" }, 12.14);pop(q(".v"), 16.36); pop(q(".p"), 19.31); pop(q(".du"), 21.49);
     tl.fromTo(q(".sub .s0"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 0.6);tl.to(q(".sub .s0"), {opacity:0, duration:.1}, 1.67);tl.fromTo(q(".sub .s1"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 1.81);tl.to(q(".sub .s1"), {opacity:0, duration:.1}, 4.91);tl.fromTo(q(".sub .s2"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 5.05);tl.to(q(".sub .s2"), {opacity:0, duration:.1}, 7.4);tl.fromTo(q(".sub .s3"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 7.54);tl.to(q(".sub .s3"), {opacity:0, duration:.1}, 10.79);tl.fromTo(q(".sub .s4"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 10.93);tl.to(q(".sub .s4"), {opacity:0, duration:.1}, 12.91);tl.fromTo(q(".sub .s5"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 13.05);tl.to(q(".sub .s5"), {opacity:0, duration:.1}, 15.24);tl.fromTo(q(".sub .s6"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 15.38);tl.to(q(".sub .s6"), {opacity:0, duration:.1}, 18.79);tl.fromTo(q(".sub .s7"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 18.93);tl.to(q(".sub .s7"), {opacity:0, duration:.1}, 21.05);tl.fromTo(q(".sub .s8"), {opacity:0, y:12}, {opacity:1, y:0, duration:.18, ease:"power2.out"}, 21.19);tl.to(q(".sub .s8"), {opacity:0, duration:.1}, 23.98);
     tl.to(q(".stage"), { opacity: 0, filter: "blur(8px)", duration: .25, ease: "power2.in" }, T - 0.25);
     window.__timelines = window.__timelines || {};

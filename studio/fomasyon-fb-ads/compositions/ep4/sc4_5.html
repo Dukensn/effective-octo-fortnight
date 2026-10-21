@@ -51,9 +51,9 @@
   <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
 </svg></div>
       <div class="ft"><div><small>WhatsApp</small><b class="hd">Sak an kwi · livrezon gratis</b></div><span class="bt">Voye mesaj</span></div></div>
-    <div class="lb b0"><span>1</span><div><b>Tèks prensipal</b>Premye liy lan se tout bagay</div></div>
-    <div class="lb b1"><span>2</span><div><b>Tit</b>Kout, ak benefis la</div></div>
-    <div class="lb b2"><span>3</span><div><b>Bouton</b>Voye mesaj · Achte · Enskri</div></div>
+    <div class="lb gh b0"><span>1</span><div><b>Tèks prensipal</b>Premye liy lan se tout bagay</div></div>
+    <div class="lb gh b1"><span>2</span><div><b>Tit</b>Kout, ak benefis la</div></div>
+    <div class="lb gh b2"><span>3</span><div><b>Bouton</b>Voye mesaj · Achte · Enskri</div></div>
     <svg class="ld" width="1920" height="1080"><path class="p0" d="M1010 330 H1180" /><path class="p1" d="M1000 805 H1180" /><path class="p2" d="M1120 805 V880 H1180" /></svg></div>
       <div class="top"><div class="chip-ep"><b>VIDEYO 4</b>KREYE EPI LANSE PREMYE PIBLISITE OU</div><div class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1B1A18"/><path d="M27 77 L50 23 L73 77" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="51" width="16" height="16" rx="3.5" fill="#D97757"/></svg>
 ATELYE DIJITAL</div></div>
@@ -67,9 +67,10 @@ ATELYE DIJITAL</div></div>
     
 var R = document.getElementById(SID), q = function (s) { return R.querySelector(s); }, qa = function (s) { return Array.prototype.slice.call(R.querySelectorAll(s)); };
 var tl = gsap.timeline({ paused: true });
-function pop(s, t, d) { tl.fromTo(s, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
-function up(s, t, d) { tl.fromTo(s, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
-function fade(s, t, d) { tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
+var G = function (i, el) { return el && el.classList && el.classList.contains("gh") ? .14 : 0; };
+function pop(s, t, d) { tl.fromTo(s, { opacity: G, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: d || 0.35, ease: "expo.out" }, t); }
+function up(s, t, d) { tl.fromTo(s, { opacity: G, y: 40 }, { opacity: 1, y: 0, duration: d || 0.45, ease: "expo.out" }, t); }
+function fade(s, t, d) { tl.fromTo(s, { opacity: G }, { opacity: 1, duration: d || 0.4, ease: "power2.out" }, t); }
 function out(s, t, d) { tl.to(s, { opacity: 0, duration: d || 0.3, ease: "power2.in" }, t); }
 function grow(s, t, d, o) { tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: o || "0% 50%" }, t); }
 function growY(s, t, d) { tl.fromTo(s, { scaleY: 0 }, { scaleY: 1, duration: d || 0.6, ease: "expo.out", transformOrigin: "50% 100%" }, t); }
@@ -83,6 +84,7 @@ function draw(s, t, d) { qa(s).forEach(function (p) { var L = p.getTotalLength ?
 
     tl.fromTo(q(".dots"), { x: 0, y: 0 }, { x: -22, y: -14, duration: T, ease: "none" }, 0);
     tl.fromTo(q(".stage"), { scale: 1 }, { scale: 1.025, duration: T, ease: "none", transformOrigin: "50% 45%" }, 0);
+    tl.fromTo(qa(".gh"), { opacity: 0 }, { opacity: .14, duration: .5, ease: "power2.out" }, .25);   // the layout shows as a ghost, parts light up on their word
     tl.fromTo(q(".top"), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out" }, 0.05);
     pop(q(".post"), 0.6);
     up(q(".b0"), 2.92); draw(".ld .p0", 2.92, .5); tl.to(q(".pt .l1"), { backgroundColor: "#F7DCCF", duration: .3 }, 4.79);

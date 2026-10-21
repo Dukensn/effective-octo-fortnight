@@ -5,7 +5,7 @@ from engine import icon, INK, INK2, MUTE, LINE, ACC, ACCD, ACCP, GOOD, WARN, BAD
 def card(c):
     body = f"""
     <div class="vc"><div class="chip"></div><div class="nm">KAT DEBI VITYÈL</div><div class="no">•••• •••• •••• 4821</div><div class="br">{icon('brand-visa', 70, '#fff')}{icon('brand-mastercard', 60, '#fff')}</div></div>
-    <div class="card nb"><div class="lab">Kat bank lokal</div><div class="x">{icon('x', 44, BAD, 3)} Souvan pa mache sou entènèt an dola</div></div>
+    <div class="card gh nb"><div class="lab">Kat bank lokal</div><div class="x">{icon('x', 44, BAD, 3)} Souvan pa mache sou entènèt an dola</div></div>
     <div class="flow"><span class="pill f0">{icon('smartphone', 30, INK)} Kat la sou telefòn ou</span><span class="pill f1">{icon('wallet', 30, INK)} Mete kòb sou li</span><span class="pill f2">{icon('credit-card', 30, INK)} Anrejistre l nan Ads Manager</span></div>
     <div class="card id"><div class="lab">Prepare yon pyès idantite</div><div class="ids"><span class="pill i0">{icon('id-card', 30, ACC)} Kat idantite</span><span class="pill i1">{icon('book-open', 30, ACC)} Paspò</span><span class="pill i2">{icon('id-card', 30, ACC)} Lisans</span></div></div>"""
     css = f"""
@@ -52,7 +52,7 @@ def hookrule(c):
 def video(c):
     segs = [("0 – 3 s", "Kwòk", "Yon fraz oswa yon imaj ki kenbe moun", "kenbe moun", ACC), ("", "Pwodwi an aksyon", "Montre l k ap travay", "an aksyon", INK),
             ("", "Sou-tit", "Anpil moun gade san son", "sou-tit", "#3D3A35"), ("", "Aksyon klè", "« Ekri nou sou WhatsApp »", "aksyon klè", GOOD)]
-    tl_ = "".join(f'<div class="sg g{k}" style="background:{col}"><small>{a}</small><b>{t}</b><span>{d}</span></div>' for k, (a, t, d, _, col) in enumerate(segs))
+    tl_ = "".join(f'<div class="sg gh g{k}" style="background:{col}"><small>{a}</small><b>{t}</b><span>{d}</span></div>' for k, (a, t, d, _, col) in enumerate(segs))
     body = f"""<div class="lab ttl">Estrikti yon videyo piblisite</div><div class="tl">{tl_}</div>
     <div class="fmts"><div class="fm v"><div class="sh"></div><b>9:16</b><span>Reels · Stories</span></div><div class="fm p"><div class="sh"></div><b>4:5</b><span>Fil la</span></div>
       <div class="du pill">{icon('timer', 32, '#fff')} 15 – 30 segonn</div></div>"""
@@ -66,7 +66,7 @@ def video(c):
     & .v .sh {{ width: 160px; height: 284px; }} & .p .sh {{ width: 200px; height: 250px; }}
     & .fm b {{ display: block; font: 900 44px/1 "InterD"; }} & .fm span {{ font: 600 24px/1 "Inter"; color: {INK2}; }}
     & .du {{ margin-left: auto; margin-bottom: 40px; background: {INK}; color: #fff; font-size: 34px; }}"""
-    js = f'up(q(".ttl"), {c.at(0)});' + "".join(f'tl.fromTo(q(".g{k}"), {{ opacity: 0, y: 40 }}, {{ opacity: 1, y: 0, duration: .45, ease: "expo.out" }}, {c.cue(w)});' for k, (_, _, _, w, _) in enumerate(segs)) + \
+    js = f'up(q(".ttl"), {c.at(0)});' + "".join(f'tl.fromTo(q(".g{k}"), {{ opacity: G, y: 40 }}, {{ opacity: 1, y: 0, duration: .45, ease: "expo.out" }}, {c.cue(w)});' for k, (_, _, _, w, _) in enumerate(segs)) + \
         f'pop(q(".v"), {c.cue("nèf sou sèz")}); pop(q(".p"), {c.cue("kat sou senk")}); pop(q(".du"), {c.cue("kenz ak trant")});'
     return body, css, js
 
@@ -99,9 +99,9 @@ def anatomy(c):
       <div class="pt"><span class="l1">Ou bouke chèche yon sak ki dire?</span> Sak nou yo fèt ak kwi, a la men, nan Pòtoprens... <u>Wè plis</u></div>
       <div class="im">{icon('image', 90, LINE, 1.5)}</div>
       <div class="ft"><div><small>WhatsApp</small><b class="hd">Sak an kwi · livrezon gratis</b></div><span class="bt">Voye mesaj</span></div></div>
-    <div class="lb b0"><span>1</span><div><b>Tèks prensipal</b>Premye liy lan se tout bagay</div></div>
-    <div class="lb b1"><span>2</span><div><b>Tit</b>Kout, ak benefis la</div></div>
-    <div class="lb b2"><span>3</span><div><b>Bouton</b>Voye mesaj · Achte · Enskri</div></div>
+    <div class="lb gh b0"><span>1</span><div><b>Tèks prensipal</b>Premye liy lan se tout bagay</div></div>
+    <div class="lb gh b1"><span>2</span><div><b>Tit</b>Kout, ak benefis la</div></div>
+    <div class="lb gh b2"><span>3</span><div><b>Bouton</b>Voye mesaj · Achte · Enskri</div></div>
     <svg class="ld" width="1920" height="1080"><path class="p0" d="M1010 330 H1180" /><path class="p1" d="M1000 805 H1180" /><path class="p2" d="M1120 805 V880 H1180" /></svg>"""
     css = f"""
     & .post {{ left: 380px; top: 170px; width: 700px; padding: 28px; }}
@@ -170,8 +170,8 @@ def first72(c):
       <div class="mk m0"><b>0 è</b><span>Lansman</span></div><div class="mk m1"><b>24 è</b><span>Gade CPM ak CTR</span></div><div class="mk m2"><b>72 è</b><span>Gade kou pa rezilta</span></div>
       <div class="lock pill">{icon('shield-check', 30, '#fff')} Pa manyen anyen pandan 3 jou</div></div>
     <div class="dc">
-      <div class="card d0"><div class="lab">Si CTR ba</div><div class="h2">{icon('refresh-cw', 40, ACC)} Chanje piblisite a</div></div>
-      <div class="card d1"><div class="lab">Si kou pa rezilta anba limit ou</div><div class="h2">{icon('trending-up', 40, GOOD)} Ogmante bidjè a dousman</div><div class="rl">+20 % maksimòm, chak 2 a 3 jou</div></div></div>"""
+      <div class="card gh d0"><div class="lab">Si CTR ba</div><div class="h2">{icon('refresh-cw', 40, ACC)} Chanje piblisite a</div></div>
+      <div class="card gh d1"><div class="lab">Si kou pa rezilta anba limit ou</div><div class="h2">{icon('trending-up', 40, GOOD)} Ogmante bidjè a dousman</div><div class="rl">+20 % maksimòm, chak 2 a 3 jou</div></div></div>"""
     css = f"""
     & .tlx {{ position: absolute; left: 200px; top: 200px; width: 1520px; height: 260px; }}
     & .bar {{ position: absolute; left: 0; right: 0; top: 60px; height: 12px; border-radius: 6px; background: {INK}; transform-origin: 0 50%; }}
@@ -191,7 +191,7 @@ def first72(c):
 def final(c):
     m = [("eye", "Kòman yon vant fèt", "Kòman yon vant"), ("layers", "Kòman platfòm nan mache", "Kòman platfòm"), ("chart-column", "Kòman pou li chif yo", "li chif yo"),
          ("rocket", "Kreye ak lanse yon piblisite", "kreye ak lanse")]
-    cards = "".join(f'<div class="card m m{k}" style="left:{160 + k * 410}px">{icon(ic, 56, ACC)}<div class="t">{t}</div><div class="ck">{icon("check", 30, "#fff", 3)}</div></div>'
+    cards = "".join(f'<div class="card gh m m{k}" style="left:{160 + k * 410}px">{icon(ic, 56, ACC)}<div class="t">{t}</div><div class="ck">{icon("check", 30, "#fff", 3)}</div></div>'
                     for k, (ic, t, _) in enumerate(m))
     body = f'<div class="h1 ttl">Ou fèk aprann baz Facebook Ads</div>{cards}<div class="rule"><span class="pill a">Kòmanse piti</span><span class="pill b">Li chif ou yo</span><span class="pill c">Amelyore yon bouton alafwa</span></div>'
     css = f"""

@@ -27,7 +27,7 @@ METRIC_CSS = STRIP_CSS + f"""
 
 def metric_card(term, full, definition, formula_parts, result):
     fm = "".join(f'<span class="f{k}{" op" if p in ("÷", "×", "=") else ""}">{p}</span>' for k, p in enumerate(formula_parts))
-    return (f'<div class="card mc"><div class="term">{term}</div><div class="full">{full}</div><div class="def">{definition}</div>'
+    return (f'<div class="card gh mc"><div class="term">{term}</div><div class="full">{full}</div><div class="def">{definition}</div>'
             f'<div class="fm">{fm}<span class="rs">{result}</span></div></div>')
 
 
@@ -88,7 +88,7 @@ def reach(c):
 def cpm(c):
     body = strip(0) + metric_card("CPM", "KOU POU MIL ENPRESYON", "Pri ou peye pou piblisite a parèt 1 000 fwa. Se pri atansyon an.",
                                   ["20 $", "÷", "5 000", "×", "1 000", "="], "4 $") + \
-        f"""<div class="side"><div class="card cmp"><div class="lab">Plis konkirans → CPM pi wo</div>
+        f"""<div class="side"><div class="card gh cmp"><div class="lab">Plis konkirans → CPM pi wo</div>
         <div class="bars"><div class="b b0"><div class="f"></div><span>Ayiti</span></div><div class="b b1"><div class="f"></div><span>Ozetazini</span></div></div></div></div>"""
     css = METRIC_CSS + f"""
     & .cmp {{ padding: 36px; }} & .bars {{ display: flex; align-items: flex-end; gap: 70px; height: 380px; justify-content: center; margin-top: 20px; }}
@@ -102,7 +102,7 @@ def cpm(c):
 def ctr(c):
     body = strip(3) + metric_card("CTR", "TO KLIK · NÒT PIBLISITE A", "Pousantaj moun ki klike, pami moun ki wè piblisite a.",
                                   ["100", "÷", "5 000", "×", "100", "="], "2 %") + \
-        f"""<div class="side"><div class="card sc"><div class="lab">Repè jeneral</div>
+        f"""<div class="side"><div class="card gh sc"><div class="lab">Repè jeneral</div>
         <div class="zs"><div class="z z0">Fèb<br><b>&lt; 1 %</b></div><div class="z z1">Kòrèk<br><b>1 – 2 %</b></div><div class="z z2">Bon<br><b>&gt; 2 %</b></div></div>
         <div class="pt">▲ ou la</div></div></div>"""
     css = METRIC_CSS + f"""
@@ -117,7 +117,7 @@ def ctr(c):
 
 def cpc(c):
     body = strip(3) + metric_card("CPC", "KOU PA KLIK", "Konbyen chak klik koute w.", ["20 $", "÷", "100", "="], "0,20 $") + \
-        f"""<div class="side"><div class="card ss"><div class="lab">CTR ↑ → CPC ↓</div>
+        f"""<div class="side"><div class="card gh ss"><div class="lab">CTR ↑ → CPC ↓</div>
         <svg width="560" height="320" viewBox="0 0 560 320"><polygon points="280,250 250,300 310,300" fill="{INK}"/>
         <g class="bm"><rect x="40" y="236" width="480" height="16" rx="8" fill="{INK2}"/>
         <g transform="translate(70 120)"><rect width="140" height="110" rx="20" fill="{GOOD}"/><text x="70" y="70" text-anchor="middle" font-family="Inter" font-weight="800" font-size="38" fill="#fff">CTR</text></g>
@@ -132,7 +132,7 @@ def cpc(c):
 def cpa(c):
     body = strip(4) + metric_card("CPA", "KOU PA REZILTA", "Konbyen sa koute w pou chak rezilta: yon vant, yon mesaj, yon enskripsyon.",
                                   ["20 $", "÷", "4 vant", "="], "5 $") + \
-        f"""<div class="side"><div class="card cv"><div class="lab">To konvèsyon</div><div class="pp">{''.join('<i></i>' for _ in range(100))}</div>
+        f"""<div class="side"><div class="card gh cv"><div class="lab">To konvèsyon</div><div class="pp">{''.join('<i></i>' for _ in range(100))}</div>
         <div class="r"><b>4</b> sou 100 klik = <b>4 %</b></div></div></div>"""
     css = METRIC_CSS + f"""
     & .cv {{ padding: 36px; }} & .pp {{ display: grid; grid-template-columns: repeat(20, 1fr); gap: 8px; margin: 24px 0; }}
@@ -146,7 +146,7 @@ def cpa(c):
 def roas(c):
     body = strip() + metric_card("ROAS", "KÒB KI RANTRE ÷ KÒB PIBLISITE", "Konbyen kòb piblisite a fè rantre pou chak dola ou mete.",
                                  ["4 × 25 $", "=", "100 $", "÷", "20 $", "="], "5") + \
-        f"""<div class="side"><div class="card pf"><div class="lab">ROAS se pa benefis</div>
+        f"""<div class="side"><div class="card gh pf"><div class="lab">ROAS se pa benefis</div>
         <div class="ln l0"><span>Benefis sou chak sak, anvan piblisite</span><b>10 $</b></div>
         <div class="ln l1"><span>Kou pa vant ou (CPA)</span><b>5 $</b></div>
         <div class="ok">{icon('check', 36, '#fff', 3)} CPA anba 10 $ → ou fè lajan</div></div></div>"""
@@ -181,7 +181,7 @@ def diagnose(c):
 
 def recap3(c):
     m = [("eye", "WÈ", "CPM", "pou pa twò chè"), ("mouse-pointer-click", "ENTERESE", "CTR", "nòt piblisite a"), ("shopping-cart", "AJI", "Konvèsyon · CPA", "kou pa rezilta")]
-    cols = "".join(f'<div class="col k{k}"><div class="ci">{icon(ic, 70, "#fff")}</div><div class="w">{w}</div><div class="eq">↓</div><div class="mt">{mt}</div><div class="d">{d}</div></div>'
+    cols = "".join(f'<div class="col gh k{k}"><div class="ci">{icon(ic, 70, "#fff")}</div><div class="w">{w}</div><div class="eq">↓</div><div class="mt">{mt}</div><div class="d">{d}</div></div>'
                    for k, (ic, w, mt, d) in enumerate(m))
     body = f'<div class="h2 ttl">Ou rekonèt lwa lavant lan?</div>{cols}<div class="nx pill">Pwochen videyo · kreye epi lanse piblisite ou</div>'
     css = f"""
