@@ -273,7 +273,7 @@ p { margin: 0; }
 .pills button { border: 0; background: none; padding: 8px 14px; border-radius: 8px; font-weight: 500; color: var(--text); }
 .pills button.active { background: var(--primary); color: #fff; }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--bg); padding: 4px; border-radius: 12px; }
-.seg button { border: 0; background: none; padding: 9px; border-radius: 9px; font-weight: 500; }
+.seg button { border: 0; background: none; padding: 9px; border-radius: 9px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
 .seg button.active { background: var(--primary); color: #fff; }
 
 /* ---------------- Badges ---------------- */
@@ -745,3 +745,32 @@ html { -webkit-tap-highlight-color: transparent; }
 .composer .btn-icon { width: 46px; height: 46px; border-radius: 50%; padding: 0; }
 @media (min-width: 1024px) { .composer { left: var(--sidebar); } .composer { max-width: none; } }
 @media (max-width: 1023px) { .composer { bottom: calc(64px + env(safe-area-inset-bottom)); padding-bottom: 10px; } }
+
+/* ---------- Relances de paiement ---------- */
+.relance-model { display: flex; gap: 12px; align-items: flex-start; background: var(--bg); border-radius: 12px; padding: 12px 14px; color: var(--ink); line-height: 1.5; }
+@media (max-width: 767px) { .relance-model { flex-direction: column; } }
+
+/* ---------- Journal des modifications ---------- */
+.journal-row { border-bottom: 1px solid var(--line-2); }
+.journal-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; border: 0; background: none; text-align: left; color: var(--text); }
+.journal-head:disabled { cursor: default; opacity: 1; }
+.journal-head b { color: var(--ink); font-weight: 600; }
+.journal-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--faint); }
+.journal-dot.d-notes { background: var(--orange); }
+.journal-dot.d-finance { background: var(--green); }
+.journal-dot.d-eleves { background: var(--primary); }
+.journal-dot.d-discipline { background: var(--red); }
+.journal-dot.d-acces { background: #8b5cf6; }
+.journal-body { padding: 0 16px 14px 37px; display: flex; flex-direction: column; gap: 6px; }
+.journal-change { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; padding: 6px 10px; background: var(--bg); border-radius: 8px; }
+.journal-change s { text-decoration: line-through; }
+@media (max-width: 767px) { .journal-head { padding: 12px; } .journal-body { padding-left: 12px; } }
+
+/* ---------- Espace parent ---------- */
+.parent-tile { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; text-align: left; min-width: 0; }
+.parent-tile > svg { width: 22px; height: 22px; color: var(--primary); flex: none; }
+.parent-tile span { display: flex; flex-direction: column; min-width: 0; }
+.parent-tile b { color: var(--ink); font-size: 15px; }
+.parent-tile small { color: var(--muted); font-size: 12px; }
+@media (max-width: 380px) { .login .seg button svg { display: none; } }
+.pin-show { font-size: 34px; font-weight: 800; letter-spacing: 12px; text-align: center; color: var(--ink); background: var(--bg); border-radius: 12px; padding: 14px; font-variant-numeric: tabular-nums; }

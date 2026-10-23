@@ -90,10 +90,10 @@ export default function Palmares({ admin }: { admin?: boolean }) {
       <Modal open={actions} onClose={() => setActions(false)} title={`${classe?.code} - ${ev.titre}`}>{ActionList}</Modal>
       <Confirm open={closeAsk} onClose={() => setCloseAsk(false)} title="Clôturer le contrôle" confirmLabel="Clôturer"
         message="Après clôture, les notes ne pourront plus être modifiées par le professeur. Seule la direction pourra rouvrir le contrôle."
-        onConfirm={() => { db.patch('evaluations', ev.id, { statut: 'Clôturé' }); audit('Clôture contrôle', `${subject?.nom} ${classe?.code} ${ev.titre}`); toast('Contrôle clôturé'); }} />
+        onConfirm={() => { db.patch('evaluations', ev.id, { statut: 'Clôturé' }); audit('Clôture contrôle', `${subject?.nom} ${classe?.code} ${ev.titre}`, { domaine: 'notes' }); toast('Contrôle clôturé'); }} />
       <Modal open={hist} onClose={() => setHist(false)} title="Historique">
         {history.length === 0 ? <p className="muted small">Aucune modification enregistrée sur cet appareil.</p> : history.map((h) => (
-          <div key={h.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--line-2)' }}><b style={{ color: 'var(--ink)' }}>{h.action}</b><div className="tiny muted">{db.get('users', h.userId)?.nom ?? '—'} · {timeAgo(h.date)}</div></div>
+          <div key={h.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--line-2)' }}><b style={{ color: 'var(--ink)' }}>{h.action}</b><div className="tiny muted">{db.get('users', h.userId)?.nom ?? '—'} · {timeAgo(h.date)}</div>{h.changements?.map((c, i) => <div key={i} className="journal-change mt-4"><span className="grow">{c.libelle}</span><s className="muted">{c.avant}</s><span className="muted">→</span><b>{c.apres}</b></div>)}</div>
         ))}
         {ev.saisieLe && <p className="tiny muted mt-12">Dernière saisie : {timeAgo(ev.saisieLe)}</p>}
       </Modal>

@@ -25,6 +25,7 @@ npm run preview    # tester la version de production
 | Administration | M. Joël Méus | Censeur (présences, discipline) |
 | Professeur | M. Jean Robert | Mathématiques en S3-A, S4-A, S4-B (5e contrôle à saisir) |
 | Professeur | tous les autres professeurs | leurs matières |
+| Parent | M. Jean Dorval — téléphone 3698 7654 | Parent de Jean Philippe (S4-A) et Naomi (S2-B) |
 
 Les profils sont fictifs (photos tirées des maquettes). Paramètres → Données → « Réinitialiser la démo » remet tout à zéro.
 
@@ -36,6 +37,20 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Bulletins en 3 choix** (classe, période, modèle) ; **conseil de classe automatique** : appréciation, conduite (absences, retards, incidents), observations (matières faibles), décision ou avis du conseil.
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
+
+## Journal, relances et espace parent (version 8)
+- **Journal des modifications** (Menu → Journal) : qui, quand, quoi. Une note déjà saisie qui change garde
+  l’ancienne et la nouvelle valeur ; annuler un paiement exige un motif. Filtres par domaine, utilisateur et période,
+  export Excel. Les lignes ne se modifient ni ne se suppriment (aussi dans `firestore.rules`).
+- **Relances de paiement** (Finance → Paiements → Relances) : message personnalisable ({parent}, {eleve}, {classe},
+  {reste}, {ecole}), envoi WhatsApp ou SMS un par un pour une sélection, date et nombre de relances par élève,
+  filtre « pas relancés depuis 7 jours ».
+- **Espace parent** : connexion avec le numéro de téléphone et un code à 4 chiffres créé depuis la fiche du parent
+  (Parents → Accès parent). Le parent voit seulement ses enfants : moyennes des périodes validées par la direction,
+  contrôles corrigés, absences, discipline, devoirs, paiements et reçus.
+  Démonstration : 3698 7654, code 1234 (M. Jean Dorval, deux enfants).
+  Sur le téléphone des parents, il faudra une synchronisation filtrée (seulement leurs enfants) : les règles
+  Firestore interdisent déjà aux comptes parent de lire le reste de l’école.
 
 ## Assistant (version 7)
 Menu **Assistant** (ou ＋ → Assistant sur téléphone) : un chat où l’on écrit une demande en français ou en créole.
@@ -154,4 +169,5 @@ src/data/compute.ts    moyennes pondérées, rangs, appréciations, décisions
 src/docs/              bulletins, badges, fiches imprimables
 src/ai/                assistant (demande → commande JSON → action)
 src/pages/admin/       espace direction      src/pages/teacher/  espace professeur
+src/pages/parent/      espace parent
 ```

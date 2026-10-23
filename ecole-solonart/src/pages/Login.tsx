@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ShieldCheck, GraduationCap, WifiOff } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, GraduationCap, WifiOff, Users } from 'lucide-react';
 import { useCollection, useDoc } from '../data/store';
-import { login } from '../lib/session';
+import { login, loginParent } from '../lib/session';
 import { Avatar } from '../components/ui';
 import { SchoolLogo } from '../components/Logo';
 
@@ -9,7 +9,9 @@ export default function Login() {
   const school = useDoc('school', 'main');
   const users = useCollection('users');
   const roles = useCollection('roles');
-  const [space, setSpace] = useState<'admin' | 'professeur'>('admin');
+  const [space, setSpace] = useState<'admin' | 'professeur' | 'parent'>('admin');
+  const [tel, setTel] = useState('');
+  const [ppin, setPpin] = useState('');
   const [selected, setSelected] = useState<string | null>(null);
   const [pin, setPin] = useState(['', '', '', '']);
   const [error, setError] = useState('');
@@ -68,9 +70,19 @@ export default function Login() {
               <h3 style={{ fontSize: 18 }} className="mt-16">Connexion</h3>
               <p className="muted small mt-8 mb-16">Choisissez votre espace puis votre compte.</p>
               <div className="seg mb-16">
-                <button className={space === 'admin' ? 'active' : ''} onClick={() => setSpace('admin')}><ShieldCheck size={16} style={{ verticalAlign: -3, marginRight: 6 }} />Administration</button>
-                <button className={space === 'professeur' ? 'active' : ''} onClick={() => setSpace('professeur')}><GraduationCap size={16} style={{ verticalAlign: -3, marginRight: 6 }} />Professeur</button>
+                <button className={space === 'admin' ? 'active' : ''} onClick={() => setSpace('admin')}><ShieldCheck size={16} />Direction</button>
+                <button className={space === 'professeur' ? 'active' : ''} onClick={() => setSpace('professeur')}><GraduationCap size={16} />Professeur</button>
+                <button className={space === 'parent' ? 'active' : ''} onClick={() => { setSpace('parent'); setError(''); }}><Users size={16} />Parent</button>
               </div>
+              {space === 'parent' ? (
+                <form className="stack" style={{ gap: 12 }} onSubmit={(e) => { e.preventDefault(); const err = loginParent(tel, ppin); if (err) { setError(err); setPpin(''); } }}>
+                  <label className="field"><span>Numéro de téléphone</span><input className="input" type="tel" inputMode="tel" autoComplete="tel" value={tel} onChange={(e) => { setTel(e.target.value); setError(''); }} placeholder="Ex. 3698 7654" /></label>
+                  <label className="field"><span>Code à 4 chiffres</span><input className="input" type="password" inputMode="numeric" maxLength={4} value={ppin} onChange={(e) => { setPpin(e.target.value.replace(/\D/g, '')); setError(''); }} placeholder="••••" /></label>
+                  {error && <p className="small" style={{ color: 'var(--red)' }}>{error}</p>}
+                  <button className="btn btn-primary" type="submit" disabled={ppin.length !== 4 || !tel.trim()}>Se connecter</button>
+                  <p className="tiny muted">Le code vous est remis par le secrétariat de l’école. Démonstration : 3698 7654, code 1234.</p>
+                </form>
+              ) : <>
               {users.filter((u) => u.actif && roleOf(u.roleId)?.espace === space).length > 6 && <input className="input mb-12" placeholder="Rechercher mon nom…" value={q} onChange={(e) => setQ(e.target.value)} />}
               <div className="stack" style={{ gap: 8, maxHeight: '52dvh', overflowY: 'auto', paddingRight: 2 }}>
                 {list.map((u) => (
@@ -83,6 +95,7 @@ export default function Login() {
                   </button>
                 ))}
               </div>
+              </>}
             </>
           ) : (
             <>

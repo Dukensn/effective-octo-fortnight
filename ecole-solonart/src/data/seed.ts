@@ -546,6 +546,7 @@ export function seedDatabase() {
     { id: 'r-cpt', nom: 'Comptable', description: 'Finance, paiements, salaires et rapports financiers.', espace: 'admin', permissions: perms('none', { dashboard: 'read', finance: 'write', eleves: 'read', parents: 'read', personnel: 'read', rapports: 'read' }), updatedAt: 0 },
     { id: 'r-cen', nom: 'Censeur', description: 'Présences, discipline et consultation des notes.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'read', presences: 'write', discipline: 'write', cahier: 'read', notes: 'read', classes: 'read', emploi: 'read', parents: 'read', communication: 'write' }), updatedAt: 0 },
     { id: 'r-prof', nom: 'Professeur', description: 'Espace professeur : ses classes, saisie des notes, appel, palmarès.', systeme: true, espace: 'professeur', permissions: perms('none'), updatedAt: 0 },
+    { id: 'r-par', nom: 'Parent', description: 'Espace parent : notes validées, absences, discipline, devoirs et paiements de ses enfants uniquement.', systeme: true, espace: 'parent', permissions: perms('none'), updatedAt: 0 },
   ];
   db.bulkPut('roles', roles);
   const byPoste = (p: string) => staff.find((s) => s.poste === p)!;
@@ -558,6 +559,8 @@ export function seedDatabase() {
     ...staff.filter((s) => s.type === 'Professeur').map((s) => ({
       id: s.id === robert.id ? 'u-prof' : `u-${s.id}`, nom: `${s.sexe === 'F' ? 'Mme' : 'M.'} ${s.prenom} ${s.nom}`, email: s.email, roleId: 'r-prof', staffId: s.id, pin: '1234', actif: true, photo: s.photo,
     })),
+    // Espace parent (démonstration) : connexion avec le numéro de téléphone et le code 1234
+    ...[jeanDorval, marieDorval].map((g) => ({ id: `u-par-${g.id}`, nom: `${g.sexe === 'F' ? 'Mme' : 'M.'} ${g.prenom} ${g.nom}`, email: g.email ?? '', telephone: g.telephone, roleId: 'r-par', guardianId: g.id, pin: '1234', actif: true, photo: g.photo })),
   ];
   db.bulkPut('users', users as User[]);
 }

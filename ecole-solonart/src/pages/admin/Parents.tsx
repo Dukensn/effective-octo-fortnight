@@ -8,6 +8,7 @@ import { fullName, norm, downloadCSV, dateLong } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 import { printDocument } from '../../lib/print';
 import { GuardianListSheet, GuardianSheet } from '../../docs/Sheets';
+import { ParentAccess } from './ParentAccess';
 
 const LIENS: Guardian['lien'][] = ['Père', 'Mère', 'Tuteur', 'Tutrice', 'Grand-père', 'Grand-mère', 'Oncle', 'Tante', 'Frère', 'Sœur', 'Autre'];
 
@@ -227,11 +228,12 @@ function GuardianPanel({ g, kids, onEdit }: { g: Guardian; kids: { id: string; p
       {tab === 'comm' && (
         <div className="card card-pad">
           <p className="small muted mb-12">Messages envoyés à tous les parents ou aux classes de ses enfants.</p>
-          {messages.filter((m) => m.cible === 'Tous les parents' || kids.some((k) => k.classeId === m.classeId)).map((m) => (
+          {messages.filter((m) => (m.relance ? kids.some((k) => k.id === m.relance!.eleveId) : m.cible === 'Tous les parents' || kids.some((k) => k.classeId === m.classeId))).map((m) => (
             <div key={m.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--line-2)' }}><b style={{ color: 'var(--ink)' }}>{m.objet}</b> <span className="tiny muted">· {m.canal}</span><div className="small muted">{m.contenu}</div></div>
           ))}
         </div>
       )}
+      <ParentAccess g={g} canWrite={canWrite} />
       <div className="grid g-2" style={{ gap: 12 }}>
         <div className="card card-pad">
           <h3 style={{ fontSize: 15 }} className="mb-12">Actions rapides</h3>

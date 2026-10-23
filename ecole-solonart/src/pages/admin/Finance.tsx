@@ -3,13 +3,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Expense, Payment, PaymentMode, Project, Salary } from '../../data/types';
-import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, Empty, scrollIntoRow, useIsMobile } from '../../components/ui';
+import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, scrollIntoRow, useIsMobile } from '../../components/ui';
 import { BarChart, Donut } from '../../components/charts';
 import { money, moneyShort, dateShort, fullName, monthLabel, monthShort, todayISO, downloadCSV, norm, civ } from '../../lib/format';
 import { activeMonths, balances, monthlyReport, nextReceipt } from '../../lib/finance';
 import { useSession, audit } from '../../lib/session';
 import { printDocument } from '../../lib/print';
 import { ReceiptSheet, FinanceReportSheet, MonthlyReportSheet } from '../../docs/Sheets';
+import Relances from './Relances';
 
 type Tab = 'apercu' | 'paiements' | 'salaires' | 'depenses' | 'comptabilite' | 'projets' | 'rapports';
 const MODES: PaymentMode[] = ['MonCash', 'NatCash', 'Espèces', 'Virement', 'Chèque'];
@@ -204,16 +205,16 @@ function Payments({ onNew, canWrite }: { onNew: () => void; canWrite: boolean })
   const [classe, setClasse] = useState('all');
   const [mode, setMode] = useState('all');
   const [statut, setStatut] = useState('all');
+  const [cancel, setCancel] = useState<Payment | null>(null);
   const sMap = new Map(students.map((s) => [s.id, s]));
   const list = useMemo(() => payments.filter((p) => (classe === 'all' || p.classeId === classe) && (mode === 'all' || p.mode === mode) && (statut === 'all' || p.statut === statut) && (!q || norm(`${fullName(sMap.get(p.eleveId))} ${p.recu} ${p.reference ?? ''}`).includes(norm(q)))).sort((a, b) => b.date.localeCompare(a.date)), [payments, classe, mode, statut, q]); // eslint-disable-line
   const paged = usePaged(list, 15);
   const b = balances();
-  const debtors = students.filter((s) => s.statut === 'Actif' && (classe === 'all' || s.classeId === classe) && (b.get(s.id)?.rest ?? 0) > 0 && (!q || norm(fullName(s)).includes(norm(q)))).sort((x, y) => (b.get(y.id)?.rest ?? 0) - (b.get(x.id)?.rest ?? 0));
   const total = list.filter((p) => p.statut === 'Payé').reduce((a, p) => a + p.montant, 0);
   return (
     <>
       <div className="card card-pad row wrap mb-16" style={{ gap: 12, alignItems: 'flex-end' }}>
-        <div className="seg" style={{ minWidth: 260 }}><button className={view === 'paiements' ? 'active' : ''} onClick={() => setView('paiements')}>Paiements</button><button className={view === 'creances' ? 'active' : ''} onClick={() => setView('creances')}>Élèves en retard ({students.filter((s) => s.statut === 'Actif' && (b.get(s.id)?.rest ?? 0) > 0).length})</button></div>
+        <div className="seg" style={{ minWidth: 260 }}><button className={view === 'paiements' ? 'active' : ''} onClick={() => setView('paiements')}>Paiements</button><button className={view === 'creances' ? 'active' : ''} onClick={() => setView('creances')}>Relances ({students.filter((s) => s.statut === 'Actif' && (b.get(s.id)?.rest ?? 0) > 0).length})</button></div>
         <div style={{ flex: '1 1 220px' }}><SearchInput value={q} onChange={setQ} placeholder="Élève, n° de reçu, référence..." /></div>
         <select className="select" style={{ width: 150 }} value={classe} onChange={(e) => setClasse(e.target.value)}><option value="all">Toutes classes</option>{classes.map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select>
         {view === 'paiements' && <><select className="select" style={{ width: 140 }} value={mode} onChange={(e) => setMode(e.target.value)}><option value="all">Tous modes</option>{MODES.map((m) => <option key={m}>{m}</option>)}</select>
@@ -230,24 +231,37 @@ function Payments({ onNew, canWrite }: { onNew: () => void; canWrite: boolean })
               <tr key={p.id}><td className="small">{p.recu}</td><td style={{ whiteSpace: 'nowrap' }}>{dateShort(p.date)}</td><td><div className="person"><Avatar src={s?.photo} name={fullName(s)} size={28} /><b>{fullName(s)}</b></div></td><td className="only-desktop">{classes.find((c) => c.id === p.classeId)?.code}</td><td className="small">{p.motif}{p.versement ? ` · ${p.versement}` : ''}</td><td className="num bold">{money(p.montant)}</td><td className="only-desktop">{p.mode}</td><td><StatusBadge s={p.statut} /></td>
                 <td><Menu items={[
                   { label: 'Imprimer le reçu', icon: <Printer />, onClick: () => printDocument(<ReceiptSheet payment={p} />, 'A4 portrait', p.recu) },
-                  ...(canWrite && p.statut === 'En attente' ? [{ label: 'Confirmer le paiement', icon: <CheckCircle2 />, onClick: () => { db.patch('payments', p.id, { statut: 'Payé' }); toast('Paiement confirmé'); } }] : []),
-                  ...(canWrite && p.statut !== 'Annulé' ? [{ label: 'Annuler', icon: <Wallet />, danger: true, onClick: () => { db.patch('payments', p.id, { statut: 'Annulé' }); audit('Annulation paiement', p.recu); toast('Paiement annulé'); } }] : []),
+                  ...(canWrite && p.statut === 'En attente' ? [{ label: 'Confirmer le paiement', icon: <CheckCircle2 />, onClick: () => { db.patch('payments', p.id, { statut: 'Payé' }); audit('Confirmation paiement', `${p.recu} ${fullName(s)} ${money(p.montant)}`, { domaine: 'finance', changements: [{ libelle: 'Statut', avant: 'En attente', apres: 'Payé' }] }); toast('Paiement confirmé'); } }] : []),
+                  ...(canWrite && p.statut !== 'Annulé' ? [{ label: 'Annuler', icon: <Wallet />, danger: true, onClick: () => setCancel(p) }] : []),
                 ]} /></td></tr>); })}</tbody>
           </table></div>
           <Pager {...paged} />
+          {cancel && <CancelPayment payment={cancel} onClose={() => setCancel(null)} />}
         </div>
       ) : (
-        <div className="card">
-          <div className="table-wrap"><table className="t">
-            <thead><tr><th>Élève</th><th>Classe</th><th className="num">Dû</th><th className="num">Payé</th><th className="num">Restant</th><th>Parent</th><th /></tr></thead>
-            <tbody>{debtors.slice(0, 100).map((s) => { const x = b.get(s.id)!; const g = db.get('guardians', s.tuteurIds[0]); return (
-              <tr key={s.id}><td><div className="person"><Avatar src={s.photo} name={fullName(s)} size={28} /><b>{fullName(s)}</b></div></td><td>{classes.find((c) => c.id === s.classeId)?.code}</td><td className="num">{money(x.due)}</td><td className="num">{money(x.paid)}</td><td className="num bold" style={{ color: 'var(--red)' }}>{money(x.rest)}</td><td className="small">{g?.telephone}</td>
-                <td>{g && <a className="btn btn-sm btn-soft" target="_blank" rel="noreferrer" href={`https://wa.me/${g.telephone.replace(/\D/g, '')}?text=${encodeURIComponent(`Bonjour ${civ(g)}, ${school?.nom} vous rappelle qu'un solde de ${money(x.rest)} reste à payer pour la scolarité de ${fullName(s)}. Paiement possible par MonCash ou au secrétariat. Merci.`)}`}>Rappel WhatsApp</a>}</td></tr>); })}</tbody>
-          </table></div>
-          {debtors.length === 0 && <Empty title="Aucun élève en retard de paiement" />}
-        </div>
+        <Relances classe={classe} q={q} canWrite={canWrite} />
       )}
     </>
+  );
+}
+
+/** Annuler un paiement exige un motif : il reste au journal avec le montant et l'auteur. */
+function CancelPayment({ payment: p, onClose }: { payment: Payment; onClose: () => void }) {
+  const [motif, setMotif] = useState('');
+  const s = db.get('students', p.eleveId);
+  const ok = motif.trim().length >= 5;
+  const confirm = () => {
+    db.patch('payments', p.id, { statut: 'Annulé' });
+    audit('Annulation paiement', `${p.recu} ${fullName(s)} ${money(p.montant)}`, { domaine: 'finance', motif: motif.trim(), changements: [{ libelle: 'Statut', avant: p.statut, apres: 'Annulé' }] });
+    toast('Paiement annulé');
+    onClose();
+  };
+  return (
+    <Modal open onClose={onClose} title="Annuler le paiement" footer={<><button className="btn" onClick={onClose}>Retour</button><button className="btn btn-danger" disabled={!ok} onClick={confirm}>Annuler le paiement</button></>}>
+      <p className="small mb-12">{p.recu} · <b>{fullName(s)}</b> · {money(p.montant)} ({p.mode}, {dateShort(p.date)})</p>
+      <Field label="Motif de l’annulation" req><textarea className="input" rows={3} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Ex. erreur de montant, chèque sans provision, doublon…" /></Field>
+      <p className="tiny muted mt-8">Le paiement n’est pas effacé : il reste visible comme « Annulé », et le journal garde qui l’a annulé, quand et pourquoi.</p>
+    </Modal>
   );
 }
 
@@ -265,7 +279,7 @@ function PaymentForm({ eleveId, prefill, onClose }: { eleveId: string; prefill?:
     const montant = f.montant || Math.round(bal?.rest ?? 0);
     if (montant <= 0) return toast('Montant invalide', true);
     const p = db.put('payments', { recu: nextReceipt(), eleveId: s.id, classeId: s.classeId, date: f.date, montant, mode: f.mode, motif: f.motif, versement: f.motif === 'Scolarité' ? ['1er versement', '2e versement', '3e versement'][existing] ?? 'Complément' : undefined, reference: f.reference || undefined, statut: 'Payé' });
-    audit('Paiement', `${p.recu} ${fullName(s)} ${money(montant)}`);
+    audit('Paiement', `${p.recu} ${fullName(s)} ${money(montant)}`, { domaine: 'finance' });
     toast(`Paiement enregistré — ${p.recu}`);
     if (print) printDocument(<ReceiptSheet payment={p} />, 'A4 portrait', p.recu);
     onClose();

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Upload, Plus, Download, RotateCcw, Cloud, CloudOff, KeyRound, Trash2, ShieldCheck, Check } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Access, ModuleKey, Period, Role, School, Subject, User } from '../../data/types';
@@ -269,11 +269,13 @@ function RolesTab() {
 
 function DataTab() {
   const sync = useSyncState();
+  const nav = useNavigate();
+  const canJournal = useSession()!.can('utilisateurs');
   const canEdit = useCanEdit();
   const input = useRef<HTMLInputElement>(null);
   const [reset, setReset] = useState(false);
   useCollection('audit');
-  const logs = db.list('audit').slice().sort((a, b) => b.date - a.date).slice(0, 30);
+  const logs = db.list('audit').slice().sort((a, b) => b.date - a.date).slice(0, 15);
   return (
     <div className="split">
       <div className="stack">
@@ -299,7 +301,7 @@ function DataTab() {
           <input ref={input} type="file" accept="application/json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; try { await db.importJSON(await f.text()); toast('Données importées'); } catch (err) { toast((err as Error).message, true); } }} />
         </Card>
       </div>
-      <Card title="Journal d’activité" pad={false}>
+      <Card title="Journal d’activité" pad={false} link={canJournal ? 'Tout voir' : undefined} onLink={() => nav('/journal')}>
         <div className="list" style={{ maxHeight: 520, overflow: 'auto' }}>{logs.map((l) => (
           <div key={l.id} className="list-item"><div className="grow"><b style={{ color: 'var(--ink)', fontWeight: 600 }}>{l.action}</b><div className="tiny muted">{l.detail}</div></div><span className="tiny muted" style={{ textAlign: 'right' }}>{db.get('users', l.userId)?.nom ?? ''}<br />{timeAgo(l.date)}</span></div>
         ))}</div>

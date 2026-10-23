@@ -297,6 +297,8 @@ export interface Message extends Meta {
   classeId?: ID;
   destinataires: number;
   auteurId?: ID;
+  /** Relance de paiement : élève concerné et solde au moment de l'envoi. */
+  relance?: { eleveId: ID; tuteurId?: ID; reste: number };
 }
 
 export interface SchoolEvent extends Meta {
@@ -349,7 +351,7 @@ export interface Role extends Meta {
   nom: string;
   description: string;
   systeme?: boolean; // non supprimable
-  espace: 'admin' | 'professeur';
+  espace: 'admin' | 'professeur' | 'parent';
   permissions: Partial<Record<ModuleKey, Access>>;
 }
 
@@ -359,17 +361,25 @@ export interface User extends Meta {
   telephone?: string;
   roleId: ID;
   staffId?: ID; // lien vers la fiche personnel (pour les professeurs)
+  guardianId?: ID; // lien vers la fiche parent (espace parent)
   pin: string; // code de connexion local (remplacé par Firebase Auth en production)
   actif: boolean;
   dernierAcces?: number;
   photo?: string;
 }
 
+/** Une valeur modifiée, gardée telle qu'elle était avant et après. */
+export interface AuditChange { libelle: string; avant: string; apres: string }
+
+/** Journal des modifications : on n'y ajoute que des lignes, on ne les modifie ni ne les supprime. */
 export interface AuditLog extends Meta {
   date: number;
   userId?: ID;
   action: string;
   detail: string;
+  domaine?: 'notes' | 'finance' | 'eleves' | 'discipline' | 'acces' | 'autre';
+  motif?: string;
+  changements?: AuditChange[];
 }
 
 export interface Collections {

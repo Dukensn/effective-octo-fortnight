@@ -1,7 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
-  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles,
+  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles, History,
 } from 'lucide-react';
 import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
@@ -47,6 +47,8 @@ import TeacherCahier from './pages/teacher/TeacherCahier';
 import TeacherDiscipline from './pages/teacher/TeacherDiscipline';
 import Discipline from './pages/admin/Discipline';
 import Cahier from './pages/admin/Cahier';
+import Journal from './pages/admin/Journal';
+import { ParentHome, ParentNotes, ParentVie, ParentPaiements, ParentDevoirs } from './pages/parent/Parent';
 
 const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/', label: 'Tableau de bord', icon: Home, end: true, m: 'dashboard' },
@@ -65,6 +67,7 @@ const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/documents', label: 'Documents', icon: FolderOpen, m: 'documents' },
   { to: '/communication', label: 'Communication', icon: Mail, m: 'communication' },
   { to: '/rapports', label: 'Rapports', icon: BarChart3, m: 'rapports' },
+  { to: '/journal', label: 'Journal', icon: History, m: 'utilisateurs' },
   { to: '/parametres', label: 'Paramètres', icon: Settings, m: 'parametres' },
 ];
 
@@ -144,6 +147,7 @@ function AdminApp() {
         <Route path="/communication" element={G('communication', <Communication />)} />
         <Route path="/evenements" element={<Events />} />
         <Route path="/rapports" element={G('rapports', <Reports />)} />
+        <Route path="/journal" element={G('utilisateurs', <Journal />)} />
         <Route path="/parametres" element={G('parametres', <SettingsPage />)} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/aide" element={<Help />} />
@@ -183,11 +187,38 @@ function TeacherApp() {
   );
 }
 
+const PARENT_NAV: NavItem[] = [
+  { to: '/', label: 'Accueil', icon: Home, end: true },
+  { to: '/p/notes', label: 'Notes', icon: FileText },
+  { to: '/p/vie', label: 'Vie scolaire', icon: ClipboardCheck },
+  { to: '/p/paiements', label: 'Paiements', icon: Receipt },
+  { to: '/p/devoirs', label: 'Devoirs', icon: NotebookPen },
+  { to: '/evenements', label: 'Événements', icon: CalendarHeart },
+];
+
+function ParentApp() {
+  return (
+    <Shell items={PARENT_NAV} tabs={PARENT_NAV.slice(0, 4)}>
+      <Routes>
+        <Route path="/" element={<ParentHome />} />
+        <Route path="/p/notes" element={<ParentNotes />} />
+        <Route path="/p/vie" element={<ParentVie />} />
+        <Route path="/p/paiements" element={<ParentPaiements />} />
+        <Route path="/p/devoirs" element={<ParentDevoirs />} />
+        <Route path="/evenements" element={<Events />} />
+        <Route path="/profil" element={<Profile />} />
+        <Route path="/aide" element={<Help />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Shell>
+  );
+}
+
 export default function App() {
   const session = useSession();
   return (
     <HashRouter>
-      {!session ? <Login /> : session.isTeacher ? <TeacherApp /> : <AdminApp />}
+      {!session ? <Login /> : session.isParent ? <ParentApp /> : session.isTeacher ? <TeacherApp /> : <AdminApp />}
       <Toasts />
       <PrintRoot />
     </HashRouter>

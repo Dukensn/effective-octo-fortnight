@@ -6,7 +6,10 @@ const ADMIN: [string, string][] = [
   ['Notes et professeurs', 'Les professeurs saisissent leurs notes dans leur espace. Elles arrivent automatiquement dans Notes / Examens. La direction suit l’avancement, peut corriger, puis verrouille la période.'],
   ['Bulletins', 'Documents → Bulletins : choisissez le modèle, la période, la classe, puis « Imprimer / PDF ». Les appréciations se préparent dans Notes / Examens → Conseil de classe (bouton « Proposer automatiquement »).'],
   ['Badges', 'Documents → Badges : onglets Professeurs, Direction, Personnel, Élèves. Chaque catégorie a ses propres modèles. 9 badges par feuille A4.'],
-  ['Paiements', 'Finance → Nouveau → Paiement élève. Le reste à payer est calculé automatiquement ; imprimez le reçu en 2 exemplaires. « Élèves en retard » permet d’envoyer un rappel WhatsApp.'],
+  ['Paiements', 'Finance → Nouveau → Paiement élève. Le reste à payer est calculé automatiquement ; imprimez le reçu en 2 exemplaires. Annuler un paiement demande un motif, gardé au journal.'],
+  ['Relances', 'Finance → Paiements → Relances : choisissez les élèves (ou « Pas relancés depuis 7 jours »), vérifiez le message, puis « Relancer la sélection ». WhatsApp et les SMS s’ouvrent un par un avec le message prêt ; chaque envoi est noté.'],
+  ['Accès parent', 'Parents → fiche du parent → « Accès parent » : un code à 4 chiffres est créé. Le parent se connecte avec son numéro de téléphone et ce code, et ne voit que ses enfants.'],
+  ['Journal', 'Menu → Journal : toutes les actions importantes, avec l’auteur, l’heure, l’ancienne et la nouvelle valeur (notes modifiées, paiements annulés…). Rien ne peut y être effacé.'],
   ['Rôles', 'Paramètres → Rôles & permissions : créez un rôle (ex. Caissier) et cochez ce qu’il peut voir ou modifier. Puis Paramètres → Utilisateurs pour lui donner un compte.'],
   ['Hors ligne', 'L’application fonctionne sans Internet. Les modifications sont gardées sur l’appareil et envoyées à Firebase dès que la connexion revient.'],
 ];
@@ -17,9 +20,16 @@ const PROF: [string, string][] = [
   ['Appel', 'Faire l’appel : tout le monde est présent par défaut, touchez seulement les absents ou retards puis « Enregistrer l’appel ».'],
 ];
 
+const PARENT: [string, string][] = [
+  ['Notes', 'La moyenne d’une période apparaît quand la direction l’a validée. Avant, vous voyez les contrôles déjà corrigés.'],
+  ['Plusieurs enfants', 'Touchez le prénom de l’enfant en haut de l’écran pour passer de l’un à l’autre.'],
+  ['Paiements et reçus', 'Paiements : total de l’année, déjà payé, reste à payer, et chaque reçu à télécharger.'],
+  ['Code oublié', 'Demandez un nouveau code au secrétariat. Vous pouvez changer votre code dans Menu → votre nom.'],
+];
+
 export default function Help() {
   const session = useSession()!;
-  const items = session.isTeacher ? PROF : ADMIN;
+  const items = session.isParent ? PARENT : session.isTeacher ? PROF : ADMIN;
   return (
     <div style={{ maxWidth: 820, margin: '0 auto' }}>
       <PageHead title="Centre d’aide" sub="Les réponses aux questions les plus fréquentes." />

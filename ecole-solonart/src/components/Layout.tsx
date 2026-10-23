@@ -64,14 +64,14 @@ function GlobalSearch({ autoFocus, onDone }: { autoFocus?: boolean; onDone?: () 
     if (n.length < 2) return [];
     const out: { label: string; sub: string; to: string; photo?: string }[] = [];
     for (const s of students) if (norm(`${s.prenom} ${s.nom} ${s.matricule}`).includes(n)) out.push({ label: fullName(s), sub: `Élève · ${s.matricule}`, to: `/eleves/${s.id}`, photo: s.photo });
-    if (!session?.isTeacher) {
+    if (!(session?.isTeacher || session?.isParent)) {
       for (const g of guardians) if (norm(`${g.prenom} ${g.nom} ${g.telephone}`).includes(n)) out.push({ label: fullName(g), sub: `Parent · ${g.telephone}`, to: `/parents?id=${g.id}`, photo: g.photo });
       for (const c of classes) if (norm(`${c.code} ${c.nom}`).includes(n)) out.push({ label: c.code, sub: c.nom, to: `/classes/${c.id}` });
       for (const s of staff) if (norm(`${s.prenom} ${s.nom} ${s.matricule} ${s.poste}`).includes(n)) out.push({ label: fullName(s), sub: `${s.poste} · ${s.matricule}`, to: `/personnel?id=${s.id}`, photo: s.photo });
     }
     return out.slice(0, 8);
-  }, [q, students, guardians, classes, staff, session?.isTeacher]);
-  if (session?.isTeacher) return null;
+  }, [q, students, guardians, classes, staff, session?.isTeacher, session?.isParent]);
+  if (session?.isTeacher || session?.isParent) return null;
   return (
     <div className="search" style={{ position: 'relative' }}>
       <Search />
@@ -125,7 +125,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
   const desktop = useIsDesktop();
   const pendingStudents = useCollection('students').filter((s) => s.statut === 'En attente').length;
   const pendingPayments = useCollection('payments').filter((p) => p.statut === 'En attente').length;
-  const notifCount = session?.isTeacher ? 0 : pendingStudents + pendingPayments;
+  const notifCount = (session?.isTeacher || session?.isParent) ? 0 : pendingStudents + pendingPayments;
   useEffect(() => { window.scrollTo(0, 0); setSearchOpen(false); setPlus(false); setMore(false); }, [location.pathname, location.search]);
   const phone = useIsMobile();
   const [contentEl, setContentEl] = useState<HTMLElement | null>(null);
@@ -157,7 +157,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
               <Bell />
               {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
             </button>
-            {!session.isTeacher && (
+            {!(session.isTeacher || session.isParent) && (
               <button className="btn year-select" style={{ color: 'var(--ink)', fontWeight: 500 }} onClick={() => navigate('/parametres?tab=annee')} title="Changer d’année scolaire">Année {year?.libelle}</button>
             )}
             <UserMenu name={session.user.nom} photo={session.user.photo} role={roleLabel} />
@@ -166,7 +166,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
           <header className="appbar">
             {isTab ? <SchoolLogo size={28} className="appbar-logo" /> : <button className="icon-btn" aria-label="Retour" onClick={goBack}><ArrowLeft /></button>}
             <h1 className="appbar-title"><span ref={titleRef} className="ab-slot" /><span className="ab-default">{fallbackTitle}</span></h1>
-            {!session.isTeacher && <button className="icon-btn" aria-label="Rechercher" onClick={() => setSearchOpen(!searchOpen)}><Search /></button>}
+            {!(session.isTeacher || session.isParent) && <button className="icon-btn" aria-label="Rechercher" onClick={() => setSearchOpen(!searchOpen)}><Search /></button>}
             <button className="icon-btn" aria-label="Notifications" onClick={() => navigate('/evenements')}>
               <Bell />
               {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
@@ -197,7 +197,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
       <Sheet open={more} onClose={() => setMore(false)}>
         <button className="me-row" onClick={() => { setMore(false); navigate('/profil'); }}>
           <Avatar src={session.user.photo} name={session.user.nom} size={46} />
-          <span className="grow"><b>{session.user.nom}</b><small>{roleLabel}{!session.isTeacher && year ? ` · Année ${year.libelle}` : ''}</small></span>
+          <span className="grow"><b>{session.user.nom}</b><small>{roleLabel}{!(session.isTeacher || session.isParent) && year ? ` · Année ${year.libelle}` : ''}</small></span>
           <ChevronRight size={18} className="chev" />
         </button>
         <div className="app-grid">

@@ -6,6 +6,7 @@ import { classStudents, gradesForEvaluation, isPreschool, levelOf, LEVELS } from
 import { Avatar, Empty, Modal, ScreenHead, toast } from '../../components/ui';
 import { fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
+import type { AuditChange } from '../../data/types';
 
 /** Saisie des notes d'une évaluation — utilisée par le professeur et par l'administration. */
 export default function GradeEntry({ admin }: { admin?: boolean }) {
@@ -57,16 +58,23 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
 
   const save = () => {
     if (invalid) return toast(`${invalid} note(s) invalide(s) : entre 0 et ${max}, ou « abs »`, true);
+    // Une note déjà enregistrée qui change (ou disparaît) est gardée au journal : ancienne et nouvelle valeur.
+    const shown = (g?: { note: number | null; absent?: boolean }) => (!g ? '—' : g.absent ? 'abs' : g.note === null ? '—' : String(g.note).replace('.', ','));
+    const changements: AuditChange[] = [];
     const docs = students.flatMap((s) => {
       const p = parsed[s.id];
       const cur = existing.get(s.id);
-      if (p.empty) { if (cur) db.remove('grades', cur.id); return []; }
-      return [{ id: cur?.id ?? `gr-${ev.id}-${s.id}`, evaluationId: ev.id, eleveId: s.id, note: p.absent ? null : Math.round(p.note! * 100) / 100, absent: !!p.absent }];
+      const next = p.empty ? undefined : { note: p.absent ? null : Math.round(p.note! * 100) / 100, absent: !!p.absent };
+      if (cur && shown(cur) !== shown(next)) changements.push({ libelle: fullName(s), avant: shown(cur), apres: shown(next) });
+      if (!next) { if (cur) db.remove('grades', cur.id); return []; }
+      return [{ id: cur?.id ?? `gr-${ev.id}-${s.id}`, evaluationId: ev.id, eleveId: s.id, ...next }];
     });
     db.bulkPut('grades', docs);
     try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
     db.patch('evaluations', ev.id, { statut: ev.statut === 'Clôturé' ? 'Clôturé' : 'En cours', saisiePar: session.user.id, saisieLe: Date.now() });
-    audit('Saisie des notes', `${subject?.nom} ${classe?.code} ${ev.titre} (${docs.length})`);
+    const what = `${subject?.nom} ${classe?.code} ${ev.titre}`;
+    if (changements.length) audit('Modification de notes', `${what} · ${changements.length} note(s) changée(s)`, { domaine: 'notes', changements });
+    else audit('Saisie des notes', `${what} (${docs.length})`, { domaine: 'notes' });
     setDone(true);
   };
 

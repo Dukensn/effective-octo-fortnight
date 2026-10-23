@@ -7,18 +7,36 @@ service cloud.firestore {
     function userDoc(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/users/$(request.auth.uid)).data; }
     function role(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/roles/$(userDoc(ecole).roleId)).data; }
     function signedIn() { return request.auth != null; }
-    function isDirection(ecole) { return signedIn() && userDoc(ecole).roleId == 'r-dir'; }
-    function canWrite(ecole, module) { return signedIn() && (isDirection(ecole) || role(ecole).permissions[module] == 'write'); }
-    function isTeacher(ecole) { return signedIn() && role(ecole).espace == 'professeur'; }
+    function active(ecole) { return signedIn() && userDoc(ecole).actif == true; }
+    function isParent(ecole) { return active(ecole) && role(ecole).espace == 'parent'; }
+    function isStaff(ecole) { return active(ecole) && role(ecole).espace != 'parent'; }
+    function isDirection(ecole) { return isStaff(ecole) && userDoc(ecole).roleId == 'r-dir'; }
+    function canWrite(ecole, module) { return isStaff(ecole) && (isDirection(ecole) || role(ecole).permissions[module] == 'write'); }
+    function isTeacher(ecole) { return isStaff(ecole) && role(ecole).espace == 'professeur'; }
+
+    // Journal des modifications : on ajoute des lignes, personne ne peut les modifier ni les supprimer.
+    match /ecoles/{ecole}/audit/{id} {
+      allow read: if isStaff(ecole);
+      allow create: if active(ecole);
+      allow update, delete: if false;
+    }
 
     match /ecoles/{ecole}/{collection}/{id} {
-      allow read: if signedIn() && userDoc(ecole).actif == true;
-      // Notes : le professeur écrit les notes de ses évaluations, la direction tout.
-      allow write: if collection in ['grades', 'evaluations', 'attendance', 'audit'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
+      // Le personnel lit toute l'école. Un parent ne lit que sa propre fiche utilisateur :
+      // les données de ses enfants lui seront servies par une synchronisation filtrée (à mettre en place).
+      allow read: if collection != 'audit' && isStaff(ecole);
+      allow read: if collection == 'users' && isParent(ecole) && id == request.auth.uid;
+
+      allow write: if collection != 'audit' && collection in ['grades', 'evaluations', 'attendance'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
       allow write: if collection in ['students', 'guardians'] && (canWrite(ecole, 'eleves') || canWrite(ecole, 'inscriptions') || canWrite(ecole, 'parents'));
       allow write: if collection in ['payments', 'expenses', 'salaries', 'projects'] && canWrite(ecole, 'finance');
       allow write: if collection in ['users', 'roles'] && canWrite(ecole, 'utilisateurs');
-      allow write: if isDirection(ecole);
+      // Le secrétariat (module Parents) crée les accès parent, uniquement avec le rôle « Parent ».
+      allow write: if collection == 'users' && canWrite(ecole, 'parents') && request.resource.data.roleId == 'r-par';
+      // Un parent ne modifie que son code et sa date de visite.
+      allow update: if collection == 'users' && isParent(ecole) && id == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pin', 'dernierAcces', 'photo', 'updatedAt']);
+      allow write: if collection != 'audit' && isDirection(ecole);
     }
   }
 }
