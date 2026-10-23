@@ -1,6 +1,5 @@
-// Commande ERP structurée : ce que le LLM local doit produire (UNIQUEMENT du JSON),
-// sa validation, et un analyseur par règles qui prend le relais quand le petit modèle se trompe.
-import type { ChatMessage } from './agent.worker';
+// Commande ERP structurée {action, entite, variables}, produite par un analyseur par règles (français et créole).
+// Un modèle d'IA locale pourra plus tard produire le même JSON.
 
 export const ERP_ACTIONS = [
   'consulter_resultats', 'consulter_eleve', 'consulter_impayes', 'consulter_finances', 'consulter_presences',
@@ -24,83 +23,10 @@ export interface ErpCommand {
   variables: ErpVariables;
   /** Texte d'origine (tapé ou transcrit). */
   texte: string;
-  /** « llm » si le JSON du modèle était valide, « regles » si l'analyseur de secours a été utilisé. */
-  source: 'llm' | 'regles';
+  source: 'regles';
 }
 
-export const SYSTEM_PROMPT = `Tu convertis une demande d'un membre du personnel d'une école en commande JSON pour le logiciel de l'école.
-Réponds UNIQUEMENT par un objet JSON, sans texte avant ni après, de la forme :
-{"action": "...", "entite": "...", "variables": {...}}
-Actions possibles :
-- consulter_resultats (variables : classe, periode)
-- consulter_eleve (variables : eleve)
-- consulter_impayes (variables : classe)
-- consulter_finances (variables : mois au format AAAA-MM)
-- consulter_presences (variables : classe)
-- consulter_discipline (variables : classe)
-- consulter_cahier (variables : classe)
-- signaler_incident (variables : eleve, type, description)
-- encaisser_paiement (variables : eleve, montant, mode)
-- enregistrer_depense (variables : libelle, montant, categorie)
-- inscrire_eleve (variables : prenom, nom, classe)
-- nouvelle_seance (variables : classe, matiere, titre)
-- faire_appel (variables : classe)
-- ouvrir_page (variables : page)
-- inconnu (si la demande ne correspond à rien)
-Les classes s'écrivent comme S4-A, S3-B, 7AF, 9AF, PS, MS, GS. Les montants sont des nombres en gourdes.`;
-
-// Exemples pour guider les petits modèles (apprentissage par l'exemple).
-const FEW_SHOT: [string, object][] = [
-  ['Montre-moi les résultats de la S4-A au 4e contrôle', { action: 'consulter_resultats', entite: 'classe', variables: { classe: 'S4-A', periode: 'C4' } }],
-  ['Qui n’a pas encore payé en 7e année ?', { action: 'consulter_impayes', entite: 'paiement', variables: { classe: '7AF' } }],
-  ['Jean Philippe Dorval a payé 15000 gourdes par MonCash', { action: 'encaisser_paiement', entite: 'paiement', variables: { eleve: 'Jean Philippe Dorval', montant: 15000, mode: 'MonCash' } }],
-  ['Signale que Marie Dupont utilisait son téléphone en classe', { action: 'signaler_incident', entite: 'incident', variables: { eleve: 'Marie Dupont', type: 'Téléphone', description: 'Utilisait son téléphone en classe' } }],
-  ['Rapport financier du mois d’avril', { action: 'consulter_finances', entite: 'finance', variables: { mois: '2025-04' } }],
-  ['Kijan prezans S3-A ye ?', { action: 'consulter_presences', entite: 'presence', variables: { classe: 'S3-A' } }],
-];
-
-export function buildMessages(text: string): ChatMessage[] {
-  return [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...FEW_SHOT.flatMap(([q, a]) => [{ role: 'user' as const, content: q }, { role: 'assistant' as const, content: JSON.stringify(a) }]),
-    { role: 'user', content: text },
-  ];
-}
-
-/** Extrait le premier objet JSON équilibré d'une réponse (le modèle peut ajouter du texte autour). */
-export function extractJson(raw: string): unknown {
-  const start = raw.indexOf('{');
-  if (start < 0) return null;
-  let depth = 0, inStr = false, esc = false;
-  for (let i = start; i < raw.length; i++) {
-    const c = raw[i];
-    if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue; }
-    if (c === '"') inStr = true;
-    else if (c === '{') depth++;
-    else if (c === '}' && --depth === 0) {
-      try { return JSON.parse(raw.slice(start, i + 1)); } catch { return null; }
-    }
-  }
-  return null;
-}
-
-/** Valide le JSON du modèle ; renvoie null s'il est inutilisable. */
-export function validateCommand(obj: unknown, texte: string): ErpCommand | null {
-  if (!obj || typeof obj !== 'object') return null;
-  const o = obj as Record<string, unknown>;
-  const rawAction = String(o.action ?? '').trim().toLowerCase();
-  const action = (ERP_ACTIONS as readonly string[]).includes(rawAction) ? (rawAction as ErpAction) : null;
-  if (!action) return null;
-  const vars = (o.variables ?? o.params ?? o.parametres ?? {}) as Record<string, unknown>;
-  const variables: ErpVariables = {};
-  for (const [k, v] of Object.entries(typeof vars === 'object' && vars ? vars : {})) {
-    if (typeof v === 'string' && v.trim()) (variables as Record<string, unknown>)[k] = v.trim();
-    else if (typeof v === 'number' && Number.isFinite(v)) (variables as Record<string, unknown>)[k] = v;
-  }
-  return { action, entite: ENTITE[action], variables, texte, source: 'llm' };
-}
-
-// ---------------- Analyseur par règles (secours) ----------------
+// ---------------- Analyseur par règles ----------------
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const MOIS = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
 const MOIS_KR = ['janvye', 'fevriye', 'mas', 'avril', 'me', 'jen', 'jiyè', 'out', 'septanm', 'oktob', 'novanm', 'desanm'];
@@ -173,14 +99,4 @@ export function ruleBasedCommand(text: string, ctx: { classCodes: string[]; scho
   if (action === 'enregistrer_depense') v.libelle = text.replace(/\d[\d\s.,]*\s*(?:g\b|gdes?\b|gourdes?|goud|htg)/i, '').trim();
   if (action === 'ouvrir_page') v.page = text.replace(/^(ouvre|ouvrir|va a|va à|aller a|aller à)\s+(la\s+page\s+)?/i, '').trim();
   return { action, entite: ENTITE[action], variables: v, texte: text, source: 'regles' };
-}
-
-/** Combine : le JSON du modèle s'il est valide, complété par les règles (classe, montant…) quand il en oublie. */
-export function resolveCommand(raw: string, text: string, ctx: { classCodes: string[]; schoolStartYear: number }): ErpCommand {
-  const rules = ruleBasedCommand(text, ctx);
-  const llm = validateCommand(extractJson(raw), text);
-  if (!llm || llm.action === 'inconnu') return rules.action !== 'inconnu' ? rules : llm ?? rules;
-  const facts: ErpVariables = {};
-  for (const k of ['classe', 'mois', 'montant', 'periode'] as const) if (rules.variables[k] !== undefined) facts[k] = rules.variables[k];
-  return { ...llm, variables: { ...(llm.action === rules.action ? rules.variables : facts), ...llm.variables } };
 }

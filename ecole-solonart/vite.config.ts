@@ -29,14 +29,9 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-        navigateFallback: 'index.html',
-        // Moteur ONNX (WebAssembly, ~21 Mo) : gardé au 1er usage pour que l'assistant marche hors ligne.
-        runtimeCaching: [
-          { urlPattern: /\/assets\/ort-wasm[^/]*\.(?:wasm|mjs)$/, handler: 'CacheFirst', options: { cacheName: 'ia-moteur', expiration: { maxEntries: 4 } } },
-        ]
+        navigateFallback: 'index.html'
       }
     })
   ],
-  worker: { format: 'es' },
   build: { chunkSizeWarningLimit: 1500 }
 });
