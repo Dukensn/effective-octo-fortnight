@@ -611,6 +611,9 @@ html { -webkit-tap-highlight-color: transparent; }
   .stat .l { font-size: 11.5px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stat .s { display: none; }
   .g-stats.mini .stat { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
+  .g-stats.mini .stat { overflow: hidden; }
+  .g-stats.mini .stat .grow { width: 100%; }
+  .g-stats.mini .stat .l { white-space: normal; line-height: 1.2; overflow-wrap: anywhere; }
   .g-stats.mini .stat .ic { width: 28px !important; height: 28px !important; border-radius: 8px; }
   .g-stats.mini .stat .ic svg { width: 15px; height: 15px; }
   /* Accueil : les raccourcis sont dans le bouton « ＋ » */
