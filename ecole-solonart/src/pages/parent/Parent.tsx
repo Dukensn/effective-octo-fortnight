@@ -1,18 +1,23 @@
 // Espace parent : uniquement les enfants liés au compte, en lecture seule.
-// Les moyennes d'une période ne sont visibles qu'une fois la période validée (verrouillée) par la direction.
-import { useState, type ReactNode } from 'react';
+// Bulletins et progrès : seulement les périodes validées (verrouillées) par la direction.
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, ClipboardCheck, Wallet, NotebookPen, ChevronRight, Printer, Lock, ShieldAlert } from 'lucide-react';
+import { FileText, ClipboardCheck, Wallet, Printer, Lock, ShieldAlert, MessagesSquare, TrendingUp, TrendingDown, Trophy } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Student } from '../../data/types';
-import { classReport, evaluationsForClass, fmtNote, gradesForEvaluation, isPreschool, scaleNote, sortedPeriods } from '../../data/compute';
+import { classReport, fmtNote, isPreschool, scaleNote, sortedPeriods } from '../../data/compute';
 import { Avatar, Badge, Card, Empty, PageHead, StatCard, StatusBadge } from '../../components/ui';
 import { LevelPill } from '../../components/Level';
-import { dateShort, fullName, money, todayISO } from '../../lib/format';
+import { dateShort, fullName, money, timeAgo } from '../../lib/format';
 import { balances } from '../../lib/finance';
 import { useSession } from '../../lib/session';
 import { printDocument } from '../../lib/print';
 import { ReceiptSheet } from '../../docs/Sheets';
+import { BulletinPages, TRI_THEMES, type BulletinModel } from '../../docs/Bulletins';
+import { buildBulletin } from '../../docs/common';
+import { Scaled, A4L } from '../../components/Scaled';
+import { BarChart } from '../../components/charts';
+import { isUnread } from '../../lib/chat';
 
 const KEY = 'solonart:enfant';
 
@@ -59,9 +64,11 @@ export function ParentHome() {
   const session = useSession()!;
   const nav = useNavigate();
   const { kids } = useChild();
-  useCollection('grades'); useCollection('attendance'); useCollection('payments'); useCollection('lessons');
+  useCollection('grades'); useCollection('attendance'); useCollection('payments'); useCollection('incidents');
+  const chat = useCollection('chat');
   const school = useDoc('school', 'main');
   const bareme = school?.bareme ?? 20;
+  const go = (id: string, to: string) => { try { localStorage.setItem(KEY, id); } catch { /* ignore */ } nav(to); };
   return (
     <>
       <PageHead title={`Bonjour ${session.user.nom.replace(/^(M\.|Mme)\s+/, '').split(' ')[0]}`} sub="Le suivi de vos enfants à l’école, mis à jour par l’établissement." />
@@ -72,26 +79,32 @@ export function ParentHome() {
             const last = lastValidated(k);
             const abs = absencesOf(k.id);
             const bal = balances().get(k.id);
-            const homework = db.list('lessons').filter((l) => l.classeId === k.classeId && l.devoirs && (l.pourLe ?? '') >= todayISO()).length;
+            const unread = chat.filter((m) => m.eleveId === k.id && isUnread(m, 'parent')).length;
+            const lastAlert = chat.filter((m) => m.eleveId === k.id && m.auteur === 'systeme').sort((a, b) => b.date - a.date)[0];
             const pre = isPreschool(classe);
             return (
               <div key={k.id} className="card card-pad">
                 <div className="row mb-16" style={{ gap: 12 }}>
                   <Avatar src={k.photo} name={fullName(k)} size={52} />
-                  <div className="grow"><b style={{ color: 'var(--ink)', fontSize: 16 }}>{fullName(k)}</b><div className="small muted">{classe?.nom} · {k.matricule}</div></div>
+                  <div className="grow"><b style={{ color: 'var(--ink)', fontSize: 16 }}>{fullName(k)}</b><div className="small muted">{classe?.nom}</div></div>
                 </div>
-                <div className="grid g-stats">
-                  <button className="parent-tile" onClick={() => { localStorage.setItem(KEY, k.id); nav('/p/notes'); }}>
-                    <FileText /><span><b>{last ? (pre ? <LevelPill v={last.report.general} long /> : `${fmtNote(scaleNote(last.report.general, bareme))}/${bareme}`) : '—'}</b><small>{last ? `${last.period.libelle}${pre ? '' : ` · ${last.report.rank}e / ${last.effectif}`}` : 'Aucune période validée'}</small></span>
+                {lastAlert && (
+                  <button className={`bubble sys t-${lastAlert.type} parent-alert`} onClick={() => go(k.id, '/p/messages')}>
+                    <div className="bubble-from">Dernière alerte · {timeAgo(lastAlert.date)}</div>{lastAlert.texte}
                   </button>
-                  <button className="parent-tile" onClick={() => { localStorage.setItem(KEY, k.id); nav('/p/vie'); }}>
+                )}
+                <div className="grid g-stats">
+                  <button className="parent-tile" onClick={() => go(k.id, '/p/bulletins')}>
+                    <FileText /><span><b>{last ? (pre ? <LevelPill v={last.report.general} long /> : `${fmtNote(scaleNote(last.report.general, bareme))}/${bareme}`) : '—'}</b><small>{last ? `Bulletin ${last.period.libelle}${pre ? '' : ` · ${last.report.rank}e / ${last.effectif}`}` : 'Aucun bulletin publié'}</small></span>
+                  </button>
+                  <button className="parent-tile" onClick={() => go(k.id, '/p/messages')}>
+                    <MessagesSquare /><span><b>{unread ? `${unread} nouveau${unread > 1 ? 'x' : ''}` : 'Messages'}</b><small>{unread ? 'Message(s) non lu(s)' : 'École et professeurs'}</small></span>
+                  </button>
+                  <button className="parent-tile" onClick={() => go(k.id, '/p/vie')}>
                     <ClipboardCheck /><span><b>{abs.filter((a) => a.statut === 'Absent').length} absence(s)</b><small>{abs.filter((a) => a.statut === 'Retard').length} retard(s) cette année</small></span>
                   </button>
-                  <button className="parent-tile" onClick={() => { localStorage.setItem(KEY, k.id); nav('/p/paiements'); }}>
+                  <button className="parent-tile" onClick={() => go(k.id, '/p/paiements')}>
                     <Wallet /><span><b style={{ color: bal?.rest ? 'var(--red)' : 'var(--green)' }}>{bal?.rest ? money(bal.rest, school?.monnaie) : 'À jour'}</b><small>{bal?.rest ? 'Reste à payer' : 'Scolarité réglée'}</small></span>
-                  </button>
-                  <button className="parent-tile" onClick={() => { localStorage.setItem(KEY, k.id); nav('/p/devoirs'); }}>
-                    <NotebookPen /><span><b>{homework} devoir(s)</b><small>À rendre prochainement</small></span>
                   </button>
                 </div>
               </div>
@@ -103,59 +116,83 @@ export function ParentHome() {
   );
 }
 
-export function ParentNotes() {
+/** Bulletins officiels publiés (périodes validées par la direction), tels que l'école les imprime. */
+export function ParentBulletins() {
   const { child, picker } = useChild();
-  useCollection('grades'); useCollection('periods'); useCollection('evaluations');
-  const school = useDoc('school', 'main');
-  const bareme = school?.bareme ?? 20;
-  const [open, setOpen] = useState<string | null>(null);
-  if (!child) return <><PageHead title="Notes" /><NoChild /></>;
+  useCollection('grades'); useCollection('periods'); useCollection('reportEntries');
+  const [scope, setScope] = useState<string | null>(null);
+  if (!child) return <><PageHead title="Bulletins" /><NoChild /></>;
   const classe = db.get('classes', child.classeId);
   const pre = isPreschool(classe);
   const periods = sortedPeriods();
-  const current = periods.find((p) => !p.verrouillee);
-  // Contrôles déjà corrigés et clôturés de la période en cours (avant validation de la moyenne)
-  const recent = current ? evaluationsForClass(child.classeId).filter((e) => e.periodeId === current.id && e.statut === 'Clôturé') : [];
+  const published = periods.filter((p) => p.verrouillee);
+  const allDone = periods.length > 0 && published.length === periods.length;
+  const scopes: [string, string][] = [...published.map((p) => [p.id, p.libelle] as [string, string]), ...(allDone ? [['annuel', 'Bulletin annuel'] as [string, string]] : [])];
+  const current = scope && scopes.some(([k]) => k === scope) ? scope : scopes[scopes.length - 1]?.[0];
+  const model: BulletinModel = pre ? 'prescolaire' : current === 'annuel' ? 'annuel' : 'tripliable';
+  const theme = TRI_THEMES[0];
+  const d = current ? buildBulletin(child.id, current) : null;
+  const sides = model === 'annuel' ? ['both'] as const : ['recto', 'verso'] as const;
   return (
     <>
-      <PageHead title="Notes" sub={`${fullName(child)} · ${classe?.code}`} />
+      <PageHead title="Bulletins" sub={`${fullName(child)} · ${classe?.code}`} />
       {picker}
-      <div className="stack">
-        {periods.map((p) => {
-          if (!p.verrouillee) return (
-            <div key={p.id} className="card card-pad row" style={{ gap: 12 }}><Lock size={18} color="var(--faint)" /><span className="grow"><b style={{ color: 'var(--ink)' }}>{p.libelle}</b><div className="tiny muted">La moyenne sera publiée après validation par la direction.</div></span></div>
-          );
-          const rep = classReport(child.classeId, p.id);
-          const r = rep?.students.find((x) => x.student.id === child.id);
-          const isOpen = open === p.id;
-          return (
-            <div key={p.id} className="card">
-              <button className="journal-head" onClick={() => setOpen(isOpen ? null : p.id)} aria-expanded={isOpen}>
-                <span className="grow"><b>{p.libelle}</b><span className="tiny muted" style={{ display: 'block' }}>{pre ? 'Niveau global' : r?.general != null ? `Rang ${r.rank}e sur ${rep!.effectif} · moyenne de la classe ${fmtNote(scaleNote(rep!.classGeneral, bareme))}` : 'Pas de note'}</span></span>
-                <b style={{ fontSize: 18, color: 'var(--ink)' }}>{pre ? <LevelPill v={r?.general} /> : `${fmtNote(scaleNote(r?.general ?? null, bareme))}`}</b>
-                <ChevronRight size={16} style={{ transform: isOpen ? 'rotate(90deg)' : undefined }} />
-              </button>
-              {isOpen && r && (
-                <div className="table-wrap"><table className="t">
-                  <thead><tr><th>Matière</th><th className="num">{pre ? 'Niveau' : 'Moyenne'}</th>{!pre && <th className="num">Classe</th>}</tr></thead>
-                  <tbody>{r.lines.filter((l) => l.byPeriod[p.id] !== null).map((l) => (
-                    <tr key={l.course.id}><td>{l.subject.nom}</td><td className="num bold">{pre ? <LevelPill v={l.byPeriod[p.id]} /> : fmtNote(scaleNote(l.byPeriod[p.id], bareme))}</td>{!pre && <td className="num muted">{fmtNote(scaleNote(l.classAvg, bareme))}</td>}</tr>
-                  ))}</tbody>
-                </table></div>
-              )}
-            </div>
-          );
-        })}
-        {recent.length > 0 && (
-          <Card title={`Contrôles corrigés · ${current!.libelle}`} pad={false}>
-            <div className="list">{recent.map((e) => {
-              const g = gradesForEvaluation(e.id).get(child.id);
-              const subj = db.get('subjects', e.matiereId);
-              return <div key={e.id} className="list-item"><span className="grow">{subj?.nom}<br /><span className="tiny muted">{e.titre} · {dateShort(e.date)}</span></span><b style={{ color: 'var(--ink)' }}>{!g ? '—' : g.absent ? 'Absent' : pre ? <LevelPill v={g.note === null ? null : (g.note / e.noteMax) * 20} /> : `${fmtNote(g.note, g.note !== null && Number.isInteger(g.note) ? 0 : 1)}/${e.noteMax}`}</b></div>;
-            })}</div>
-          </Card>
-        )}
-      </div>
+      {!scopes.length ? <Empty title="Aucun bulletin publié">Le bulletin apparaît ici dès que la direction a validé la période.</Empty> : (
+        <div className="stack">
+          <div className="chips-scroll">{scopes.map(([k, l]) => <button key={k} className={`chip ${k === current ? 'active' : ''}`} onClick={() => setScope(k)}>{l}</button>)}</div>
+          {periods.filter((p) => !p.verrouillee).length > 0 && <p className="tiny muted"><Lock size={12} style={{ verticalAlign: -2 }} /> {periods.filter((p) => !p.verrouillee).map((p) => p.libelle).join(', ')} : publié après validation par la direction.</p>}
+          {d && <>
+            <button className="btn btn-primary" style={{ alignSelf: 'flex-start' }} onClick={() => printDocument(<BulletinPages d={d} model={model} theme={theme} />, 'A4 landscape', `Bulletin ${fullName(child)}`)}><Printer size={16} />Télécharger (PDF)</button>
+            {sides.map((sd) => <div key={sd} className="card" style={{ padding: 8, overflow: 'hidden' }}><Scaled width={A4L.w} height={A4L.h}><BulletinPages d={d} model={model} theme={theme} sides={sd} /></Scaled></div>)}
+          </>}
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Progrès : évolution de la moyenne par période (élève et classe), points forts et matières à surveiller. */
+export function ParentProgres() {
+  const { child, picker } = useChild();
+  useCollection('grades'); useCollection('periods');
+  const school = useDoc('school', 'main');
+  const bareme = school?.bareme ?? 20;
+  if (!child) return <><PageHead title="Progrès" /><NoChild /></>;
+  const classe = db.get('classes', child.classeId);
+  const pre = isPreschool(classe);
+  const published = sortedPeriods().filter((p) => p.verrouillee);
+  const reports = published.map((p) => ({ p, rep: classReport(child.classeId, p.id) })).map(({ p, rep }) => ({ p, rep, me: rep?.students.find((x) => x.student.id === child.id) }));
+  const last = reports[reports.length - 1];
+  const prev = reports[reports.length - 2];
+  const delta = last?.me?.general != null && prev?.me?.general != null ? last.me.general - prev.me.general : null;
+  // Comparaison matière par matière entre les deux dernières périodes publiées
+  const lines = last?.me ? last.me.lines.map((l) => ({ nom: l.subject.nom, now: l.byPeriod[last.p.id], before: prev ? l.byPeriod[prev.p.id] : null })).filter((l) => l.now !== null) : [];
+  const ups = lines.filter((l) => l.before !== null && l.now! - l.before! >= 1).sort((a, b) => (b.now! - b.before!) - (a.now! - a.before!)).slice(0, 4);
+  const watch = lines.filter((l) => l.now! < 10 || (l.before !== null && l.before - l.now! >= 1.5)).sort((a, b) => a.now! - b.now!).slice(0, 4);
+  const sc = (v: number | null | undefined) => (v == null ? null : Math.round((scaleNote(v, bareme) ?? 0) * 10) / 10);
+  return (
+    <>
+      <PageHead title="Progrès" sub={`${fullName(child)} · ${classe?.code}`} />
+      {picker}
+      {!last?.me ? <Empty title="Pas encore de résultats publiés" /> : (
+        <div className="stack">
+          <div className="grid g-3">
+            <StatCard tint="blue" icon={<FileText />} value={pre ? <LevelPill v={last.me.general} long /> : `${fmtNote(sc(last.me.general))}/${bareme}`} label={`Moyenne · ${last.p.libelle}`} />
+            {!pre && <StatCard tint={delta == null ? 'blue' : delta >= 0 ? 'green' : 'red'} icon={delta != null && delta < 0 ? <TrendingDown /> : <TrendingUp />} value={delta == null ? '—' : `${delta >= 0 ? '+' : ''}${fmtNote(bareme === 100 ? delta * 5 : delta)}`} label={prev ? `Depuis le ${prev.p.libelle}` : 'Évolution'} />}
+            {!pre && <StatCard tint="violet" icon={<Trophy />} value={`${last.me.rank}e / ${last.rep!.effectif}`} label="Rang dans la classe" />}
+          </div>
+          {!pre && (
+            <Card title="Évolution de la moyenne">
+              <BarChart labels={reports.map((r) => r.p.court)} series={[{ label: fullName(child), color: '#1463f3', values: reports.map((r) => sc(r.me?.general)) }]} line={{ label: 'Moyenne de la classe', color: '#f0a500', values: reports.map((r) => sc(r.rep?.classGeneral)) }} max={bareme} ticks={4} showValues format={(n) => String(Math.round(n))} />
+              <div className="row tiny muted mt-8" style={{ gap: 14 }}><span><i className="legend-dot" style={{ background: '#1463f3' }} />{child.prenom}</span><span><i className="legend-dot" style={{ background: '#f0a500' }} />Moyenne de la classe</span></div>
+            </Card>
+          )}
+          <div className="grid g-2">
+            <Card title="En progrès">{ups.length ? ups.map((l) => <div key={l.nom} className="row between small" style={{ padding: '6px 0' }}><span>{l.nom}</span><b style={{ color: 'var(--green)' }}>{pre ? <LevelPill v={l.now} /> : `${fmtNote(sc(l.before))} → ${fmtNote(sc(l.now))}`}</b></div>) : <p className="small muted">{prev ? 'Pas de hausse marquée depuis la période précédente.' : 'Il faudra deux bulletins pour voir les progrès.'}</p>}</Card>
+            <Card title="À surveiller">{watch.length ? watch.map((l) => <div key={l.nom} className="row between small" style={{ padding: '6px 0' }}><span>{l.nom}</span><b style={{ color: 'var(--red)' }}>{pre ? <LevelPill v={l.now} /> : `${l.before != null ? `${fmtNote(sc(l.before))} → ` : ''}${fmtNote(sc(l.now))}`}</b></div>) : <p className="small muted">Aucune matière en difficulté. Bravo !</p>}</Card>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -222,33 +259,6 @@ export function ParentPaiements() {
         ))}</div>
         {list.length === 0 && <Empty title="Aucun paiement enregistré" />}
       </Card>
-    </>
-  );
-}
-
-export function ParentDevoirs() {
-  const { child, picker } = useChild();
-  const lessons = useCollection('lessons');
-  if (!child) return <><PageHead title="Devoirs" /><NoChild /></>;
-  const today = todayISO();
-  const mine = lessons.filter((l) => l.classeId === child.classeId).sort((a, b) => b.date.localeCompare(a.date));
-  const todo = mine.filter((l) => l.devoirs && (l.pourLe ?? '') >= today).sort((a, b) => (a.pourLe ?? '').localeCompare(b.pourLe ?? ''));
-  const subj = (id: string) => db.get('subjects', id)?.nom;
-  const Row = ({ title, children }: { title: ReactNode; children: ReactNode }) => <div className="list-item" style={{ alignItems: 'flex-start' }}><span className="grow">{title}{children}</span></div>;
-  return (
-    <>
-      <PageHead title="Devoirs" sub={`${fullName(child)} · cahier de textes de la classe`} />
-      {picker}
-      <div className="grid g-2">
-        <Card title="À faire" pad={false}>
-          <div className="list">{todo.map((l) => <Row key={l.id} title={<><b style={{ color: 'var(--ink)' }}>{subj(l.matiereId)}</b> <span className="tiny muted">· pour le {dateShort(l.pourLe)}</span></>}><div className="small">{l.devoirs}</div></Row>)}</div>
-          {todo.length === 0 && <Empty title="Aucun devoir à rendre" />}
-        </Card>
-        <Card title="Derniers cours" pad={false}>
-          <div className="list">{mine.slice(0, 20).map((l) => <Row key={l.id} title={<><b style={{ color: 'var(--ink)' }}>{subj(l.matiereId)}</b> <span className="tiny muted">· {dateShort(l.date)}</span></>}><div className="small">{l.titre}</div>{l.devoirs && <div className="tiny muted">Devoirs : {l.devoirs}</div>}</Row>)}</div>
-          {mine.length === 0 && <Empty title="Le cahier de textes est vide" />}
-        </Card>
-      </div>
     </>
   );
 }

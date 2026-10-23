@@ -64,6 +64,10 @@ export interface ClassRoom extends Meta {
   salle: string;
   capacite: number;
   titulaireId?: ID; // staff id
+  /** Préscolaire : co-titulaires à égalité avec le titulaire (appel, évaluation de tous les domaines, livret). */
+  cotitulaireIds?: ID[];
+  /** Secondaire : membre du personnel chargé de l'appel quotidien (les professeurs ne font pas l'appel). */
+  appelParId?: ID;
   fraisScolarite: number; // montant annuel
   fraisInscription: number;
   comite?: ComiteMember[]; // comité de classe (élèves)
@@ -340,6 +344,19 @@ export interface Lesson extends Meta {
   pourLe?: string; // date de remise des devoirs
 }
 
+/** Messagerie : un fil par élève avec l'école (administration) ou avec un professeur (préscolaire / fondamental). */
+export interface ChatMessage extends Meta {
+  eleveId: ID;
+  canal: 'ecole' | 'professeur';
+  staffId?: ID; // professeur du fil (canal « professeur »)
+  auteur: 'parent' | 'ecole' | 'professeur' | 'systeme';
+  auteurId?: ID; // utilisateur
+  texte: string;
+  type?: 'message' | 'absence' | 'retard' | 'conduite' | 'felicitations';
+  date: number;
+  lu: { parent?: boolean; ecole?: boolean; prof?: boolean };
+}
+
 export type ModuleKey =
   | 'dashboard' | 'eleves' | 'inscriptions' | 'classes' | 'parents' | 'personnel'
   | 'emploi' | 'notes' | 'presences' | 'discipline' | 'cahier' | 'finance' | 'documents' | 'communication'
@@ -406,6 +423,7 @@ export interface Collections {
   events: SchoolEvent;
   incidents: Incident;
   lessons: Lesson;
+  chat: ChatMessage;
   roles: Role;
   users: User;
   audit: AuditLog;
@@ -415,5 +433,5 @@ export type CollectionName = keyof Collections;
 export const COLLECTIONS: CollectionName[] = [
   'school', 'years', 'periods', 'classes', 'subjects', 'courses', 'guardians', 'students', 'staff',
   'evaluations', 'grades', 'reportEntries', 'attendance', 'staffAttendance', 'timetable', 'payments',
-  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'roles', 'users', 'audit',
+  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'roles', 'users', 'audit',
 ];

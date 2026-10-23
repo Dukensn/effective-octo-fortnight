@@ -9,6 +9,8 @@ const ADMIN: [string, string][] = [
   ['Paiements', 'Finance → Nouveau → Paiement élève. Le reste à payer est calculé automatiquement ; imprimez le reçu en 2 exemplaires. Annuler un paiement demande un motif, gardé au journal.'],
   ['Relances', 'Finance → Paiements → Relances : choisissez les élèves (ou « Pas relancés depuis 7 jours »), vérifiez le message, puis « Relancer la sélection ». WhatsApp et les SMS s’ouvrent un par un avec le message prêt ; chaque envoi est noté.'],
   ['Accès parent', 'Parents → fiche du parent → « Accès parent » : un code à 4 chiffres est créé. Le parent se connecte avec son numéro de téléphone et ce code, et ne voit que ses enfants.'],
+  ['Messagerie', 'Menu → Messagerie : un fil « École » par élève. Les absences, retards et notes de conduite y arrivent automatiquement chez le parent. Au préscolaire et au fondamental, les professeurs échangent aussi avec les parents ; la direction voit ces échanges (onglet « Professeurs ↔ parents »).'],
+  ['Appel', 'Un appel par jour et par classe. Préscolaire et fondamental : le(s) titulaire(s). Secondaire : le membre du personnel choisi dans la fiche de la classe (« Appel fait par »). La cloche signale chaque jour les classes sans appel.'],
   ['Journal', 'Menu → Journal : toutes les actions importantes, avec l’auteur, l’heure, l’ancienne et la nouvelle valeur (notes modifiées, paiements annulés…). Rien ne peut y être effacé.'],
   ['Rôles', 'Paramètres → Rôles & permissions : créez un rôle (ex. Caissier) et cochez ce qu’il peut voir ou modifier. Puis Paramètres → Utilisateurs pour lui donner un compte.'],
   ['Hors ligne', 'L’application fonctionne sans Internet. Les modifications sont gardées sur l’appareil et envoyées à Firebase dès que la connexion revient.'],
@@ -21,7 +23,9 @@ const PROF: [string, string][] = [
 ];
 
 const PARENT: [string, string][] = [
-  ['Notes', 'La moyenne d’une période apparaît quand la direction l’a validée. Avant, vous voyez les contrôles déjà corrigés.'],
+  ['Messages', 'Les absences, retards et remarques de conduite arrivent ici automatiquement. Vous pouvez répondre à l’école et, au préscolaire et au fondamental, aux professeurs de votre enfant.'],
+  ['Bulletins', 'Chaque bulletin apparaît dès que la direction a validé la période. « Télécharger (PDF) » donne le même bulletin que celui remis par l’école.'],
+  ['Progrès', 'L’évolution de la moyenne d’une période à l’autre, comparée à la classe, avec les matières en progrès et celles à surveiller.'],
   ['Plusieurs enfants', 'Touchez le prénom de l’enfant en haut de l’écran pour passer de l’un à l’autre.'],
   ['Paiements et reçus', 'Paiements : total de l’année, déjà payé, reste à payer, et chaque reçu à télécharger.'],
   ['Code oublié', 'Demandez un nouveau code au secrétariat. Vous pouvez changer votre code dans Menu → votre nom.'],

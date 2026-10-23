@@ -7,6 +7,7 @@ import { classReport, classStudents, fmtNote, sortedPeriods, appreciation, isPre
 import { LevelPill } from '../../components/Level';
 import { civ, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
+import { callerLabel, classTeacherIds } from '../../lib/regles';
 import { ClassForm } from './Classes';
 import { ClassComite } from './ClassComite';
 import { roleLabel } from '../../lib/comite';
@@ -52,7 +53,7 @@ export default function ClassDetail() {
       <PageHead
         back={<button className="back-link" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => nav('/classes')}><ArrowLeft size={16} />Classes</button>}
         title={classe.code}
-        sub={`${classe.nom} · ${classe.salle} · Titulaire : ${tit ? civ(tit) : '—'}`}
+        sub={`${classe.nom} · ${classe.salle} · ${classe.niveau === 'Préscolaire' && (classe.cotitulaireIds?.length ?? 0) > 0 ? `Co-titulaires : ${classTeacherIds(classe).map((id) => civ(staff.find((s) => s.id === id))).join(', ')}` : `Titulaire : ${tit ? civ(tit) : '—'}`} · Appel : ${callerLabel(classe)}`}
         actions={<>
           <button className="btn" onClick={() => nav(`/documents/bulletins?classe=${classe.id}`)}><FileText />Bulletins</button>
           {canWrite && <button className="btn btn-primary" onClick={() => setEdit(true)}><Pencil />Modifier</button>}

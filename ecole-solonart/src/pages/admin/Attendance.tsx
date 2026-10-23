@@ -9,13 +9,14 @@ import { BarChart } from '../../components/charts';
 import { todayISO, dateFull, civ } from '../../lib/format';
 import { classStudents } from '../../data/compute';
 import { useSession } from '../../lib/session';
+import { callerLabel } from '../../lib/regles';
 
 export default function AttendancePage() {
   const [params] = useSearchParams();
   const [tab, setTab] = useState<'eleves' | 'personnel' | 'stats'>((params.get('tab') as 'personnel') ?? 'eleves');
   return (
     <>
-      <PageHead title="Présences & ponctualité" sub={dateFull()} />
+      <PageHead title="Présences & ponctualité" sub={`${dateFull()} · un appel par jour et par classe ; au secondaire, il est fait par le personnel désigné.`} />
       <Tabs tabs={[['eleves', 'Élèves'], ['personnel', 'Personnel'], ['stats', 'Statistiques']]} value={tab} onChange={setTab} />
       {tab === 'eleves' && <Students />}
       {tab === 'personnel' && <StaffAtt />}
@@ -30,7 +31,9 @@ function Students() {
   const attendance = useCollection('attendance');
   const [date, setDate] = useState(todayISO());
   const [params] = useSearchParams();
-  const [classe, setClasse] = useState(params.get('classe') ?? classes[0]?.id ?? '');
+  // Par défaut : la première classe dont l'appel revient à cet utilisateur et n'est pas encore fait.
+  const mine = classes.find((c) => c.appelParId === session.user.staffId && !attendance.some((a) => a.id === `at-${todayISO()}-${c.id}-done`));
+  const [classe, setClasse] = useState(params.get('classe') ?? mine?.id ?? classes[0]?.id ?? '');
   const day = attendance.filter((a) => a.date === date);
   const absent = day.filter((a) => a.eleveId && a.statut === 'Absent').length;
   const late = day.filter((a) => a.eleveId && a.statut === 'Retard').length;
@@ -58,7 +61,7 @@ function Students() {
             return (
               <button key={c.id} className="list-item" style={{ border: 0, width: '100%', textAlign: 'left', borderBottom: '1px solid var(--line-2)', background: c.id === classe ? 'var(--primary-50)' : '#fff' }} onClick={() => setClasse(c.id)}>
                 {ok ? <CheckCircle2 size={18} color="var(--green)" /> : <Circle size={18} color="var(--faint)" />}
-                <span className="grow" style={{ fontWeight: 500, color: 'var(--ink)' }}>{c.code}</span>
+                <span className="grow" style={{ fontWeight: 500, color: 'var(--ink)' }}>{c.code}<span className="tiny muted" style={{ display: 'block', fontWeight: 400 }}>{callerLabel(c)}{c.appelParId && c.appelParId === session.user.staffId ? ' (vous)' : ''}</span></span>
                 {ok ? <span className="small muted">{abs} absent(s)</span> : <span className="small" style={{ color: 'var(--orange)' }}>En attente</span>}
               </button>
             );

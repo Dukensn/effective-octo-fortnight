@@ -6,6 +6,7 @@ import { evaluationStats, fmtNote, isPreschool, levelOf, LEVELS } from '../../da
 import { Empty, Modal, toast, useIsDesktop, Confirm, ScreenHead } from '../../components/ui';
 import { fullName, dateShort, downloadCSV, timeAgo } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
+import { teachesCourse } from '../../lib/regles';
 import { printDocument } from '../../lib/print';
 import { PalmaresSheet } from '../../docs/Sheets';
 
@@ -25,7 +26,7 @@ export default function Palmares({ admin }: { admin?: boolean }) {
   const [closeAsk, setCloseAsk] = useState(false);
   const [hist, setHist] = useState(false);
   if (!ev) return <Empty title="Évaluation introuvable" />;
-  const isOwner = course?.professeurId === session.user.staffId;
+  const isOwner = teachesCourse(session.user.staffId, course);
   const canEdit = (admin && session.can('notes', 'write')) || (isOwner && !period?.verrouillee && ev.statut !== 'Clôturé');
   const st = evaluationStats(ev);
   const pre = isPreschool(classe);

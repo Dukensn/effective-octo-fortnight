@@ -1,12 +1,14 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
-  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles, History,
+  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles, History, MessagesSquare, TrendingUp,
 } from 'lucide-react';
 import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
 import { PrintRoot } from './lib/print';
 import { useSession } from './lib/session';
+import { useCollection } from './data/store';
+import { canTeacherCall, canTeacherMessage } from './lib/regles';
 import type { ModuleKey } from './data/types';
 import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -48,7 +50,8 @@ import TeacherDiscipline from './pages/teacher/TeacherDiscipline';
 import Discipline from './pages/admin/Discipline';
 import Cahier from './pages/admin/Cahier';
 import Journal from './pages/admin/Journal';
-import { ParentHome, ParentNotes, ParentVie, ParentPaiements, ParentDevoirs } from './pages/parent/Parent';
+import { ParentHome, ParentBulletins, ParentProgres, ParentVie, ParentPaiements } from './pages/parent/Parent';
+import { AdminMessages, TeacherMessages, ParentMessages } from './pages/Messages';
 
 const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/', label: 'Tableau de bord', icon: Home, end: true, m: 'dashboard' },
@@ -65,6 +68,7 @@ const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/cahier', label: 'Cahier de textes', icon: NotebookPen, m: 'cahier' },
   { to: '/finance', label: 'Finance', icon: BadgeDollarSign, m: 'finance' },
   { to: '/documents', label: 'Documents', icon: FolderOpen, m: 'documents' },
+  { to: '/messages', label: 'Messagerie', icon: MessagesSquare, m: 'communication' },
   { to: '/communication', label: 'Communication', icon: Mail, m: 'communication' },
   { to: '/rapports', label: 'Rapports', icon: BarChart3, m: 'rapports' },
   { to: '/journal', label: 'Journal', icon: History, m: 'utilisateurs' },
@@ -77,6 +81,7 @@ const TEACHER_NAV: NavItem[] = [
   { to: '/prof/notes', label: 'Saisir des notes', icon: BookOpenCheck },
   { to: '/prof/palmares', label: 'Palmarès', icon: Trophy },
   { to: '/prof/appel', label: 'Faire l’appel', icon: ClipboardCheck },
+  { to: '/prof/messages', label: 'Messages', icon: MessagesSquare },
   { to: '/prof/emploi', label: 'Emploi du temps', icon: CalendarClock },
   { to: '/prof/cahier', label: 'Cahier de textes', icon: NotebookPen },
   { to: '/prof/discipline', label: 'Discipline', icon: ShieldAlert },
@@ -145,6 +150,7 @@ function AdminApp() {
         <Route path="/documents/bulletins" element={G('documents', <ReportCards />)} />
         <Route path="/documents/badges" element={G('documents', <Badges />)} />
         <Route path="/communication" element={G('communication', <Communication />)} />
+        <Route path="/messages" element={G('communication', <AdminMessages />)} />
         <Route path="/evenements" element={<Events />} />
         <Route path="/rapports" element={G('rapports', <Reports />)} />
         <Route path="/journal" element={G('utilisateurs', <Journal />)} />
@@ -158,14 +164,21 @@ function AdminApp() {
 }
 
 function TeacherApp() {
+  const session = useSession()!;
+  const classes = useCollection('classes');
+  useCollection('courses');
+  // L'appel n'apparaît que pour les professeurs qui en ont la charge (jamais au secondaire) ; idem pour la messagerie.
+  const appel = classes.some((c) => canTeacherCall(session.user.staffId, c));
+  const msg = classes.some((c) => canTeacherMessage(session.user.staffId, c));
+  const items = TEACHER_NAV.filter((n) => (n.to !== '/prof/appel' || appel) && (n.to !== '/prof/messages' || msg));
   const tabs: NavItem[] = [
     { to: '/', label: 'Accueil', icon: Home, end: true },
     { to: '/prof/notes', label: 'Notes', icon: BookOpenCheck },
-    { to: '/prof/appel', label: 'Appel', icon: ClipboardCheck },
-    { to: '/prof/emploi', label: 'Horaire', icon: CalendarClock },
+    appel ? { to: '/prof/appel', label: 'Appel', icon: ClipboardCheck } : { to: '/prof/cahier', label: 'Cahier', icon: NotebookPen },
+    msg ? { to: '/prof/messages', label: 'Messages', icon: MessagesSquare } : { to: '/prof/emploi', label: 'Horaire', icon: CalendarClock },
   ];
   return (
-    <Shell items={TEACHER_NAV} tabs={tabs}>
+    <Shell items={items} tabs={tabs}>
       <Routes>
         <Route path="/" element={<TeacherHome />} />
         <Route path="/prof/classes" element={<TeacherClasses />} />
@@ -178,6 +191,7 @@ function TeacherApp() {
         <Route path="/prof/emploi" element={<TeacherTimetable />} />
         <Route path="/prof/cahier" element={<TeacherCahier />} />
         <Route path="/prof/discipline" element={<TeacherDiscipline />} />
+        <Route path="/prof/messages" element={<TeacherMessages />} />
         <Route path="/evenements" element={<Events />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/aide" element={<Help />} />
@@ -189,10 +203,11 @@ function TeacherApp() {
 
 const PARENT_NAV: NavItem[] = [
   { to: '/', label: 'Accueil', icon: Home, end: true },
-  { to: '/p/notes', label: 'Notes', icon: FileText },
+  { to: '/p/messages', label: 'Messages', icon: MessagesSquare },
+  { to: '/p/bulletins', label: 'Bulletins', icon: FileText },
+  { to: '/p/progres', label: 'Progrès', icon: TrendingUp },
   { to: '/p/vie', label: 'Vie scolaire', icon: ClipboardCheck },
   { to: '/p/paiements', label: 'Paiements', icon: Receipt },
-  { to: '/p/devoirs', label: 'Devoirs', icon: NotebookPen },
   { to: '/evenements', label: 'Événements', icon: CalendarHeart },
 ];
 
@@ -201,10 +216,11 @@ function ParentApp() {
     <Shell items={PARENT_NAV} tabs={PARENT_NAV.slice(0, 4)}>
       <Routes>
         <Route path="/" element={<ParentHome />} />
-        <Route path="/p/notes" element={<ParentNotes />} />
+        <Route path="/p/messages" element={<ParentMessages />} />
+        <Route path="/p/bulletins" element={<ParentBulletins />} />
+        <Route path="/p/progres" element={<ParentProgres />} />
         <Route path="/p/vie" element={<ParentVie />} />
         <Route path="/p/paiements" element={<ParentPaiements />} />
-        <Route path="/p/devoirs" element={<ParentDevoirs />} />
         <Route path="/evenements" element={<Events />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/aide" element={<Help />} />

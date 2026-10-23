@@ -6,11 +6,12 @@ import { Avatar, Badge, Card, Empty, PageHead } from '../../components/ui';
 import { IncidentForm, incidentTone } from '../../components/IncidentForm';
 import { dateShort, fullName } from '../../lib/format';
 import { useSession } from '../../lib/session';
+import { teachesCourse } from '../../lib/regles';
 
 /** Le professeur signale un incident (ou des félicitations) pour un élève de ses classes. */
 export default function TeacherDiscipline() {
   const session = useSession()!;
-  const courses = useCollection('courses').filter((c) => c.professeurId === session.user.staffId);
+  const courses = useCollection('courses').filter((c) => teachesCourse(session.user.staffId, c));
   const classIds = new Set(courses.map((c) => c.classeId));
   const students = useCollection('students').filter((s) => classIds.has(s.classeId) && s.statut === 'Actif');
   const classes = useCollection('classes');

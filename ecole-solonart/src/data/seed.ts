@@ -1,6 +1,7 @@
 // Données de démonstration (profils fictifs) — contexte haïtien, École Mixte Solonart, Léogâne.
 import { db } from './store';
 import type {
+  ChatMessage,
   ClassRoom, Course, Evaluation, Grade, Guardian, Period, Role, Staff, Student, Subject, TimetableSlot,
   Payment, Expense, Salary, Attendance, ModuleKey, Access, User, Sexe, Incident, Lesson,
 } from './types';
@@ -267,6 +268,9 @@ export function seedDatabase() {
       langue: 'Français', updatedAt: 0,
     });
   }
+  // Démonstration espace parent : la famille Dorval a aussi un enfant en moyenne section (préscolaire).
+  const petit = students.find((x) => x.classeId === 'c-ms' && x.statut === 'Actif');
+  if (petit) { petit.nom = 'Dorval'; petit.tuteurIds = [jeanDorval.id, marieDorval.id]; }
   db.bulkPut('guardians', guardians);
   db.bulkPut('students', students);
   // Comités de classe : élèves élus (pas de comité au préscolaire).
@@ -279,6 +283,9 @@ export function seedDatabase() {
     c.comite = picked.map((x, i) => ({ eleveId: x.id, role: comiteRoles[i], depuis: '2024-10-07' }));
   }
   classes.forEach((c) => delete (c as Partial<ClassRoom & { _n: number }>)._n);
+  // Secondaire : l'appel quotidien est fait par le censeur, pas par les professeurs.
+  const censeur = staff.find((x) => x.poste.startsWith('Censeur'));
+  classes.forEach((c) => { if (c.niveau === 'Secondaire') c.appelParId = censeur?.id; });
   db.bulkPut('classes', classes);
 
   // ---------- Évaluations & notes ----------
@@ -538,6 +545,16 @@ export function seedDatabase() {
   }
   db.bulkPut('lessons', lessons);
 
+  // ---------- Préscolaire : deux maîtresses co-titulaires par classe ----------
+  const firstNew = staff.length;
+  const cotit = [
+    addStaff({ nom: 'Lafortune', prenom: 'Nadège', sexe: 'F', type: 'Professeur', poste: 'Maîtresse', specialite: 'Préscolaire', diplome: 'Brevet de jardinière d’enfants', salaire: 25000 }),
+    addStaff({ nom: 'Célestin', prenom: 'Fabienne', sexe: 'F', type: 'Professeur', poste: 'Maîtresse', specialite: 'Préscolaire', diplome: 'Brevet de jardinière d’enfants', salaire: 25000 }),
+    addStaff({ nom: 'Augustin', prenom: 'Myrlande', sexe: 'F', type: 'Professeur', poste: 'Maîtresse', specialite: 'Préscolaire', diplome: 'Diplôme ENI (préscolaire)', salaire: 25500 }),
+  ];
+  db.bulkPut('staff', staff.slice(firstNew));
+  ['ps', 'ms', 'gs'].forEach((code, i) => db.patch('classes', `c-${code}`, { cotitulaireIds: [cotit[i].id] }));
+
   // ---------- Rôles & utilisateurs ----------
   const roles: Role[] = [
     { id: 'r-dir', nom: 'Directeur', description: 'Accès complet à toute l’application.', systeme: true, espace: 'admin', permissions: perms('write'), updatedAt: 0 },
@@ -563,4 +580,20 @@ export function seedDatabase() {
     ...[jeanDorval, marieDorval].map((g) => ({ id: `u-par-${g.id}`, nom: `${g.sexe === 'F' ? 'Mme' : 'M.'} ${g.prenom} ${g.nom}`, email: g.email ?? '', telephone: g.telephone, roleId: 'r-par', guardianId: g.id, pin: '1234', actif: true, photo: g.photo })),
   ];
   db.bulkPut('users', users as User[]);
+
+  // ---------- Messagerie (démonstration) ----------
+  const now = Date.now();
+  const H = 3600000;
+  const naomi = students.find((x) => x.nom === 'Dorval' && x.prenom === 'Naomi');
+  const chat: Omit<ChatMessage, 'updatedAt'>[] = [
+    { id: 'chat-d1', eleveId: 'e-jean-philippe', canal: 'ecole', auteur: 'systeme', type: 'felicitations', texte: 'Félicitations : Premier prix au concours de lecture.', date: now - 72 * H, lu: { ecole: true, prof: true, parent: true } },
+    ...(naomi ? [
+      { id: 'chat-d2', eleveId: naomi.id, canal: 'ecole' as const, auteur: 'systeme' as const, type: 'absence' as const, texte: 'Absence : Naomi n’était pas en classe hier. Merci de prévenir l’école du motif.', date: now - 26 * H, lu: { ecole: true, prof: true, parent: true } },
+      { id: 'chat-d3', eleveId: naomi.id, canal: 'ecole' as const, auteur: 'parent' as const, auteurId: `u-par-${jeanDorval.id}`, type: 'message' as const, texte: 'Bonjour, Naomi avait de la fièvre. Elle revient demain avec un certificat médical. Merci.', date: now - 25 * H, lu: { parent: true } },
+    ] : []),
+    ...(petit ? [
+      { id: 'chat-d4', eleveId: petit.id, canal: 'professeur' as const, staffId: maitresses.MS.id, auteur: 'professeur' as const, auteurId: `u-${maitresses.MS.id}`, type: 'message' as const, texte: `Bonjour M. Dorval, ${petit.prenom} a très bien participé à l’atelier de peinture aujourd’hui. Pensez à apporter une blouse pour vendredi.`, date: now - 5 * H, lu: { prof: true } },
+    ] : []),
+  ];
+  db.bulkPut('chat', chat as ChatMessage[]);
 }

@@ -63,7 +63,7 @@ export default function Dashboard() {
       { n: appels, label: 'Appels non faits aujourd’hui', sub: 'Classes sans feuille de présence', to: '/presences', icon: ClipboardCheck, tint: 'violet', m: 'presences' },
       { n: notes, label: `Notes à saisir — ${current?.court ?? ''}`, sub: 'Évaluations incomplètes', to: '/notes', icon: PenSquare, tint: 'blue', m: 'notes' },
       { n: moncash, label: 'Paiements à confirmer', sub: 'MonCash / NatCash en attente', to: '/finance?tab=paiements', icon: Smartphone, tint: 'orange', m: 'finance' },
-      { n: finance.late, label: 'Élèves en retard de paiement', sub: 'Envoyer un rappel WhatsApp', to: '/finance?tab=paiements', icon: BadgeDollarSign, tint: 'red', m: 'finance' },
+      { n: finance.late, label: 'Élèves en retard de paiement', sub: 'Relances WhatsApp ou SMS', to: '/finance?tab=paiements', icon: BadgeDollarSign, tint: 'red', m: 'finance' },
       { n: sal, label: 'Salaires du mois à payer', sub: 'Personnel en attente', to: '/finance?tab=salaires', icon: Wallet, tint: 'green', m: 'finance' },
       { n: photos, label: 'Élèves sans photo', sub: 'Séance photo avec le téléphone', to: '/eleves/photos', icon: Camera, tint: 'blue', m: 'eleves' },
       { n: incOuverts, label: 'Incidents à traiter', sub: 'Registre de discipline', to: '/discipline', icon: ShieldAlert, tint: 'red', m: 'discipline' },

@@ -6,11 +6,12 @@ import { Empty, PageHead } from '../../components/ui';
 import { LessonForm } from '../../components/LessonForm';
 import { LessonList } from '../admin/Cahier';
 import { useSession } from '../../lib/session';
+import { teachesCourse } from '../../lib/regles';
 
 /** Cahier de textes du professeur : ses cours, ses séances, ses devoirs. */
 export default function TeacherCahier() {
   const session = useSession()!;
-  const courses = useCollection('courses').filter((c) => c.professeurId === session.user.staffId);
+  const courses = useCollection('courses').filter((c) => teachesCourse(session.user.staffId, c));
   const classes = useCollection('classes');
   const subjects = useCollection('subjects');
   const lessons = useCollection('lessons');

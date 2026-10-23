@@ -6,6 +6,7 @@ import { classStudents, gradesForEvaluation, isPreschool, levelOf, LEVELS } from
 import { Avatar, Empty, Modal, ScreenHead, toast } from '../../components/ui';
 import { fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
+import { teachesCourse } from '../../lib/regles';
 import type { AuditChange } from '../../data/types';
 
 /** Saisie des notes d'une évaluation — utilisée par le professeur et par l'administration. */
@@ -47,7 +48,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
   })), [values, max]) as Record<string, { ok: boolean; empty?: boolean; absent?: boolean; note?: number }>;
 
   if (!ev) return <Empty title="Évaluation introuvable" />;
-  const isOwner = course?.professeurId === session.user.staffId;
+  const isOwner = teachesCourse(session.user.staffId, course);
   const canAdmin = admin && session.can('notes', 'write');
   const locked = !canAdmin && (period?.verrouillee || ev.statut === 'Clôturé');
   if (!isOwner && !canAdmin) return <Empty title="Accès refusé">Cette évaluation ne fait pas partie de vos cours.</Empty>;

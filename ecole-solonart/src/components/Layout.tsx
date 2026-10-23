@@ -7,6 +7,7 @@ import { watchTables } from '../lib/stackTables';
 import { useCollection, useDoc } from '../data/store';
 import { logout, useSession } from '../lib/session';
 import { useSyncState } from '../data/sync';
+import { useNotifications } from '../lib/notifications';
 import { norm, fullName } from '../lib/format';
 
 export interface NavItem { to: string; label: string; icon: LucideIcon; end?: boolean }
@@ -123,10 +124,10 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
   const navigate = useNavigate();
   const location = useLocation();
   const desktop = useIsDesktop();
-  const pendingStudents = useCollection('students').filter((s) => s.statut === 'En attente').length;
-  const pendingPayments = useCollection('payments').filter((p) => p.statut === 'En attente').length;
-  const notifCount = (session?.isTeacher || session?.isParent) ? 0 : pendingStudents + pendingPayments;
-  useEffect(() => { window.scrollTo(0, 0); setSearchOpen(false); setPlus(false); setMore(false); }, [location.pathname, location.search]);
+  const notifs = useNotifications();
+  const notifCount = notifs.reduce((a, x) => a + x.n, 0);
+  const [bell, setBell] = useState(false);
+  useEffect(() => { window.scrollTo(0, 0); setSearchOpen(false); setPlus(false); setMore(false); setBell(false); }, [location.pathname, location.search]);
   const phone = useIsMobile();
   const [contentEl, setContentEl] = useState<HTMLElement | null>(null);
   useEffect(() => (phone && contentEl ? watchTables(contentEl) : undefined), [phone, contentEl]);
@@ -153,7 +154,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
             <GlobalSearch />
             <span className="spacer" />
             <SyncPill />
-            <button className="icon-btn" aria-label="Notifications" onClick={() => navigate('/evenements')}>
+            <button className="icon-btn" aria-label="Notifications" onClick={() => setBell(true)}>
               <Bell />
               {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
             </button>
@@ -167,7 +168,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
             {isTab ? <SchoolLogo size={28} className="appbar-logo" /> : <button className="icon-btn" aria-label="Retour" onClick={goBack}><ArrowLeft /></button>}
             <h1 className="appbar-title"><span ref={titleRef} className="ab-slot" /><span className="ab-default">{fallbackTitle}</span></h1>
             {!(session.isTeacher || session.isParent) && <button className="icon-btn" aria-label="Rechercher" onClick={() => setSearchOpen(!searchOpen)}><Search /></button>}
-            <button className="icon-btn" aria-label="Notifications" onClick={() => navigate('/evenements')}>
+            <button className="icon-btn" aria-label="Notifications" onClick={() => setBell(true)}>
               <Bell />
               {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
             </button>
@@ -193,6 +194,16 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
             </button>
           ))}
         </div>
+      </Sheet>
+      <Sheet open={bell} onClose={() => setBell(false)} title="Notifications">
+        {notifs.map((x) => (
+          <button key={x.label} className="notif-row" onClick={() => { setBell(false); navigate(x.to); }}>
+            <span className={`todo-n tint-${x.tone}`}>{x.n}</span>
+            <span className="grow"><b>{x.label}</b><small>{x.sub}</small></span><ChevronRight size={18} className="chev" />
+          </button>
+        ))}
+        {notifs.length === 0 && <p className="small muted" style={{ padding: '12px 4px' }}>Rien en attente.</p>}
+        <button className="notif-row" onClick={() => { setBell(false); navigate('/evenements'); }}><span className="grow"><b>Événements à venir</b><small>Réunions, examens, congés</small></span><ChevronRight size={18} className="chev" /></button>
       </Sheet>
       <Sheet open={more} onClose={() => setMore(false)}>
         <button className="me-row" onClick={() => { setMore(false); navigate('/profil'); }}>

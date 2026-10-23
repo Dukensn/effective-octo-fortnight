@@ -56,7 +56,7 @@ export function PrescolaireRecto({ d }: { d: BulletinData }) {
           <div style={{ ...box, background: '#fff', fontSize: 10.5, display: 'grid', gap: 3 }}>
             <div>Né{d.student.sexe === 'F' ? 'e' : ''} le : <b>{dateLong(d.student.dateNaissance)}</b></div>
             <div>Matricule : <b>{d.student.matricule}</b></div>
-            <div>Maîtresse : <b>{d.titulaire || '—'}</b></div>
+            <div>{d.titulaire.includes(' et ') ? 'Maîtresses' : 'Maîtresse'} : <b>{d.titulaire || '—'}</b></div>
             <div>Année scolaire : <b>{d.yearLabel}</b></div>
           </div>
           <div style={{ ...box, background: '#fff' }}>
@@ -115,7 +115,7 @@ export function PrescolaireRecto({ d }: { d: BulletinData }) {
           </div>
           <div style={{ marginTop: 'auto', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'end', fontSize: 10.5, borderTop: '1px solid #e2dbf6', paddingTop: 6 }}>
             <div style={{ color: INK }}>Fait à {d.school.commune}, le {dateLong(d.periods.find((x) => x.id === d.scope)?.fin ?? d.periods[d.periods.length - 1]?.fin)}</div>
-            <div className="d-sign"><span>La Maîtresse</span><Signature variant={2} w={90} color={INK} /><div className="line" /><span>{d.titulaire}</span></div>
+            <div className="d-sign"><span>{d.titulaire.includes(' et ') ? 'Les Maîtresses' : 'La Maîtresse'}</span><Signature variant={2} w={90} color={INK} /><div className="line" /><span>{d.titulaire}</span></div>
             <div className="d-sign"><span>La Direction</span><Signature image={d.school.signatureDirecteur} w={90} color={INK} /><div className="line" /><span>{d.school.directeur}</span></div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { INCIDENT_TYPES, SANCTIONS, type Incident, type Student } from '../data/
 import { Avatar, Field, Modal, SearchInput, Toggle, toast } from './ui';
 import { civ, dateLong, fullName, norm, todayISO } from '../lib/format';
 import { audit, useSession } from '../lib/session';
+import { notifyIncident } from '../lib/chat';
 
 export const GRAVITES: NonNullable<Incident['gravite']>[] = ['Légère', 'Moyenne', 'Grave'];
 export const incidentTone = (i: Pick<Incident, 'type' | 'gravite'>) =>
@@ -51,8 +52,10 @@ export function IncidentForm({ value, students, onClose }: { value: Partial<Inci
       statut: felicitations ? 'Clôturé' : f.statut,
       auteurId: f.auteurId ?? session.user.staffId,
     } as Incident;
-    const saved = db.put('incidents', doc);
-    audit(value.id ? 'Modification incident' : 'Signalement incident', `${fullName(eleve)} · ${f.type}`);
+    // Nouveau signalement : le parent reçoit automatiquement une note de conduite dans sa messagerie.
+    const saved = db.put('incidents', value.id ? doc : { ...doc, parentsPrevenus: true });
+    if (!value.id && eleve) notifyIncident(saved.id, eleve, saved.type, saved.description, saved.sanction);
+    audit(value.id ? 'Modification incident' : 'Signalement incident', `${fullName(eleve)} · ${f.type}`, { domaine: 'discipline' });
     toast(value.id ? 'Incident mis à jour' : felicitations ? 'Félicitations enregistrées' : 'Incident enregistré');
     onClose();
     return saved;
@@ -118,7 +121,8 @@ export function IncidentForm({ value, students, onClose }: { value: Partial<Inci
         )}
         {!felicitations && (
           <div className="stack" style={{ gap: 10 }}>
-            <label className="row between"><span>Parents prévenus</span><Toggle on={!!f.parentsPrevenus} onChange={(v) => set('parentsPrevenus', v)} label="Parents prévenus" /></label>
+            {value.id ? <label className="row between"><span>Parents prévenus</span><Toggle on={!!f.parentsPrevenus} onChange={(v) => set('parentsPrevenus', v)} label="Parents prévenus" /></label>
+              : <p className="tiny muted">Le parent recevra automatiquement cette note de conduite dans sa messagerie.</p>}
             <label className="row between"><span>Dossier clôturé</span><Toggle on={f.statut === 'Clôturé'} onChange={(v) => set('statut', v ? 'Clôturé' : 'Ouvert')} label="Dossier clôturé" /></label>
           </div>
         )}

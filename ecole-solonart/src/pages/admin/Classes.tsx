@@ -64,7 +64,8 @@ export default function Classes() {
 }
 
 export function ClassForm({ value, onClose, onSaved }: { value: Partial<ClassRoom>; onClose: () => void; onSaved?: (id: string) => void }) {
-  const staff = useCollection('staff').filter((s) => s.type === 'Professeur' && s.statut === 'Actif');
+  const allStaff = useCollection('staff').filter((s) => s.statut === 'Actif');
+  const staff = allStaff.filter((s) => s.type === 'Professeur');
   const school = db.get('school', 'main')!;
   const [f, setF] = useState<Partial<ClassRoom>>({ niveau: 'Secondaire', capacite: 35, fraisInscription: 5000, fraisScolarite: 60000, ...value });
   const set = (k: keyof ClassRoom, v: unknown) => setF((x) => ({ ...x, [k]: v }));
@@ -95,7 +96,17 @@ export function ClassForm({ value, onClose, onSaved }: { value: Partial<ClassRoo
         <Field label="Salle"><input className="input" value={f.salle ?? ''} onChange={(e) => set('salle', e.target.value)} /></Field>
         <Field label="Capacité"><input type="number" className="input" value={f.capacite} onChange={(e) => set('capacite', Number(e.target.value))} /></Field>
         <Field label="Titulaire"><select className="select" value={f.titulaireId ?? ''} onChange={(e) => set('titulaireId', e.target.value || undefined)}><option value="">—</option>{staff.map((s) => <option key={s.id} value={s.id}>{civ(s)}</option>)}</select></Field>
-        <div />
+        {f.niveau === 'Secondaire' ? (
+          <Field label="Appel fait par"><select className="select" value={f.appelParId ?? ''} onChange={(e) => set('appelParId', e.target.value || undefined)}><option value="">Administration (toute personne autorisée)</option>{allStaff.filter((s) => s.type !== 'Professeur').map((s) => <option key={s.id} value={s.id}>{civ(s)} · {s.poste}</option>)}</select></Field>
+        ) : <div />}
+        {f.niveau === 'Préscolaire' && (
+          <Field label="Co-titulaires (à égalité : appel, évaluations, livret)" className="span-2">
+            <div className="row wrap" style={{ gap: 6 }}>{staff.filter((s) => s.id !== f.titulaireId).map((s) => {
+              const on = (f.cotitulaireIds ?? []).includes(s.id);
+              return <button key={s.id} type="button" className={`chip ${on ? 'active' : ''}`} onClick={() => set('cotitulaireIds', on ? (f.cotitulaireIds ?? []).filter((x) => x !== s.id) : [...(f.cotitulaireIds ?? []), s.id])}>{civ(s)}</button>;
+            })}</div>
+          </Field>
+        )}
         <Field label={`Frais d’inscription (${money(f.fraisInscription ?? 0)})`}><input type="number" className="input" value={f.fraisInscription} onChange={(e) => set('fraisInscription', Number(e.target.value))} /></Field>
         <Field label={`Scolarité annuelle (${money(f.fraisScolarite ?? 0)})`}><input type="number" className="input" value={f.fraisScolarite} onChange={(e) => set('fraisScolarite', Number(e.target.value))} /></Field>
       </div>

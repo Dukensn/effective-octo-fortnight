@@ -21,10 +21,24 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Messagerie : on n'efface pas les messages ; seul l'état « lu » change.
+    // Un parent n'écrit que pour ses enfants ; un professeur n'écrit pas aux parents du secondaire.
+    function student(ecole, eid) { return get(/databases/$(database)/documents/ecoles/$(ecole)/students/$(eid)).data; }
+    function classOf(ecole, eid) { return get(/databases/$(database)/documents/ecoles/$(ecole)/classes/$(student(ecole, eid).classeId)).data; }
+    match /ecoles/{ecole}/chat/{id} {
+      allow read: if isStaff(ecole);
+      allow create: if (isStaff(ecole) && !isTeacher(ecole))
+        || (isTeacher(ecole) && (request.resource.data.auteur == 'systeme'
+            || (request.resource.data.auteur == 'professeur' && classOf(ecole, request.resource.data.eleveId).niveau != 'Secondaire')))
+        || (isParent(ecole) && request.resource.data.auteur == 'parent' && student(ecole, request.resource.data.eleveId).tuteurIds.hasAny([userDoc(ecole).guardianId]));
+      allow update: if active(ecole) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lu', 'updatedAt']);
+      allow delete: if false;
+    }
+
     match /ecoles/{ecole}/{collection}/{id} {
       // Le personnel lit toute l'école. Un parent ne lit que sa propre fiche utilisateur :
       // les données de ses enfants lui seront servies par une synchronisation filtrée (à mettre en place).
-      allow read: if collection != 'audit' && isStaff(ecole);
+      allow read: if !(collection in ['audit', 'chat']) && isStaff(ecole);
       allow read: if collection == 'users' && isParent(ecole) && id == request.auth.uid;
 
       allow write: if collection != 'audit' && collection in ['grades', 'evaluations', 'attendance'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
@@ -36,7 +50,7 @@ service cloud.firestore {
       // Un parent ne modifie que son code et sa date de visite.
       allow update: if collection == 'users' && isParent(ecole) && id == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pin', 'dernierAcces', 'photo', 'updatedAt']);
-      allow write: if collection != 'audit' && isDirection(ecole);
+      allow write: if !(collection in ['audit', 'chat']) && isDirection(ecole);
     }
   }
 }

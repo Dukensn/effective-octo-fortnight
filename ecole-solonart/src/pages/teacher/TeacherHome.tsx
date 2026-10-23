@@ -5,12 +5,14 @@ import { Avatar, Badge, Card } from '../../components/ui';
 import { classStudents, gradesForEvaluation } from '../../data/compute';
 import { dateFull, dateShort } from '../../lib/format';
 import { useSession } from '../../lib/session';
+import { canTeacherCall, teachesCourse } from '../../lib/regles';
 import { DAYS, hourLabel } from '../admin/Timetable';
 
 export function useMyCourses() {
   const session = useSession()!;
   const courses = useCollection('courses');
-  return courses.filter((c) => c.professeurId === session.user.staffId);
+  useCollection('classes');
+  return courses.filter((c) => teachesCourse(session.user.staffId, c));
 }
 
 export default function TeacherHome() {
@@ -69,7 +71,7 @@ export default function TeacherHome() {
               <div key={s.id} className="list-item">
                 <span className="tint-green" style={{ width: 34, height: 34, borderRadius: 9, display: 'grid', placeItems: 'center' }}><CalendarClock size={16} /></span>
                 <span className="grow"><b style={{ color: 'var(--ink)', fontSize: 13 }}>{subj(s.matiereId) ?? s.libelle}</b><br /><span className="tiny muted">{hourLabel(s.debut)} - {hourLabel(s.fin)} · {classes.find((c) => c.id === s.classeId)?.code} · {s.salle}</span></span>
-                <button className="btn btn-sm btn-soft" onClick={() => nav(`/prof/appel?classe=${s.classeId}`)}><ClipboardCheck size={14} />Appel</button>
+                {canTeacherCall(session.user.staffId, classes.find((c) => c.id === s.classeId)) && <button className="btn btn-sm btn-soft" onClick={() => nav(`/prof/appel?classe=${s.classeId}`)}><ClipboardCheck size={14} />Appel</button>}
               </div>
             ))}
             {today.length === 0 && <div className="list-item small muted">Aucun cours aujourd’hui.</div>}

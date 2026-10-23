@@ -38,6 +38,24 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Messagerie, règles par niveau et espace parent recentré (version 9)
+- **Appel** : un seul par jour et par classe. Préscolaire et fondamental : le(s) titulaire(s) ; secondaire :
+  le personnel désigné dans la fiche de la classe (« Appel fait par », le censeur par défaut) — les professeurs
+  du secondaire n'ont plus d'écran d'appel. La cloche signale chaque jour les classes sans appel (à partir de 8 h).
+- **Préscolaire** : plusieurs **co-titulaires** à égalité par classe (appel, évaluation de tous les domaines,
+  noms et signature sur le livret).
+- **Messagerie** (Menu → Messagerie, et espaces professeur / parent) : un fil « École » par élève ; absences,
+  retards et notes de conduite y arrivent **automatiquement** chez le parent, avec en plus un WhatsApp prérempli
+  pour l'urgent. Au préscolaire et au fondamental, professeur et parent s'écrivent ; la direction voit ces fils.
+  Au secondaire, seule l'administration écrit aux parents.
+- **Espace parent** : Accueil, Messages, **Bulletins** (les bulletins officiels publiés, aperçu + PDF) et
+  **Progrès** (évolution de la moyenne face à la classe, matières en progrès / à surveiller) ; Vie scolaire et
+  Paiements dans le menu. Les écrans Notes et Devoirs ont été retirés.
+- Démonstration : M. Jean Dorval (3698 7654, code 1234) a trois enfants dont un en moyenne section ;
+  Mme Mirlande Desrosiers (titulaire MS) et Mme Fabienne Célestin (co-titulaire MS).
+- Notifications sur le téléphone du parent hors de l'application et WhatsApp automatique : à brancher avec la
+  synchronisation en ligne (Firebase) ; WhatsApp automatique demande l'API WhatsApp Business (payante).
+
 ## Journal, relances et espace parent (version 8)
 - **Journal des modifications** (Menu → Journal) : qui, quand, quoi. Une note déjà saisie qui change garde
   l’ancienne et la nouvelle valeur ; annuler un paiement exige un motif. Filtres par domaine, utilisateur et période,
@@ -47,7 +65,7 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
   filtre « pas relancés depuis 7 jours ».
 - **Espace parent** : connexion avec le numéro de téléphone et un code à 4 chiffres créé depuis la fiche du parent
   (Parents → Accès parent). Le parent voit seulement ses enfants : moyennes des périodes validées par la direction,
-  contrôles corrigés, absences, discipline, devoirs, paiements et reçus.
+  absences, discipline, paiements et reçus (voir la version 9 pour la suite).
   Démonstration : 3698 7654, code 1234 (M. Jean Dorval, deux enfants).
   Sur le téléphone des parents, il faudra une synchronisation filtrée (seulement leurs enfants) : les règles
   Firestore interdisent déjà aux comptes parent de lire le reste de l’école.
