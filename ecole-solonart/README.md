@@ -37,6 +37,32 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Assistant IA locale (version 7)
+Menu **Assistant** (ou ＋ → Assistant sur téléphone) : un chat où l’on écrit ou dicte une demande.
+L’IA tourne **dans l’appareil** (transformers.js + ONNX Runtime, WebGPU ou WASM) : aucune donnée ne part sur Internet.
+
+```
+npm install @huggingface/transformers@3
+```
+
+| Profil | Voix (Whisper, int4) | Agent (int4) | Téléchargement |
+|---|---|---|---|
+| Téléphone | whisper-tiny | SmolLM2-135M-Instruct | ~170 Mo |
+| Ordinateur | whisper-base | Llama-3.2-1B-Instruct (repli Qwen2.5-1.5B) | ~700 Mo |
+
+- Détection automatique de l’appareil, avec choix manuel (Auto / Téléphone / Ordinateur).
+- Un seul profil en mémoire : l’ancien est libéré (`dispose`) avant de charger le nouveau.
+- Modèles gardés dans IndexedDB (`solonart-modeles`) : téléchargés une seule fois, puis hors ligne.
+- Micro capté et converti en mono 16 kHz (Web Audio), compatible WebView / Capacitor.
+- `processVoiceCommand(audioBlob)` : Whisper → agent → **JSON strict** `{ action, entite, variables }`.
+- Sans IA chargée, les demandes écrites marchent déjà grâce à des règles (français et créole).
+- **Lecture** (résultats, impayés, finances, présences, discipline, cahier) : réponse directe dans le chat.
+- **Écriture** (paiement, dépense, inscription, incident, séance) : le formulaire s’ouvre prérempli,
+  rien n’est enregistré sans que l’utilisateur confirme.
+
+Code : `src/ai/` (`AdaptiveVoiceERPAgent.ts`, `agent.worker.ts`, `audio.ts`, `erpCommand.ts`, `erpActions.ts`)
+et `src/pages/Assistant.tsx`. Le domaine `huggingface.co` doit être joignable au premier chargement.
+
 ## Registre de discipline et cahier de textes (version 6)
 - **Discipline** (menu Discipline, ou ＋ → Incident) :
   - on signale un incident ou des félicitations : élève, date, type, gravité, faits, mesure prise (avertissement, retenue, convocation, exclusion de N jours…) ;
@@ -139,5 +165,6 @@ src/data/sync.ts       synchronisation Firebase (optionnelle)
 src/data/seed.ts       données de démonstration
 src/data/compute.ts    moyennes pondérées, rangs, appréciations, décisions
 src/docs/              bulletins, badges, fiches imprimables
+src/ai/                assistant IA locale (voix + agent JSON)
 src/pages/admin/       espace direction      src/pages/teacher/  espace professeur
 ```

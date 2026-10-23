@@ -48,13 +48,16 @@ export default function Finance() {
   const [params, setParams] = useSearchParams();
   const [tab, setTab] = useState<Tab>((params.get('tab') as Tab) ?? 'apercu');
   const [payForm, setPayForm] = useState<string | null>(null);
+  const [payPrefill, setPayPrefill] = useState<{ montant?: number; mode?: PaymentMode }>();
   const [expForm, setExpForm] = useState<Partial<Expense> | null>(null);
   const [projForm, setProjForm] = useState<Partial<Project> | null>(null);
   const session = useSession()!;
   const canWrite = session.can('finance', 'write');
   useEffect(() => {
-    if (params.get('new')) { setPayForm(params.get('eleve') ?? ''); setTab('paiements'); setParams({ tab: 'paiements' }, { replace: true }); return; }
-    if (params.get('depense')) { setExpForm({}); setTab('depenses'); setParams({ tab: 'depenses' }, { replace: true }); return; }
+    // Préremplissage (assistant IA, liens) : ?new=1&eleve=…&montant=…&mode=… / ?depense=1&libelle=…&montant=…
+    const montant = Number(params.get('montant')) || undefined;
+    if (params.get('new')) { setPayPrefill({ montant, mode: (MODES as string[]).includes(params.get('mode') ?? '') ? (params.get('mode') as PaymentMode) : undefined }); setPayForm(params.get('eleve') ?? ''); setTab('paiements'); setParams({ tab: 'paiements' }, { replace: true }); return; }
+    if (params.get('depense')) { setExpForm({ libelle: params.get('libelle') ?? undefined, montant }); setTab('depenses'); setParams({ tab: 'depenses' }, { replace: true }); return; }
     const t = params.get('tab') as Tab | null;
     if (t && t !== tab) setTab(t);
   }, [params]); // eslint-disable-line
@@ -83,7 +86,7 @@ export default function Finance() {
       {tab === 'comptabilite' && <Journal />}
       {tab === 'projets' && <Projects onEdit={setProjForm} canWrite={canWrite} />}
       {tab === 'rapports' && <Reports />}
-      {payForm !== null && <PaymentForm eleveId={payForm} onClose={() => setPayForm(null)} />}
+      {payForm !== null && <PaymentForm eleveId={payForm} prefill={payPrefill} onClose={() => { setPayForm(null); setPayPrefill(undefined); }} />}
       {expForm && <ExpenseForm value={expForm} onClose={() => setExpForm(null)} />}
       {projForm && <ProjectForm value={projForm} onClose={() => setProjForm(null)} />}
     </>
@@ -248,14 +251,14 @@ function Payments({ onNew, canWrite }: { onNew: () => void; canWrite: boolean })
   );
 }
 
-function PaymentForm({ eleveId, onClose }: { eleveId: string; onClose: () => void }) {
+function PaymentForm({ eleveId, prefill, onClose }: { eleveId: string; prefill?: { montant?: number; mode?: PaymentMode }; onClose: () => void }) {
   const students = useCollection('students').filter((s) => s.statut === 'Actif');
   const [q, setQ] = useState('');
   const [sid, setSid] = useState(eleveId);
   const s = students.find((x) => x.id === sid);
   const bal = s ? balances().get(s.id) : undefined;
   const existing = useCollection('payments').filter((p) => p.eleveId === sid && p.motif === 'Scolarité' && p.statut === 'Payé').length;
-  const [f, setF] = useState({ montant: 0, mode: 'MonCash' as PaymentMode, motif: 'Scolarité' as Payment['motif'], reference: '', date: todayISO() });
+  const [f, setF] = useState({ montant: prefill?.montant ?? 0, mode: prefill?.mode ?? ('MonCash' as PaymentMode), motif: 'Scolarité' as Payment['motif'], reference: '', date: todayISO() });
   const matches = q.length >= 2 ? students.filter((x) => norm(`${fullName(x)} ${x.matricule}`).includes(norm(q))).slice(0, 6) : [];
   const save = (print: boolean) => {
     if (!s) return toast('Choisissez un élève', true);

@@ -29,7 +29,8 @@ function Students() {
   const classes = useCollection('classes').slice().sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
   const attendance = useCollection('attendance');
   const [date, setDate] = useState(todayISO());
-  const [classe, setClasse] = useState(classes[0]?.id ?? '');
+  const [params] = useSearchParams();
+  const [classe, setClasse] = useState(params.get('classe') ?? classes[0]?.id ?? '');
   const day = attendance.filter((a) => a.date === date);
   const absent = day.filter((a) => a.eleveId && a.statut === 'Absent').length;
   const late = day.filter((a) => a.eleveId && a.statut === 'Retard').length;

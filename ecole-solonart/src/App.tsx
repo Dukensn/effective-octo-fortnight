@@ -1,7 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
-  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen,
+  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles,
 } from 'lucide-react';
 import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
@@ -35,6 +35,7 @@ import Reports from './pages/admin/Reports';
 import SettingsPage from './pages/admin/Settings';
 import Profile from './pages/Profile';
 import Help from './pages/Help';
+import Assistant from './pages/Assistant';
 import TeacherHome from './pages/teacher/TeacherHome';
 import TeacherClasses from './pages/teacher/TeacherClasses';
 import TeacherEvaluations from './pages/teacher/TeacherEvaluations';
@@ -49,6 +50,7 @@ import Cahier from './pages/admin/Cahier';
 
 const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/', label: 'Tableau de bord', icon: Home, end: true, m: 'dashboard' },
+  { to: '/assistant', label: 'Assistant', icon: Sparkles, m: 'dashboard' },
   { to: '/eleves', label: 'Élèves', icon: Users, m: 'eleves' },
   { to: '/inscriptions', label: 'Inscriptions', icon: PenSquare, m: 'inscriptions' },
   { to: '/classes', label: 'Classes', icon: Map, m: 'classes' },
@@ -97,6 +99,7 @@ function AdminApp() {
     { to: '/documents', label: 'Documents', icon: FolderOpen, m: 'documents' },
   ] as (NavItem & { m: ModuleKey })[]).filter((t) => session.can(t.m)).slice(0, 3);
   const quick = ([
+    { label: 'Assistant', sub: 'Demander à la voix', icon: Sparkles, to: '/assistant', tint: 'violet', m: 'dashboard', w: false },
     { label: 'Inscrire un élève', sub: 'En 1 minute', icon: UserPlus, to: '/inscriptions/rapide', tint: 'blue', m: 'inscriptions', w: true },
     { label: 'Encaisser', sub: 'Paiement + reçu', icon: Receipt, to: '/finance?new=1', tint: 'green', m: 'finance', w: true },
     { label: 'Dépense', sub: 'Enregistrer une sortie', icon: TrendingDown, to: '/finance?tab=depenses&depense=1', tint: 'red', m: 'finance', w: true },
@@ -114,6 +117,7 @@ function AdminApp() {
       <Routes>
         <Route path="/" element={G('dashboard', <Dashboard />)} />
         <Route path="/gestion" element={<Gestion />} />
+        <Route path="/assistant" element={G('dashboard', <Assistant />)} />
         <Route path="/eleves" element={G('eleves', <Students />)} />
         <Route path="/eleves/import" element={G('inscriptions', <ImportStudents />)} />
         <Route path="/eleves/photos" element={G('eleves', <ClassPhotos />)} />

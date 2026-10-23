@@ -722,3 +722,37 @@ html { -webkit-tap-highlight-color: transparent; }
 .homework { display: block; margin-top: 6px; padding: 6px 10px; border-radius: 8px; background: var(--violet-50); color: #5b3aa8; font-size: 12.5px; font-weight: 500; }
 .only-phone-flex { display: none !important; }
 @media (max-width: 767px) { .only-phone-flex { display: flex !important; } }
+
+/* ---------------- Assistant (IA locale) ---------------- */
+.assistant { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.ai-panel { overflow: hidden; }
+.ai-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border: 0; background: none; text-align: left; }
+.ai-head b { display: block; color: var(--ink); font-size: 14.5px; }
+.ai-head small { color: var(--muted); font-size: 12px; }
+.ai-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
+.ai-dot.on { background: var(--green); }
+.ai-dot.busy { background: var(--orange); animation: pulse 1s infinite alternate; }
+@keyframes pulse { to { opacity: .35; } }
+.ai-body { display: flex; flex-direction: column; gap: 12px; padding: 0 14px 14px; }
+.chat { display: flex; flex-direction: column; gap: 10px; padding-bottom: 76px; }
+.chat-empty { padding: 8px 0; }
+.bubble { max-width: 88%; padding: 10px 14px; border-radius: 16px; font-size: 14.5px; line-height: 1.4; }
+.bubble.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+.bubble.ai { align-self: flex-start; background: #fff; border: 1px solid var(--line); color: var(--text); border-bottom-left-radius: 4px; }
+.bubble.ai.warn { border-color: #f6d19a; background: #fffaf1; }
+.bubble.ai.confirm { border-color: #bcd3ff; background: #f5f9ff; }
+.ai-lines { display: flex; flex-direction: column; margin-top: 8px; border-top: 1px solid var(--line-2); }
+.ai-line { display: flex; align-items: center; gap: 8px; padding: 7px 0; border: 0; border-bottom: 1px solid var(--line-2); background: none; text-align: left; color: var(--ink); font-size: 13.5px; }
+.ai-line:disabled { cursor: default; color: var(--text); }
+.ai-line b { font-weight: 600; white-space: nowrap; }
+.ai-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 11.5px; color: var(--muted); }
+.ai-meta button { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--muted); font-size: 11.5px; padding: 2px 4px; }
+.ai-json { margin: 6px 0 0; padding: 8px 10px; background: var(--bg); border-radius: 8px; font-size: 11.5px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.chat-status { align-self: center; font-size: 12.5px; color: var(--muted); padding: 2px 8px; }
+.composer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; display: flex; gap: 8px; align-items: center; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(245, 248, 253, 0.97); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+.composer .input { height: 46px; border-radius: 23px; padding: 0 16px; background: #fff; }
+.composer .btn-icon { width: 46px; height: 46px; border-radius: 50%; padding: 0; }
+.composer .mic { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--primary); display: grid; place-items: center; flex: none; transition: box-shadow .08s; }
+.composer .mic.rec { background: var(--red); border-color: var(--red); color: #fff; }
+@media (min-width: 1024px) { .composer { left: var(--sidebar); } .composer { max-width: none; } }
+@media (max-width: 1023px) { .composer { bottom: calc(64px + env(safe-area-inset-bottom)); padding-bottom: 10px; } }

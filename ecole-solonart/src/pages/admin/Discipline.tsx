@@ -24,7 +24,15 @@ export default function Discipline() {
   const [type, setType] = useState('all');
   const [statut, setStatut] = useState<'Ouverts' | 'Tous'>('Tous');
   const [q, setQ] = useState('');
-  const [form, setForm] = useState<Partial<Incident> | null>(params.get('new') ? { eleveId: params.get('eleve') ?? undefined } : null);
+  // Préremplissage (assistant IA, fiche élève) : ?new=1&eleve=…&type=…&description=…
+  const [form, setForm] = useState<Partial<Incident> | null>(() => {
+    if (!params.get('new')) return null;
+    const f: Partial<Incident> = {};
+    if (params.get('eleve')) f.eleveId = params.get('eleve')!;
+    if ((INCIDENT_TYPES as readonly string[]).includes(params.get('type') ?? '')) f.type = params.get('type') as Incident['type'];
+    if (params.get('description')) f.description = params.get('description')!;
+    return f;
+  });
   const stu = (id: string) => students.find((s) => s.id === id);
   const list = useMemo(() => incidents
     .filter((i) => (classe === 'all' || (i.classeId ?? stu(i.eleveId)?.classeId) === classe) && (type === 'all' || i.type === type) && (statut === 'Tous' || i.statut === 'Ouvert'))

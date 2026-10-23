@@ -19,7 +19,7 @@ export default function QuickEnroll() {
   const school = db.get('school', 'main')!;
   const empty = { nom: '', prenom: '', sexe: 'M' as 'M' | 'F', naissance: '', parent: '', telephone: '', photo: '', paye: true, mode: 'Espèces' as PaymentMode };
   const [classeId, setClasseId] = useState(params.get('classe') ?? '');
-  const [f, setF] = useState(empty);
+  const [f, setF] = useState({ ...empty, prenom: params.get('prenom') ?? '', nom: params.get('nom') ?? '' });
   const [photoOpen, setPhotoOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [last, setLast] = useState<Student | null>(null);
