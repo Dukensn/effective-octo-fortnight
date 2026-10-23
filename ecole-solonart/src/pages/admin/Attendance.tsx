@@ -1,19 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Circle, UserCheck, UserX, Clock, Percent, LogIn, LogOut } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
 import type { StaffAttendance } from '../../data/types';
-import { PageHead, Tabs, Field, Card, StatCard, Avatar, StatusBadge, toast } from '../../components/ui';
+import { PageHead, Tabs, Field, Card, StatCard, Avatar, StatusBadge, Modal, toast } from '../../components/ui';
 import { RollCall } from '../../components/RollCall';
 import { BarChart } from '../../components/charts';
 import { todayISO, dateFull, civ } from '../../lib/format';
 import { classStudents } from '../../data/compute';
 import { useSession } from '../../lib/session';
-import { callerLabel } from '../../lib/regles';
+import { callerLabel, classesOfAbsent, slotsOnDay } from '../../lib/regles';
+import { audit } from '../../lib/session';
 
 export default function AttendancePage() {
   const [params] = useSearchParams();
   const [tab, setTab] = useState<'eleves' | 'personnel' | 'stats'>((params.get('tab') as 'personnel') ?? 'eleves');
+  // Un lien vers un autre onglet (cloche, tableau de bord) doit changer d'onglet même si la page est déjà ouverte.
+  useEffect(() => { const t = params.get('tab') as typeof tab | null; if (t) setTab(t); }, [params]);
   return (
     <>
       <PageHead title="Présences & ponctualité" sub={`${dateFull()} · un appel par jour et par classe ; au secondaire, il est fait par le personnel désigné.`} />
@@ -79,6 +82,11 @@ function StaffAtt() {
   const records = useCollection('staffAttendance');
   const [date, setDate] = useState(todayISO());
   const day = new Map(records.filter((r) => r.date === date).map((r) => [r.staffId, r]));
+  const reps = useCollection('remplacements').filter((r) => r.date === date);
+  useCollection('timetable');
+  const [replace, setReplace] = useState<string | null>(null);
+  // Enseignants absents ce jour qui ont des classes : il faut décider qui les prend.
+  const absentTeachers = staff.filter((s) => s.type === 'Professeur' && (day.get(s.id)?.statut === 'Absent' || reps.some((r) => r.absentId === s.id)) && classesOfAbsent(s.id, date).length > 0);
   const now = () => new Date().toTimeString().slice(0, 5);
   const mark = (staffId: string, patch: Partial<StaffAttendance>) => {
     const cur = day.get(staffId);
@@ -90,6 +98,22 @@ function StaffAtt() {
         <Field label="Date"><input type="date" className="input" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value)} /></Field>
         <span className="small muted">Pointage : arrivée avant 7h00 = à l’heure. {day.size}/{staff.length} pointés.</span>
       </div>
+      {absentTeachers.length > 0 && (
+        <Card title="Remplacements du jour" className="mb-16">
+          <div className="stack" style={{ gap: 8 }}>{absentTeachers.map((s) => {
+            const r = reps.find((x) => x.absentId === s.id);
+            const rp = staff.find((x) => x.id === r?.remplacantId);
+            return (
+              <div key={s.id} className="row wrap" style={{ gap: 10 }}>
+                <span className="grow small"><b style={{ color: 'var(--ink)' }}>{civ(s)}</b> absent{s.sexe === 'F' ? 'e' : ''} · {classesOfAbsent(s.id, date).map((id) => db.get('classes', id)?.code).join(', ')}<br />
+                  {rp ? <span style={{ color: 'var(--green)' }}>Remplacé{s.sexe === 'F' ? 'e' : ''} par {civ(rp)}</span> : r ? <span className="muted">{r.note || 'Sans remplaçant'}</span> : <span style={{ color: 'var(--red)' }}>Pas encore de remplaçant</span>}</span>
+                {canWrite && <button className="btn btn-sm btn-soft" onClick={() => setReplace(s.id)}><UserCheck size={14} />{r ? 'Modifier' : 'Choisir un remplaçant'}</button>}
+              </div>
+            );
+          })}</div>
+        </Card>
+      )}
+      {replace && <ReplacementForm absentId={replace} date={date} onClose={() => setReplace(null)} />}
       <div className="card"><div className="table-wrap"><table className="t">
         <thead><tr><th>Membre</th><th className="only-desktop">Poste</th><th>Arrivée</th><th>Départ</th><th>Statut</th><th /></tr></thead>
         <tbody>{staff.map((s) => {
@@ -103,13 +127,47 @@ function StaffAtt() {
               <td>{canWrite && <div className="row" style={{ gap: 6 }}>
                 {!r?.arrivee && <button className="btn btn-sm btn-soft" onClick={() => { const t = now(); mark(s.id, { arrivee: t, statut: t > '07:00' ? 'Retard' : 'Présent' }); toast(`Arrivée de ${s.prenom} à ${t}`); }}><LogIn size={14} />Arrivée</button>}
                 {r?.arrivee && !r.depart && <button className="btn btn-sm" onClick={() => mark(s.id, { depart: now() })}><LogOut size={14} />Départ</button>}
-                {!r && <button className="btn btn-sm btn-danger" onClick={() => mark(s.id, { statut: 'Absent' })}>Absent</button>}
+                {!r && <button className="btn btn-sm btn-danger" onClick={() => { mark(s.id, { statut: 'Absent' }); if (s.type === 'Professeur' && classesOfAbsent(s.id, date).length) setReplace(s.id); }}>Absent</button>}
               </div>}</td>
             </tr>
           );
         })}</tbody>
       </table></div></div>
     </>
+  );
+}
+
+/** Choisir qui remplace un enseignant absent : il fera l'appel et prendra ses classes ce jour-là. */
+function ReplacementForm({ absentId, date, onClose }: { absentId: string; date: string; onClose: () => void }) {
+  const session = useSession()!;
+  const staff = useCollection('staff').filter((s) => s.statut === 'Actif');
+  const absent = staff.find((s) => s.id === absentId);
+  const existing = db.list('remplacements').find((r) => r.date === date && r.absentId === absentId);
+  const classes = classesOfAbsent(absentId, date);
+  const [rid, setRid] = useState(existing?.remplacantId ?? '');
+  const [note, setNote] = useState(existing?.note ?? '');
+  const theirs = slotsOnDay(absentId, date);
+  // Disponibilité : nombre de créneaux du remplaçant qui tombent en même temps que ceux de l'absent.
+  const clashes = (id: string) => slotsOnDay(id, date).filter((x) => theirs.some((t) => t.debut === x.debut)).length;
+  const absentToday = new Set(db.list('staffAttendance').filter((a) => a.date === date && a.statut === 'Absent').map((a) => a.staffId));
+  const candidates = staff.filter((s) => s.id !== absentId && !absentToday.has(s.id) && (s.type === 'Professeur' || s.type === 'Direction' || s.poste.startsWith('Censeur') || s.poste.startsWith('Conseiller')))
+    .map((s) => ({ s, n: clashes(s.id) })).sort((a, b) => a.n - b.n || a.s.nom.localeCompare(b.s.nom, 'fr'));
+  const save = () => {
+    db.put('remplacements', { id: existing?.id ?? `rep-${date}-${absentId}`, date, absentId, remplacantId: rid || undefined, classeIds: classes, note: note.trim() || undefined, parId: session.user.id });
+    audit('Remplacement', `${civ(absent)} → ${civ(staff.find((s) => s.id === rid)) || 'sans remplaçant'} · ${date}`, { domaine: 'autre' });
+    toast(rid ? 'Remplaçant enregistré : il fera l’appel et prendra les classes' : 'Absence enregistrée sans remplaçant');
+    onClose();
+  };
+  return (
+    <Modal open onClose={onClose} title={`Remplacer ${civ(absent)}`} footer={<><button className="btn" onClick={onClose}>Annuler</button><button className="btn btn-primary" onClick={save}>Enregistrer</button></>}>
+      <p className="small mb-12">{dateFull(new Date(date + 'T12:00:00'))} · classes : <b>{classes.map((id) => db.get('classes', id)?.code).join(', ') || '—'}</b> · {theirs.length} cours ce jour-là.</p>
+      <Field label="Remplaçant"><select className="select" value={rid} onChange={(e) => setRid(e.target.value)}>
+        <option value="">Pas de remplaçant (étude surveillée, cours reporté…)</option>
+        {candidates.map(({ s, n }) => <option key={s.id} value={s.id}>{civ(s)} · {s.poste}{s.specialite ? ` (${s.specialite})` : ''} — {n ? `${n} cours en même temps` : 'libre'}</option>)}
+      </select></Field>
+      <Field label="Note (facultatif)" className="mt-12"><input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex. maladie, la 7AF fait de l’étude en salle B" /></Field>
+      <p className="tiny muted mt-12">Le remplaçant voit les classes sur son accueil et peut faire l’appel ce jour-là (préscolaire et fondamental). Les plus disponibles sont en tête de liste.</p>
+    </Modal>
   );
 }
 

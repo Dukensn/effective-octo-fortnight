@@ -40,7 +40,7 @@ export function RollCall({ classeId, date, readOnly }: { classeId: string; date:
       if (st === 'Présent') { if (cur) db.remove('attendance', cur.id); }
       else if (!cur || cur.statut !== st) db.put('attendance', { id, date, classeId, eleveId: s.id, statut: st, saisiePar: session.user.id });
       // Le parent est prévenu automatiquement dans sa messagerie (absence ou retard).
-      if (st === 'Absent' || st === 'Retard') { notifyAttendance(s, st, date); alerts.push({ s, st }); }
+      if ((st === 'Absent' || st === 'Retard') && notifyAttendance(s, st, date)) alerts.push({ s, st });
     }
     setAlerted(alerts);
     db.put('attendance', { id: doneId, date, classeId, eleveId: '', statut: 'Présent', saisiePar: session.user.id });

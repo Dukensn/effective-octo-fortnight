@@ -44,6 +44,7 @@ service cloud.firestore {
       allow write: if collection != 'audit' && collection in ['grades', 'evaluations', 'attendance'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
       allow write: if collection in ['students', 'guardians'] && (canWrite(ecole, 'eleves') || canWrite(ecole, 'inscriptions') || canWrite(ecole, 'parents'));
       allow write: if collection in ['payments', 'expenses', 'salaries', 'projects'] && canWrite(ecole, 'finance');
+      allow write: if collection == 'remplacements' && canWrite(ecole, 'presences');
       allow write: if collection in ['users', 'roles'] && canWrite(ecole, 'utilisateurs');
       // Le secrétariat (module Parents) crée les accès parent, uniquement avec le rôle « Parent ».
       allow write: if collection == 'users' && canWrite(ecole, 'parents') && request.resource.data.roleId == 'r-par';

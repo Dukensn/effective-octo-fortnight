@@ -38,6 +38,20 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Remplacements, réglages, sauvegarde et notifications (version 11)
+- **Emploi du temps aligné** sur Classe → Équipe & matières : changer l'enseignant d'une matière met à jour ses
+  créneaux ; les créneaux anciens sont corrigés au démarrage. Dans un créneau, l'enseignant d'une matière se règle
+  désormais dans l'écran Équipe.
+- **Remplacements** (Présences → Personnel) : marquer un professeur absent propose son remplaçant (les plus libres
+  en tête). Le remplaçant voit ses classes du jour sur son accueil et fait l'appel ; la cloche signale les absents
+  sans remplaçant.
+- **Réglages** (Paramètres → Matières & règles) : charge maximale d'un enseignant, seuil de retards avant
+  d'alerter le parent (1, 2, 3 ou 5 en 7 jours), alertes d'absence et de conduite activables.
+- **Sauvegarde** : une copie automatique par jour sur l'appareil (5 gardées, restaurables) et « Envoyer la
+  sauvegarde » (WhatsApp, Drive…) ; la cloche le rappelle chaque semaine tant que la synchronisation n'est pas branchée.
+- **Notifications sur le téléphone** (Mon profil) : nouvelles alertes de la cloche dans la barre du téléphone,
+  application ouverte ou en arrière-plan. Application fermée : à brancher avec Firebase Cloud Messaging.
+
 ## Organisation des classes (version 10)
 Classe → onglet **Équipe & matières** : la direction choisit comment la classe est organisée, et l'application
 en déduit le reste (affectations, appel, saisie des notes, signature du bulletin, messages aux parents).

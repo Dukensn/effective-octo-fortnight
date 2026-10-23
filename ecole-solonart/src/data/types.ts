@@ -30,6 +30,11 @@ export interface School extends Meta {
   bareme: 20 | 100; // note maximale par défaut
   seuilReussite: number; // ex. 10 (/20) ou 50 (/100)
   numeroMenfp?: string;
+  /** Règles de l'école (valeurs par défaut dans lib/regles : schoolRules). */
+  chargeMaxHeures?: number; // heures de cours par semaine au-delà desquelles un enseignant est signalé surchargé
+  seuilRetards?: number; // nombre de retards sur 7 jours avant d'alerter le parent (1 = à chaque retard)
+  alerteAbsence?: boolean; // prévenir le parent à chaque absence
+  alerteConduite?: boolean; // prévenir le parent à chaque incident ou félicitation
 }
 
 export interface SchoolYear extends Meta {
@@ -360,6 +365,16 @@ export interface ChatMessage extends Meta {
   lu: { parent?: boolean; ecole?: boolean; prof?: boolean };
 }
 
+/** Remplacement d'un enseignant absent pour une journée : le remplaçant fait l'appel et prend ses classes. */
+export interface Replacement extends Meta {
+  date: string;
+  absentId: ID; // staff
+  remplacantId?: ID; // staff ; vide = pas encore de remplaçant (classe en étude, cours reporté…)
+  classeIds: ID[];
+  note?: string;
+  parId?: ID; // utilisateur qui l'a organisé
+}
+
 export type ModuleKey =
   | 'dashboard' | 'eleves' | 'inscriptions' | 'classes' | 'parents' | 'personnel'
   | 'emploi' | 'notes' | 'presences' | 'discipline' | 'cahier' | 'finance' | 'documents' | 'communication'
@@ -427,6 +442,7 @@ export interface Collections {
   incidents: Incident;
   lessons: Lesson;
   chat: ChatMessage;
+  remplacements: Replacement;
   roles: Role;
   users: User;
   audit: AuditLog;
@@ -436,5 +452,5 @@ export type CollectionName = keyof Collections;
 export const COLLECTIONS: CollectionName[] = [
   'school', 'years', 'periods', 'classes', 'subjects', 'courses', 'guardians', 'students', 'staff',
   'evaluations', 'grades', 'reportEntries', 'attendance', 'staffAttendance', 'timetable', 'payments',
-  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'roles', 'users', 'audit',
+  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'remplacements', 'roles', 'users', 'audit',
 ];

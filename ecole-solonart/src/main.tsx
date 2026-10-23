@@ -8,6 +8,8 @@ import App from './App';
 import { loadDatabase } from './data/store';
 import { seedDatabase } from './data/seed';
 import { startSync } from './data/sync';
+import { reconcileTimetable } from './lib/regles';
+import { autoSnapshot } from './lib/backup';
 
 registerSW({ immediate: true });
 
@@ -18,10 +20,14 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 loadDatabase(seedDatabase).then(() => {
+  reconcileTimetable();
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />
     </StrictMode>,
   );
   startSync();
+  // Copie de sécurité quotidienne sur l'appareil (au démarrage et quand l'application passe en arrière-plan)
+  setTimeout(autoSnapshot, 4000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) void autoSnapshot(); });
 });

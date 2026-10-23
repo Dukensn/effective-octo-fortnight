@@ -1,6 +1,7 @@
 import { useCollection } from '../../data/store';
 import { PageHead } from '../../components/ui';
 import { useSession } from '../../lib/session';
+import { slotsOf } from '../../lib/regles';
 import { TimetableGrid } from '../admin/Timetable';
 import { printDocument } from '../../lib/print';
 import { TimetableSheet } from '../../docs/Sheets';
@@ -8,7 +9,8 @@ import { Printer } from 'lucide-react';
 
 export default function TeacherTimetable() {
   const session = useSession()!;
-  const slots = useCollection('timetable').filter((s) => s.professeurId === session.user.staffId);
+  useCollection('courses');
+  const slots = slotsOf(session.user.staffId, useCollection('timetable'));
   return (
     <>
       <PageHead title="Mon emploi du temps" sub={`${slots.length} cours par semaine`}

@@ -8,6 +8,7 @@ import { useCollection, useDoc } from '../data/store';
 import { logout, useSession } from '../lib/session';
 import { useSyncState } from '../data/sync';
 import { useNotifications } from '../lib/notifications';
+import { useSystemNotifications } from '../lib/push';
 import { norm, fullName } from '../lib/format';
 
 export interface NavItem { to: string; label: string; icon: LucideIcon; end?: boolean }
@@ -126,6 +127,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
   const desktop = useIsDesktop();
   const notifs = useNotifications();
   const notifCount = notifs.reduce((a, x) => a + x.n, 0);
+  useSystemNotifications(notifs);
   const [bell, setBell] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); setSearchOpen(false); setPlus(false); setMore(false); setBell(false); }, [location.pathname, location.search]);
   const phone = useIsMobile();

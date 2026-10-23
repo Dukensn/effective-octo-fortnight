@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Users, BookOpen, PenSquare, Trophy, ClipboardCheck, CalendarClock, ChevronRight, FileText } from 'lucide-react';
-import { useCollection, useDoc } from '../../data/store';
+import { db, useCollection, useDoc } from '../../data/store';
 import { Avatar, Badge, Card } from '../../components/ui';
 import { classStudents, gradesForEvaluation } from '../../data/compute';
 import { dateFull, dateShort } from '../../lib/format';
 import { useSession } from '../../lib/session';
-import { canTeacherCall, teachesCourse } from '../../lib/regles';
+import { canTeacherCall, replacementsOn, slotsOf, slotsOnDay, teachesCourse } from '../../lib/regles';
 import { DAYS, hourLabel } from '../admin/Timetable';
 
 export function useMyCourses() {
@@ -24,7 +24,9 @@ export default function TeacherHome() {
   const classes = useCollection('classes');
   const subjects = useCollection('subjects');
   const evaluations = useCollection('evaluations');
-  const slots = useCollection('timetable').filter((s) => s.professeurId === session.user.staffId);
+  useCollection('remplacements');
+  const myReps = replacementsOn().filter((r) => r.remplacantId === session.user.staffId);
+  const slots = slotsOf(session.user.staffId, useCollection('timetable'));
   useCollection('grades');
   const classIds = [...new Set(courses.map((c) => c.classeId))];
   const subjectIds = [...new Set(courses.map((c) => c.matiereId))];
@@ -45,6 +47,19 @@ export default function TeacherHome() {
       </div>
       <div className="small muted mb-12">{dateFull()}</div>
       <div className="quote mb-16">« {school?.slogan ?? 'Former aujourd’hui, les leaders de demain.'} »</div>
+      {myReps.map((r) => {
+        const abs = db.get('staff', r.absentId);
+        const cours = slotsOnDay(r.absentId).sort((a, b) => a.debut.localeCompare(b.debut));
+        const callable = classes.filter((c) => r.classeIds.includes(c.id) && canTeacherCall(session.user.staffId, c));
+        return (
+          <div key={r.id} className="card card-pad mb-16" style={{ background: 'var(--orange-50)', border: 0 }}>
+            <b style={{ color: 'var(--ink)' }}>Aujourd’hui, vous remplacez {abs ? `${abs.sexe === 'F' ? 'Mme' : 'M.'} ${abs.prenom} ${abs.nom}` : 'un collègue'}</b>
+            <div className="small mt-4">{cours.length ? cours.map((s) => `${hourLabel(s.debut)} ${classes.find((c) => c.id === s.classeId)?.code} · ${subj(s.matiereId) ?? s.libelle ?? ''}`).join(' — ') : `Classes : ${r.classeIds.map((id) => classes.find((c) => c.id === id)?.code).join(', ')}`}</div>
+            {r.note && <div className="tiny muted mt-4">{r.note}</div>}
+            {callable.length > 0 && <button className="btn btn-sm btn-primary mt-8" onClick={() => nav(`/prof/appel?classe=${callable[0].id}`)}><ClipboardCheck size={14} />Faire l’appel ({callable.map((c) => c.code).join(', ')})</button>}
+          </div>
+        );
+      })}
       <div className="tiles mb-16">
         <button className="tile" onClick={() => nav('/prof/classes')}><span className="ic"><Users /></span><b>Mes classes</b><span>{classIds.length} classes</span></button>
         <button className="tile" onClick={() => nav('/prof/cahier')}><span className="ic"><BookOpen /></span><b>Cahier de textes</b><span>{subjectIds.length} matière{subjectIds.length > 1 ? 's' : ''}</span></button>

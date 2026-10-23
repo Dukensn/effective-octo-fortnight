@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, KeyRound, Download, Smartphone } from 'lucide-react';
 import { db, useDoc } from '../data/store';
-import { PageHead, Card, Avatar, Field, toast, Badge } from '../components/ui';
+import { PageHead, Card, Avatar, Field, toast, Badge, Toggle } from '../components/ui';
+import { enablePush, pushEnabled, pushSupported } from '../lib/push';
 import { logout, useSession } from '../lib/session';
 import { civ, readFileAsDataURL } from '../lib/format';
 
 export default function Profile() {
   const session = useSession()!;
+  const [push, setPush] = useState(pushEnabled);
   const nav = useNavigate();
   const staff = useDoc('staff', session.user.staffId);
   const [pin, setPin] = useState({ old: '', a: '', b: '' });
@@ -34,6 +36,11 @@ export default function Profile() {
           if (!/^\d{4}$/.test(pin.a) || pin.a !== pin.b) return toast('Le nouveau code doit faire 4 chiffres et être confirmé', true);
           db.patch('users', session.user.id, { pin: pin.a }); setPin({ old: '', a: '', b: '' }); toast('Code modifié');
         }}><KeyRound />Enregistrer</button>
+      </Card>
+      <Card title="Notifications sur ce téléphone" className="mt-16">
+        <p className="small muted mb-12">Une notification apparaît dans la barre du téléphone pour les nouveaux messages et alertes{session.isTeacher ? ' (appel à faire, remplacement)' : ''}, quand l’application est ouverte ou en arrière-plan. Application complètement fermée : ce sera possible une fois la synchronisation en ligne branchée.</p>
+        {!pushSupported() ? <p className="small muted">Ce navigateur ne permet pas les notifications. Installez l’application (ci-dessous) puis réessayez.</p>
+          : <label className="row between"><span className="small">Recevoir les notifications</span><Toggle on={push} onChange={async (v) => { try { setPush(await enablePush(v)); } catch (e) { toast((e as Error).message, true); } }} label="Notifications" /></label>}
       </Card>
       <Card title="Application" className="mt-16">
         <p className="small muted mb-12">Installez l’application sur votre téléphone ou ordinateur pour l’ouvrir comme une application normale, même sans Internet.</p>

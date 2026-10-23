@@ -6,9 +6,8 @@ import type { ClassRoom, Course, ID } from '../../data/types';
 import { Card, toast } from '../../components/ui';
 import { civ, norm } from '../../lib/format';
 import { audit } from '../../lib/session';
-import { ORGANISATIONS, callerLabel, classTeacherIds, isSecondaire, organisationOf, type Organisation } from '../../lib/regles';
+import { ORGANISATIONS, assignCourse, schoolRules, callerLabel, classTeacherIds, isSecondaire, organisationOf, type Organisation } from '../../lib/regles';
 
-const MAX_H = 30; // heures / semaine considérées comme une charge pleine
 
 export function ClassTeam({ classe, courses, canWrite }: { classe: ClassRoom; courses: Course[]; canWrite: boolean }) {
   const staff = useCollection('staff');
@@ -16,12 +15,13 @@ export function ClassTeam({ classe, courses, canWrite }: { classe: ClassRoom; co
   const allCourses = useCollection('courses');
   const profs = staff.filter((s) => s.type === 'Professeur' && s.statut === 'Actif');
   const org = organisationOf(classe);
+  const MAX_H = schoolRules().chargeMax; // réglable dans Paramètres
   const pre = classe.niveau === 'Préscolaire';
   const team = classTeacherIds(classe);
   const name = (id?: ID) => civ(staff.find((s) => s.id === id)) || '—';
   const subj = (c: Course) => subjects.find((s) => s.id === c.matiereId);
 
-  const setAll = (profId: ID | undefined) => courses.forEach((c) => c.professeurId !== profId && db.patch('courses', c.id, { professeurId: profId }));
+  const setAll = (profId: ID | undefined) => courses.forEach((c) => assignCourse(c, profId));
   const patchClass = (p: Partial<ClassRoom>, what: string) => { db.patch('classes', classe.id, p); audit('Équipe pédagogique', `${classe.code} · ${what}`, { domaine: 'autre' }); };
 
   const choose = (o: Organisation) => {
@@ -40,7 +40,7 @@ export function ClassTeam({ classe, courses, canWrite }: { classe: ClassRoom; co
     const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
     patchClass({ cotitulaireIds: next }, `${cur.includes(id) ? 'retrait' : 'ajout'} de ${name(id)}`);
     // En équipe, les matières d'un membre retiré reviennent au titulaire.
-    if (org === 'equipe' && cur.includes(id)) courses.filter((c) => c.professeurId === id).forEach((c) => db.patch('courses', c.id, { professeurId: classe.titulaireId }));
+    if (org === 'equipe' && cur.includes(id)) courses.filter((c) => c.professeurId === id).forEach((c) => assignCourse(c, classe.titulaireId));
   };
   // Répartition automatique en équipe : la spécialité d'abord, puis le moins chargé.
   const autoSplit = () => {
@@ -51,7 +51,7 @@ export function ClassTeam({ classe, courses, canWrite }: { classe: ClassRoom; co
       const spec = team.find((id) => { const sp = norm(staff.find((x) => x.id === id)?.specialite ?? ''); return !!sp && !!s && (norm(s.nom).includes(sp) || sp.includes(norm(s.nom))); });
       const pick = spec ?? [...load.entries()].sort((a, b) => a[1] - b[1])[0][0];
       load.set(pick, (load.get(pick) ?? 0) + c.heuresSemaine);
-      if (c.professeurId !== pick) db.patch('courses', c.id, { professeurId: pick });
+      assignCourse(c, pick);
     }
     audit('Équipe pédagogique', `${classe.code} · répartition automatique`, { domaine: 'autre' });
     toast('Matières réparties entre les membres de l’équipe');
@@ -111,9 +111,9 @@ export function ClassTeam({ classe, courses, canWrite }: { classe: ClassRoom; co
               : org === 'cotitulaires' ? <span className="small muted">{team.map(name).join(', ') || '—'}</span>
               : !canWrite ? <span className="small">{name(c.professeurId)}</span>
               : org === 'equipe' ? (
-                <div className="row wrap" style={{ gap: 4 }}>{team.map((id) => <button key={id} type="button" className={`chip ${c.professeurId === id ? 'active' : ''}`} style={{ height: 30 }} onClick={() => db.patch('courses', c.id, { professeurId: id })}>{staff.find((s) => s.id === id)?.prenom}</button>)}{team.length === 0 && <span className="tiny muted">Choisissez l’équipe</span>}</div>
+                <div className="row wrap" style={{ gap: 4 }}>{team.map((id) => <button key={id} type="button" className={`chip ${c.professeurId === id ? 'active' : ''}`} style={{ height: 30 }} onClick={() => assignCourse(c, id)}>{staff.find((s) => s.id === id)?.prenom}</button>)}{team.length === 0 && <span className="tiny muted">Choisissez l’équipe</span>}</div>
               ) : (
-                <select className="select" aria-label={`Enseignant de ${subj(c)?.nom}`} value={c.professeurId ?? ''} onChange={(e) => db.patch('courses', c.id, { professeurId: e.target.value || undefined })}>
+                <select className="select" aria-label={`Enseignant de ${subj(c)?.nom}`} value={c.professeurId ?? ''} onChange={(e) => assignCourse(c, e.target.value || undefined)}>
                   <option value="">— Non affecté —</option>{profs.map((p) => <option key={p.id} value={p.id}>{civ(p)}{p.specialite ? ` · ${p.specialite}` : ''}</option>)}
                 </select>
               )}</div>

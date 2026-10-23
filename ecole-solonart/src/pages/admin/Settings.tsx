@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Upload, Plus, Download, RotateCcw, Cloud, CloudOff, KeyRound, Trash2, ShieldCheck, Check } from 'lucide-react';
+import { Upload, Plus, Download, RotateCcw, Cloud, CloudOff, KeyRound, Trash2, ShieldCheck, Check, Share2 } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Access, ModuleKey, Period, Role, School, Subject, User } from '../../data/types';
 import { PageHead, Tabs, Field, Card, Modal, toast, Avatar, Badge, Toggle, Confirm } from '../../components/ui';
-import { readFileAsDataURL, downloadBlob, timeAgo, civ } from '../../lib/format';
+import { readFileAsDataURL, downloadBlob, timeAgo, civ, dateLong } from '../../lib/format';
+import { lastExport, listSnapshots, restoreSnapshot, shareBackup } from '../../lib/backup';
 import { useSession, audit } from '../../lib/session';
 import { firebaseEnabled, useSyncState, SCHOOL_ID, pushOutbox } from '../../data/sync';
 import { SchoolLogo } from '../../components/Logo';
@@ -154,6 +155,7 @@ function SubjectsTab() {
   const COLORS = ['blue', 'green', 'pink', 'violet', 'amber', 'cyan', 'teal', 'slate'];
   return (
     <div className="split">
+      <div className="stack">
       <Card title="Barème et règles">
         <div className="form-grid">
           <Field label="Note maximale par défaut"><select className="select" disabled={!canEdit} value={school.bareme} onChange={(e) => db.patch('school', 'main', { bareme: Number(e.target.value) as 20 | 100, seuilReussite: Number(e.target.value) === 100 ? 50 : 10 })}><option value={20}>Sur 20</option><option value={100}>Sur 100</option></select></Field>
@@ -162,6 +164,20 @@ function SubjectsTab() {
         </div>
         <p className="tiny muted mt-12">Les moyennes sont pondérées par les coefficients de chaque classe (Classes → Matières & professeurs). Règle de décision : moyenne ≥ seuil → admis ; seuil − 1 → admis sous condition ; sinon redouble.</p>
       </Card>
+      <Card title="Enseignants et alertes aux parents">
+        <div className="form-grid">
+          <Field label="Charge maximale d’un enseignant (h / semaine)"><input type="number" min={5} max={60} className="input" disabled={!canEdit} value={school.chargeMaxHeures ?? 30} onChange={(e) => db.patch('school', 'main', { chargeMaxHeures: Math.max(5, Number(e.target.value)) })} /></Field>
+          <Field label="Prévenir le parent des retards"><select className="select" disabled={!canEdit} value={school.seuilRetards ?? 1} onChange={(e) => db.patch('school', 'main', { seuilRetards: Number(e.target.value) })}>
+            <option value={1}>À chaque retard</option><option value={2}>À partir de 2 retards en 7 jours</option><option value={3}>À partir de 3 retards en 7 jours</option><option value={5}>À partir de 5 retards en 7 jours</option>
+          </select></Field>
+        </div>
+        <div className="stack mt-12" style={{ gap: 10 }}>
+          <label className="row between"><span className="small">Prévenir le parent à chaque absence</span><Toggle on={school.alerteAbsence ?? true} onChange={(v) => canEdit && db.patch('school', 'main', { alerteAbsence: v })} label="Alerte absence" /></label>
+          <label className="row between"><span className="small">Prévenir le parent à chaque incident ou félicitation</span><Toggle on={school.alerteConduite ?? true} onChange={(v) => canEdit && db.patch('school', 'main', { alerteConduite: v })} label="Alerte conduite" /></label>
+        </div>
+        <p className="tiny muted mt-12">La charge sert à signaler les enseignants surchargés dans Classe → Équipe & matières.</p>
+      </Card>
+      </div>
       <Card title="Matières" actions={canEdit && <button className="btn btn-sm btn-soft" onClick={() => setAdd(true)}><Plus size={14} />Ajouter</button>}>
         <div className="stack" style={{ gap: 6 }}>
           {subjects.map((s) => (
@@ -274,6 +290,10 @@ function DataTab() {
   const canEdit = useCanEdit();
   const input = useRef<HTMLInputElement>(null);
   const [reset, setReset] = useState(false);
+  const [, setTick] = useState(0);
+  const [snaps, setSnaps] = useState<{ date: string; size: number }[]>([]);
+  const [restore, setRestore] = useState<string | null>(null);
+  useEffect(() => { void listSnapshots().then(setSnaps); }, []);
   useCollection('audit');
   const logs = db.list('audit').slice().sort((a, b) => b.date - a.date).slice(0, 15);
   return (
@@ -292,13 +312,23 @@ function DataTab() {
           {!firebaseEnabled && <p className="tiny muted mt-12">Pour synchroniser professeurs et administration sur plusieurs appareils, créez un projet Firebase, copiez <code>.env.example</code> en <code>.env.local</code>, remplissez la configuration puis reconstruisez l’application. Voir le fichier <code>FIREBASE.md</code>.</p>}
         </Card>
         <Card title="Sauvegarde">
-          <p className="small muted mb-12">Exportez toutes les données dans un fichier (à garder sur une clé USB ou Google Drive). Vous pourrez le réimporter sur un autre appareil.</p>
+          <p className="small muted mb-12">Envoyez toutes les données hors de cet appareil (WhatsApp, Google Drive, email, clé USB) : si le téléphone est perdu, ce fichier permet de tout récupérer sur un autre appareil.{lastExport() ? ` Dernier envoi : ${timeAgo(lastExport())}.` : ' Aucun envoi pour l’instant.'}</p>
           <div className="row wrap">
-            <button className="btn" onClick={() => downloadBlob(`solonart-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`, new Blob([db.exportJSON()], { type: 'application/json' }))}><Download />Exporter</button>
+            <button className="btn btn-primary" onClick={async () => { try { if (await shareBackup()) { toast('Sauvegarde envoyée'); setTick((x) => x + 1); } } catch (e) { toast((e as Error).message, true); } }}><Share2 />Envoyer la sauvegarde</button>
+            <button className="btn" onClick={() => downloadBlob(`solonart-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`, new Blob([db.exportJSON()], { type: 'application/json' }))}><Download />Télécharger</button>
             {canEdit && <button className="btn" onClick={() => input.current?.click()}><Upload />Importer</button>}
             {canEdit && <button className="btn btn-danger" onClick={() => setReset(true)}><RotateCcw />Réinitialiser la démo</button>}
           </div>
           <input ref={input} type="file" accept="application/json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; try { await db.importJSON(await f.text()); toast('Données importées'); } catch (err) { toast((err as Error).message, true); } }} />
+        </Card>
+        <Card title="Copies automatiques sur cet appareil">
+          <p className="small muted mb-12">Une copie est faite chaque jour ; les 5 dernières sont gardées. Utile pour revenir en arrière après une erreur (elles disparaissent si l’appareil est perdu).</p>
+          {snaps.length === 0 ? <p className="small muted">La première copie sera faite dans quelques secondes.</p> : (
+            <div className="list">{snaps.map((x) => (
+              <div key={x.date} className="list-item"><span className="grow">{dateLong(x.date)}<br /><span className="tiny muted">{(x.size / 1048576).toFixed(1)} Mo</span></span>
+                {canEdit && <button className="btn btn-sm" onClick={() => setRestore(x.date)}><RotateCcw size={14} />Restaurer</button>}</div>
+            ))}</div>
+          )}
         </Card>
       </div>
       <Card title="Journal d’activité" pad={false} link={canJournal ? 'Tout voir' : undefined} onLink={() => nav('/journal')}>
@@ -306,6 +336,7 @@ function DataTab() {
           <div key={l.id} className="list-item"><div className="grow"><b style={{ color: 'var(--ink)', fontWeight: 600 }}>{l.action}</b><div className="tiny muted">{l.detail}</div></div><span className="tiny muted" style={{ textAlign: 'right' }}>{db.get('users', l.userId)?.nom ?? ''}<br />{timeAgo(l.date)}</span></div>
         ))}</div>
       </Card>
+      <Confirm open={!!restore} onClose={() => setRestore(null)} danger title="Restaurer une copie" confirmLabel="Restaurer" message={`Toutes les données de cet appareil seront remplacées par la copie du ${restore ? dateLong(restore) : ''}. Les modifications faites depuis seront perdues.`} onConfirm={async () => { if (!restore) return; try { await restoreSnapshot(restore); audit('Restauration copie', restore, { domaine: 'autre' }); toast('Copie restaurée'); } catch (e) { toast((e as Error).message, true); } }} />
       <Confirm open={reset} onClose={() => setReset(false)} danger title="Réinitialiser la démonstration" confirmLabel="Réinitialiser" message="Toutes les données de cet appareil seront remplacées par les données de démonstration." onConfirm={async () => { await db.reset(); location.reload(); }} />
     </div>
   );

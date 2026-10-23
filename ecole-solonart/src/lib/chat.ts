@@ -6,7 +6,7 @@ import { db } from '../data/store';
 import type { ChatMessage, ID, Student } from '../data/types';
 import { dateShort } from './format';
 import { audit, type Session } from './session';
-import { classTeacherIds, isSecondaire } from './regles';
+import { classTeacherIds, isSecondaire, schoolRules } from './regles';
 
 export type Side = 'parent' | 'ecole' | 'prof';
 export interface Thread { key: string; eleveId: ID; canal: ChatMessage['canal']; staffId?: ID; messages: ChatMessage[]; last?: ChatMessage; unread: number }
@@ -59,14 +59,27 @@ export function notifyParent(id: string, s: Student, type: NonNullable<ChatMessa
   db.put('chat', { id, eleveId: s.id, canal: 'ecole', auteur: 'systeme', texte, type, date: Date.now(), lu: { ecole: true, prof: true } });
 }
 
-export function notifyAttendance(s: Student, statut: 'Absent' | 'Retard', date: string) {
+/** Prévient le parent selon les règles de l'école ; renvoie vrai si un message a été (ou était déjà) envoyé. */
+export function notifyAttendance(s: Student, statut: 'Absent' | 'Retard', date: string): boolean {
+  const rules = schoolRules();
+  if (statut === 'Absent' && !rules.alerteAbsence) return false;
+  if (statut === 'Retard' && rules.seuilRetards > 1) {
+    // Retards : on ne prévient qu'au seuil choisi (sur les 7 derniers jours), puis à chaque nouveau multiple.
+    const since = new Date(new Date(date).getTime() - 6 * 86400000).toISOString().slice(0, 10);
+    const n = db.list('attendance').filter((a) => a.eleveId === s.id && a.statut === 'Retard' && a.date >= since && a.date <= date).length;
+    if (n < rules.seuilRetards || n % rules.seuilRetards !== 0) return !!db.get('chat', `notif-at-${date}-${s.id}-Retard`);
+    notifyParent(`notif-at-${date}-${s.id}-Retard`, s, 'retard', `Retards : ${pr(s)} est arrivé${s.sexe === 'F' ? 'e' : ''} en retard ${n} fois en 7 jours (dernier : ${dateShort(date)}).`);
+    return true;
+  }
   const texte = statut === 'Absent'
     ? `Absence : ${pr(s)} n’était pas en classe le ${dateShort(date)}. Merci de prévenir l’école du motif.`
     : `Retard : ${pr(s)} est arrivé${s.sexe === 'F' ? 'e' : ''} en retard le ${dateShort(date)}.`;
   notifyParent(`notif-at-${date}-${s.id}-${statut}`, s, statut === 'Absent' ? 'absence' : 'retard', texte);
+  return true;
 }
 
 export function notifyIncident(incidentId: ID, s: Student, type: string, description: string, sanction?: string) {
+  if (!schoolRules().alerteConduite) return;
   const fel = type === 'Félicitations';
   const texte = fel ? `Félicitations : ${description}` : `Conduite (${type.toLowerCase()}) : ${description}${sanction ? ` Suite donnée : ${sanction}.` : ''}`;
   notifyParent(`notif-inc-${incidentId}`, s, fel ? 'felicitations' : 'conduite', texte);
