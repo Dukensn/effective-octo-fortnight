@@ -38,6 +38,23 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Espace professeur refait (version 12)
+Barre du bas : **Accueil · Horaire · Notes · Appel** (ou **Finance** si le professeur ne fait pas l'appel) · Menu.
+- **Accueil** : les cours du jour, l'appel à faire, un remplacement éventuel, puis Mes classes, Mes matières,
+  Saisir des notes, Mes écoles (secondaire) ou Palmarès, Finance, Cahier de textes et les prochaines évaluations.
+- **Emploi du temps** : vues Semaine, Jour et Mois ; détail d'un cours (date, heure, salle, élèves, programme,
+  notes, devoirs, appel). Les remplacements du jour y figurent.
+- **Plusieurs établissements (secondaire seulement)** : Mes écoles (ajouter, activer / désactiver), et le bouton +
+  de l'emploi du temps pour ajouter ses cours ailleurs ; les chevauchements sont signalés. Cet agenda est personnel.
+- **Mes classes** (cette école / toutes) et **Mes matières** (classes et heures par semaine).
+- **Finance** : salaire du mois, total versé et à venir, versements et détail (fiche de paie PDF), taux par matière
+  (réglés par la direction dans Paramètres → Matières & règles), heures du mois (prévues, effectuées, supplémentaires
+  par remplacement, annulées par absence, détail par semaine), historique, documents (fiches de paie, attestation de
+  travail) et informations du contrat.
+- **Appel** : classes du jour fait / non fait, puis feuille en grille P · R · A · E avec recherche, « Tout présent »
+  et « Enregistrer (N présents) » — la même feuille sert à la direction.
+- Démonstration : M. Jean Robert enseigne aussi au Collège Lumière (agenda personnel).
+
 ## Remplacements, réglages, sauvegarde et notifications (version 11)
 - **Emploi du temps aligné** sur Classe → Équipe & matières : changer l'enseignant d'une matière met à jour ses
   créneaux ; les créneaux anciens sont corrigés au démarrage. Dans un créneau, l'enseignant d'une matière se règle

@@ -1,7 +1,7 @@
 // Données de démonstration (profils fictifs) — contexte haïtien, École Mixte Solonart, Léogâne.
 import { db } from './store';
 import type {
-  ChatMessage,
+  ChatMessage, ExternalSlot,
   ClassRoom, Course, Evaluation, Grade, Guardian, Period, Role, Staff, Student, Subject, TimetableSlot,
   Payment, Expense, Salary, Attendance, ModuleKey, Access, User, Sexe, Incident, Lesson,
 } from './types';
@@ -580,6 +580,26 @@ export function seedDatabase() {
     ...[jeanDorval, marieDorval].map((g) => ({ id: `u-par-${g.id}`, nom: `${g.sexe === 'F' ? 'Mme' : 'M.'} ${g.prenom} ${g.nom}`, email: g.email ?? '', telephone: g.telephone, roleId: 'r-par', guardianId: g.id, pin: '1234', actif: true, photo: g.photo })),
   ];
   db.bulkPut('users', users as User[]);
+
+  // ---------- Taux horaires (par matière et niveau) ----------
+  const TAUX: Record<string, [number, number]> = { ma: [400, 300], pc: [400, 300], inf: [350, 300], svt: [350, 300] };
+  db.patch('school', 'main', {
+    tauxHoraires: subjects.filter((x) => x.groupe !== 'prescolaire').flatMap((x) => [
+      { matiereId: x.id, niveau: 'Secondaire' as const, taux: TAUX[x.id]?.[0] ?? 300 },
+      { matiereId: x.id, niveau: 'Fondamental' as const, taux: TAUX[x.id]?.[1] ?? 250 },
+    ]),
+  });
+
+  // ---------- Professeur du secondaire qui enseigne aussi ailleurs (démonstration) ----------
+  db.patch('staff', robert.id, { typeContrat: 'Temps partiel', autresEcoles: [{ id: 'ext-lumiere', nom: 'Collège Lumière', commune: 'Léogâne', actif: true }, { id: 'ext-cayes', nom: 'Institut Les Cayes', commune: 'Les Cayes', actif: false }] });
+  const robertBusy = new Set(slots.filter((x) => x.professeurId === robert.id).map((x) => `${x.jour}|${x.debut}`));
+  const free = (jour: 1 | 2 | 3 | 4 | 5) => HOURS.map(([h, f]) => [h, f]).filter(([h]) => !robertBusy.has(`${jour}|${h}`) && h >= '13:00');
+  const ext: Omit<ExternalSlot, 'updatedAt'>[] = [];
+  ([[2, 'Informatique', 'S2-A', 'Salle 3', 25], [4, 'Informatique', 'S2-A', 'Salle 3', 25], [3, 'Mathématiques', 'S1-C', 'Salle 5', 31]] as const).forEach(([jour, matiere, classe, salle, eleves], i) => {
+    const [debut, fin] = free(jour)[0] ?? ['15:00', '15:50'];
+    ext.push({ id: `ag-${i}`, staffId: robert.id, ecoleId: 'ext-lumiere', jour, debut, fin, matiere, classe, salle, eleves });
+  });
+  db.bulkPut('agenda', ext as ExternalSlot[]);
 
   // ---------- Messagerie (démonstration) ----------
   const now = Date.now();

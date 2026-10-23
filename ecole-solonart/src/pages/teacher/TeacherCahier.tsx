@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useCollection } from '../../data/store';
 import type { Lesson } from '../../data/types';
@@ -15,7 +16,8 @@ export default function TeacherCahier() {
   const classes = useCollection('classes');
   const subjects = useCollection('subjects');
   const lessons = useCollection('lessons');
-  const [coursId, setCoursId] = useState(courses[0]?.id ?? '');
+  const [params] = useSearchParams();
+  const [coursId, setCoursId] = useState(params.get('cours') ?? courses[0]?.id ?? '');
   const [form, setForm] = useState<Partial<Lesson> | null>(null);
   const label = (id: string) => { const c = courses.find((x) => x.id === id); return c ? `${classes.find((k) => k.id === c.classeId)?.code} · ${subjects.find((s) => s.id === c.matiereId)?.court}` : ''; };
   if (!courses.length) return <Empty title="Aucun cours">La direction ne vous a pas encore affecté de cours.</Empty>;

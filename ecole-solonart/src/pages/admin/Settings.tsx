@@ -177,6 +177,22 @@ function SubjectsTab() {
         </div>
         <p className="tiny muted mt-12">La charge sert à signaler les enseignants surchargés dans Classe → Équipe & matières.</p>
       </Card>
+      <Card title="Taux horaires des enseignants (G / heure)" pad={false}>
+        <div className="team-list">
+          <div className="team-row tiny muted" style={{ paddingTop: 8, paddingBottom: 8 }}><span>Matière</span><span>Fondamental</span><span>Secondaire</span></div>
+          {subjects.filter((x) => x.groupe !== 'prescolaire').map((x) => (
+            <div key={x.id} className="team-row rate-row">
+              <span className="small" style={{ color: 'var(--ink)' }}>{x.nom.split(' (')[0]}</span>
+              {(['Fondamental', 'Secondaire'] as const).map((niv) => {
+                const cur = school.tauxHoraires?.find((t) => t.matiereId === x.id && t.niveau === niv)?.taux;
+                return <input key={niv} type="number" min={0} step={25} className="input" aria-label={`Taux ${x.nom} ${niv}`} disabled={!canEdit} value={cur ?? ''} placeholder="—"
+                  onChange={(e) => { const rest = (school.tauxHoraires ?? []).filter((t) => !(t.matiereId === x.id && t.niveau === niv)); const v = Number(e.target.value); db.patch('school', 'main', { tauxHoraires: e.target.value === '' ? rest : [...rest, { matiereId: x.id, niveau: niv, taux: v }] }); }} />;
+              })}
+            </div>
+          ))}
+        </div>
+        <p className="tiny muted card-pad">Chaque professeur voit ces taux dans son espace (Finance → Taux par matière).</p>
+      </Card>
       </div>
       <Card title="Matières" actions={canEdit && <button className="btn btn-sm btn-soft" onClick={() => setAdd(true)}><Plus size={14} />Ajouter</button>}>
         <div className="stack" style={{ gap: 6 }}>

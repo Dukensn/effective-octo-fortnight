@@ -5,6 +5,7 @@ import { useCollection, useDoc } from '../../data/store';
 import { Empty, ScreenHead, StatusBadge } from '../../components/ui';
 import { dateShort } from '../../lib/format';
 import { useSession } from '../../lib/session';
+import { teachesCourse } from '../../lib/regles';
 
 export default function TeacherEvaluations() {
   const { coursId } = useParams();
@@ -16,7 +17,7 @@ export default function TeacherEvaluations() {
   const periods = useCollection('periods');
   const evaluations = useCollection('evaluations').filter((e) => e.coursId === coursId);
   const [tab, setTab] = useState<'controle' | 'examen'>('controle');
-  if (!course || course.professeurId !== session.user.staffId) return <Empty title="Cours introuvable" />;
+  if (!course || !teachesCourse(session.user.staffId, course)) return <Empty title="Cours introuvable" />;
   const typeOf = (pid: string) => periods.find((p) => p.id === pid)?.type ?? 'controle';
   const ordre = (pid: string) => periods.find((p) => p.id === pid)?.ordre ?? 0;
   const list = evaluations.filter((e) => typeOf(e.periodeId) === tab || (tab === 'examen' && /examen/i.test(e.titre))).sort((a, b) => ordre(a.periodeId) - ordre(b.periodeId) || a.date.localeCompare(b.date));

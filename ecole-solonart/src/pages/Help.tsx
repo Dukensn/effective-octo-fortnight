@@ -22,7 +22,10 @@ const PROF: [string, string][] = [
   ['Saisir des notes', 'Accueil → Saisir des notes → choisissez la classe → le contrôle → « Saisir les notes ». Tapez « abs » pour un absent. Entrée passe à l’élève suivant.'],
   ['Palmarès', 'Après l’enregistrement, le palmarès (rang, moyenne, plus haute, plus basse) est calculé. Vous pouvez l’imprimer ou l’exporter en Excel.'],
   ['Clôturer', 'Quand toutes les notes sont justes, « Clôturer le contrôle ». Seule la direction peut ensuite rouvrir.'],
-  ['Appel', 'Faire l’appel : tout le monde est présent par défaut, touchez seulement les absents ou retards puis « Enregistrer l’appel ».'],
+  ['Appel', 'Appel : choisissez la classe du jour, tout le monde est présent par défaut ; touchez A (absent), R (retard) ou E (excusé), puis « Enregistrer ». Le parent est prévenu automatiquement.'],
+  ['Emploi du temps', 'Horaire : vues Semaine, Jour et Mois. Touchez un cours pour voir la salle, la liste des élèves, le programme, les notes et les devoirs.'],
+  ['Plusieurs écoles', 'Professeurs du secondaire : Menu → Mes écoles pour ajouter un établissement, puis le bouton + de l’emploi du temps pour y noter vos cours. Les chevauchements sont signalés.'],
+  ['Finance', 'Finance : salaire du mois, versements, fiches de paie et attestation de travail en PDF, taux horaires, heures du mois.'],
 ];
 
 const PARENT: [string, string][] = [

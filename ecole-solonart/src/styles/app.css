@@ -193,7 +193,6 @@ p { margin: 0; }
 @media (max-width: 480px) { .stat { flex-direction: column; align-items: flex-start; gap: 10px; } .stat .ic { width: 42px; height: 42px; } .stat .v { font-size: 19px !important; } }
 .tint-blue { background: var(--primary-50); color: var(--primary); }
 .tint-green { background: var(--green-50); color: var(--green); }
-.tint-red { background: var(--red-50); color: var(--red); }
 .tint-orange { background: var(--orange-50); color: var(--orange); }
 .tint-violet { background: var(--violet-50); color: var(--violet); }
 .tint-navy { background: #e8edf8; color: var(--navy); }
@@ -829,3 +828,55 @@ html { -webkit-tap-highlight-color: transparent; }
   .team-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px 12px; }
   .team-prof { grid-column: 1 / -1; grid-row: 2; }
 }
+.rate-row { grid-template-columns: minmax(0, 1fr) 110px 110px; }
+.rate-row .input { height: 36px; text-align: right; }
+.team-row.tiny { grid-template-columns: minmax(0, 1fr) 110px 110px; }
+@media (max-width: 767px) { .rate-row, .team-row.tiny { grid-template-columns: minmax(0, 1fr) 84px 84px; } .rate-row .team-prof { grid-row: auto; } }
+
+/* ---------- Emploi du temps du professeur ---------- */
+.day-card { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--primary); border-radius: 12px; background: #fff; text-align: left; color: var(--text); }
+.day-card .grow { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.day-card b { color: var(--ink); font-size: 15px; }
+.week-strip { display: flex; align-items: center; gap: 4px; }
+.week-strip .wd { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; border: 0; background: none; border-radius: 12px; color: var(--text); position: relative; min-width: 0; }
+.week-strip .wd small { font-size: 11.5px; color: var(--muted); }
+.week-strip .wd b { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); font-size: 15px; }
+.week-strip .wd.today b { border: 1.5px solid var(--primary); }
+.week-strip .wd.on b { background: var(--primary); color: #fff; }
+.week-strip .wd i, .month-grid button i { width: 5px; height: 5px; border-radius: 50%; background: var(--green); display: block; }
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.month-grid small { font-size: 11.5px; color: var(--muted); padding: 4px 0; }
+.month-grid button { height: 40px; border: 0; background: none; border-radius: 10px; color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 14px; }
+.month-grid button.out { color: var(--faint); }
+.month-grid button.on { background: var(--primary); color: #fff; }
+.month-grid button.on i { background: #fff; }
+.fab { position: fixed; right: 18px; bottom: calc(84px + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--primary); color: #fff; display: grid; place-items: center; z-index: 30; box-shadow: 0 6px 18px rgba(20, 99, 243, .35); }
+@media (min-width: 1024px) { .fab { bottom: 28px; right: 28px; } }
+
+/* ---------- Finance du professeur ---------- */
+.fin-hero { display: flex; align-items: center; gap: 10px; width: 100%; padding: 18px; border: 0; border-radius: 16px; background: var(--primary); color: #fff; text-align: left; }
+.fin-hero .grow { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.fin-hero small { opacity: .85; font-size: 13px; }
+.fin-hero b { font-size: 28px; font-weight: 800; }
+.ring { width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.ring > div { width: 92px; height: 92px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring b { font-size: 22px; color: var(--ink); }
+.ring small { font-size: 11.5px; color: var(--muted); }
+.tint-red { background: var(--red-50); color: var(--red); }
+
+/* ---------- Feuille d'appel ---------- */
+.rc-head { display: flex; align-items: center; gap: 12px; }
+.rc-counts { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--muted); margin-top: 2px; }
+.rc-counts i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+.rc-grid { overflow: hidden; }
+.rc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) repeat(4, 40px); align-items: center; gap: 4px; padding: 8px 12px; border-bottom: 1px solid var(--line-2); }
+.rc-th { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--bg); text-align: center; }
+.rc-th span:nth-child(2) { text-align: left; }
+.rc-name { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--ink); font-weight: 500; font-size: 14px; }
+.rc-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-dot { width: 28px; height: 28px; margin: 0 auto; border-radius: 50%; border: 1.5px solid #c5cedd; background: #fff; color: #fff; display: grid; place-items: center; padding: 0; }
+.rc-dot.on.k0 { background: var(--green); border-color: var(--green); }
+.rc-dot.on.k1 { background: var(--orange); border-color: var(--orange); }
+.rc-dot.on.k2 { background: var(--red); border-color: var(--red); }
+.rc-dot.on.k3 { background: var(--violet); border-color: var(--violet); }
+@media (max-width: 380px) { .rc-row { grid-template-columns: 22px minmax(0, 1fr) repeat(4, 34px); padding: 8px; } .rc-name .avatar, .rc-name img { display: none; } }

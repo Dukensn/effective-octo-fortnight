@@ -108,7 +108,7 @@ const SUB_TITLES: [RegExp, string][] = [
   [/^\/inscriptions\/rapide/, 'Inscription rapide'], [/^\/inscriptions\/nouvelle/, 'Nouvelle inscription'], [/^\/eleves\/import/, 'Importer des élèves'],
   [/^\/eleves\/photos/, 'Séance photo'], [/^\/eleves\//, 'Fiche élève'], [/^\/classes\//, 'Classe'], [/^\/notes\/saisie/, 'Saisie des notes'],
   [/^\/notes\/palmares/, 'Palmarès'], [/^\/documents\/bulletins/, 'Bulletins'], [/^\/documents\/badges/, 'Badges'], [/^\/prof\/evaluation\/.+\/saisie/, 'Saisie des notes'],
-  [/^\/prof\/evaluation/, 'Palmarès'], [/^\/prof\/classes\//, 'Contrôles'], [/^\/profil/, 'Mon profil'], [/^\/aide/, 'Aide'], [/^\/evenements/, 'Événements'], [/^\/gestion/, 'Gestion'],
+  [/^\/prof\/evaluation/, 'Palmarès'], [/^\/prof\/classes\//, 'Contrôles'], [/^\/profil/, 'Mon profil'], [/^\/aide/, 'Aide'], [/^\/evenements/, 'Événements'], [/^\/gestion/, 'Gestion'], [/^\/prof\/cours/, 'Détail du cours'], [/^\/prof\/finance/, 'Finance'], [/^\/prof\/emploi/, 'Emploi du temps'], [/^\/prof\/matieres/, 'Mes matières'], [/^\/prof\/ecoles/, 'Mes écoles'],
 ];
 
 export function Shell({ items, tabs, quick = [], children }: { items: NavItem[]; tabs: NavItem[]; quick?: QuickAction[]; children: ReactNode }) {

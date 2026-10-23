@@ -35,6 +35,8 @@ export interface School extends Meta {
   seuilRetards?: number; // nombre de retards sur 7 jours avant d'alerter le parent (1 = à chaque retard)
   alerteAbsence?: boolean; // prévenir le parent à chaque absence
   alerteConduite?: boolean; // prévenir le parent à chaque incident ou félicitation
+  /** Taux horaire payé aux enseignants, par matière et par niveau (en gourdes). */
+  tauxHoraires?: { matiereId: ID; niveau: Niveau; taux: number }[];
 }
 
 export interface SchoolYear extends Meta {
@@ -185,6 +187,24 @@ export interface Staff extends Meta {
   modePaiement: 'MonCash' | 'NatCash' | 'Espèces' | 'Virement' | 'Chèque';
   nif?: string;
   statut: 'Actif' | 'Congé' | 'Inactif' | 'Archivé';
+  /** Professeurs du secondaire : autres établissements où ils enseignent (pour leur emploi du temps complet). */
+  autresEcoles?: OtherSchool[];
+  typeContrat?: 'Temps plein' | 'Temps partiel' | 'Vacataire';
+}
+
+export interface OtherSchool { id: ID; nom: string; commune?: string; actif: boolean }
+
+/** Cours donné par un professeur dans un autre établissement (son agenda personnel ; non géré par l'école). */
+export interface ExternalSlot extends Meta {
+  staffId: ID;
+  ecoleId: ID; // OtherSchool.id
+  jour: 1 | 2 | 3 | 4 | 5 | 6;
+  debut: string;
+  fin: string;
+  matiere: string;
+  classe: string;
+  salle?: string;
+  eleves?: number;
 }
 
 /** Un contrôle ou examen pour un cours (classe + matière) dans une période. */
@@ -443,6 +463,7 @@ export interface Collections {
   lessons: Lesson;
   chat: ChatMessage;
   remplacements: Replacement;
+  agenda: ExternalSlot;
   roles: Role;
   users: User;
   audit: AuditLog;
@@ -452,5 +473,5 @@ export type CollectionName = keyof Collections;
 export const COLLECTIONS: CollectionName[] = [
   'school', 'years', 'periods', 'classes', 'subjects', 'courses', 'guardians', 'students', 'staff',
   'evaluations', 'grades', 'reportEntries', 'attendance', 'staffAttendance', 'timetable', 'payments',
-  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'remplacements', 'roles', 'users', 'audit',
+  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'remplacements', 'agenda', 'roles', 'users', 'audit',
 ];

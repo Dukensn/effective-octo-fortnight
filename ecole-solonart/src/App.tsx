@@ -1,7 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
-  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles, History, MessagesSquare, TrendingUp,
+  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles, History, MessagesSquare, TrendingUp, Wallet, BookOpen, Building2,
 } from 'lucide-react';
 import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
@@ -9,6 +9,7 @@ import { PrintRoot } from './lib/print';
 import { useSession } from './lib/session';
 import { useCollection } from './data/store';
 import { canTeacherCall, canTeacherMessage } from './lib/regles';
+import { canMultiSchool } from './lib/prof';
 import type { ModuleKey } from './data/types';
 import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -44,7 +45,9 @@ import TeacherEvaluations from './pages/teacher/TeacherEvaluations';
 import Palmares from './pages/teacher/Palmares';
 import GradeEntry from './pages/teacher/GradeEntry';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
-import TeacherTimetable from './pages/teacher/TeacherTimetable';
+import TeacherSchedule, { CourseDetail } from './pages/teacher/TeacherSchedule';
+import { MySubjects, MySchools } from './pages/teacher/TeacherMine';
+import TeacherFinance from './pages/teacher/TeacherFinance';
 import TeacherCahier from './pages/teacher/TeacherCahier';
 import TeacherDiscipline from './pages/teacher/TeacherDiscipline';
 import Discipline from './pages/admin/Discipline';
@@ -77,12 +80,15 @@ const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
 
 const TEACHER_NAV: NavItem[] = [
   { to: '/', label: 'Accueil', icon: Home, end: true },
-  { to: '/prof/classes', label: 'Mes classes', icon: Users },
-  { to: '/prof/notes', label: 'Saisir des notes', icon: BookOpenCheck },
-  { to: '/prof/palmares', label: 'Palmarès', icon: Trophy },
-  { to: '/prof/appel', label: 'Faire l’appel', icon: ClipboardCheck },
-  { to: '/prof/messages', label: 'Messages', icon: MessagesSquare },
   { to: '/prof/emploi', label: 'Emploi du temps', icon: CalendarClock },
+  { to: '/prof/notes', label: 'Saisir des notes', icon: BookOpenCheck },
+  { to: '/prof/appel', label: 'Faire l’appel', icon: ClipboardCheck },
+  { to: '/prof/finance', label: 'Finance', icon: Wallet },
+  { to: '/prof/classes', label: 'Mes classes', icon: Users },
+  { to: '/prof/matieres', label: 'Mes matières', icon: BookOpen },
+  { to: '/prof/ecoles', label: 'Mes écoles', icon: Building2 },
+  { to: '/prof/palmares', label: 'Palmarès', icon: Trophy },
+  { to: '/prof/messages', label: 'Messages', icon: MessagesSquare },
   { to: '/prof/cahier', label: 'Cahier de textes', icon: NotebookPen },
   { to: '/prof/discipline', label: 'Discipline', icon: ShieldAlert },
   { to: '/evenements', label: 'Événements', icon: CalendarHeart },
@@ -170,12 +176,15 @@ function TeacherApp() {
   // L'appel n'apparaît que pour les professeurs qui en ont la charge (jamais au secondaire) ; idem pour la messagerie.
   const appel = classes.some((c) => canTeacherCall(session.user.staffId, c));
   const msg = classes.some((c) => canTeacherMessage(session.user.staffId, c));
-  const items = TEACHER_NAV.filter((n) => (n.to !== '/prof/appel' || appel) && (n.to !== '/prof/messages' || msg));
+  useCollection('staff');
+  const multi = canMultiSchool(session.user.staffId); // plusieurs établissements : secondaire seulement
+  const items = TEACHER_NAV.filter((n) => (n.to !== '/prof/appel' || appel) && (n.to !== '/prof/messages' || msg) && (n.to !== '/prof/ecoles' || multi));
+  // Barre du bas : l'essentiel du quotidien ; le reste est dans « Menu ».
   const tabs: NavItem[] = [
     { to: '/', label: 'Accueil', icon: Home, end: true },
+    { to: '/prof/emploi', label: 'Horaire', icon: CalendarClock },
     { to: '/prof/notes', label: 'Notes', icon: BookOpenCheck },
-    appel ? { to: '/prof/appel', label: 'Appel', icon: ClipboardCheck } : { to: '/prof/cahier', label: 'Cahier', icon: NotebookPen },
-    msg ? { to: '/prof/messages', label: 'Messages', icon: MessagesSquare } : { to: '/prof/emploi', label: 'Horaire', icon: CalendarClock },
+    appel ? { to: '/prof/appel', label: 'Appel', icon: ClipboardCheck } : { to: '/prof/finance', label: 'Finance', icon: Wallet },
   ];
   return (
     <Shell items={items} tabs={tabs}>
@@ -188,7 +197,11 @@ function TeacherApp() {
         <Route path="/prof/evaluation/:id" element={<Palmares />} />
         <Route path="/prof/evaluation/:id/saisie" element={<GradeEntry />} />
         <Route path="/prof/appel" element={<TeacherAttendance />} />
-        <Route path="/prof/emploi" element={<TeacherTimetable />} />
+        <Route path="/prof/emploi" element={<TeacherSchedule />} />
+        <Route path="/prof/cours/:slotId" element={<CourseDetail />} />
+        <Route path="/prof/matieres" element={<MySubjects />} />
+        <Route path="/prof/ecoles" element={<MySchools />} />
+        <Route path="/prof/finance/*" element={<TeacherFinance />} />
         <Route path="/prof/cahier" element={<TeacherCahier />} />
         <Route path="/prof/discipline" element={<TeacherDiscipline />} />
         <Route path="/prof/messages" element={<TeacherMessages />} />

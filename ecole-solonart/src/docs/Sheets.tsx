@@ -354,3 +354,47 @@ export function CahierSheet({ classeId, lessons }: { classeId: string; lessons: 
     </A4>, pi,
   ))}</>;
 }
+
+/** Fiche de paie d'un mois (reçu de salaire), remise au membre du personnel. */
+export function PaySlipSheet({ salary }: { salary: import('../data/types').Salary }) {
+  const st = db.get('staff', salary.staffId);
+  const [y, m] = salary.periode.split('-').map(Number);
+  const mois = new Date(y, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  const net = salary.montant + salary.primes - salary.retenues;
+  return page(
+    <A4 title="Fiche de paie" sub={`Période : ${mois}`}>
+      <KV rows={[['Nom', st ? `${st.sexe === 'F' ? 'Mme' : 'M.'} ${st.prenom} ${st.nom}` : '-'], ['Matricule', st?.matricule], ['Poste', `${st?.poste ?? ''}${st?.specialite ? ` · ${st.specialite}` : ''}`], ['NIF', st?.nif], ['Mode de paiement', salary.mode], ['Date de paiement', salary.datePaiement ? dateLong(salary.datePaiement) : 'En attente']]} />
+      <H>Détail</H>
+      <table className="d-table" style={{ fontSize: 12 }}>
+        <tbody>
+          <tr><td>Salaire de base</td><td style={{ textAlign: 'right' }}>{money(salary.montant)}</td></tr>
+          <tr><td>Primes</td><td style={{ textAlign: 'right' }}>{money(salary.primes)}</td></tr>
+          <tr><td>Retenues</td><td style={{ textAlign: 'right' }}>− {money(salary.retenues)}</td></tr>
+          <tr><td><b>Net payé</b></td><td style={{ textAlign: 'right' }}><b>{money(net)}</b></td></tr>
+        </tbody>
+      </table>
+      <p style={{ fontSize: 11, marginTop: 14 }}>Statut : <b>{salary.statut}</b></p>
+      <Signatures left="Le / la bénéficiaire" right="La Direction" />
+    </A4>,
+  );
+}
+
+/** Attestation de travail (année scolaire en cours). */
+export function AttestationSheet({ staffId }: { staffId: string }) {
+  const st = db.get('staff', staffId);
+  const school = db.get('school', 'main')!;
+  const year = db.get('years', school.anneeCourante);
+  const name = st ? `${st.sexe === 'F' ? 'Mme' : 'M.'} ${st.prenom} ${st.nom}` : '';
+  return page(
+    <A4 title="Attestation de travail">
+      <p style={{ fontSize: 13, lineHeight: 1.8, marginTop: 20 }}>
+        Je soussigné(e), {school.directeur}, directeur / directrice de {school.nom}, atteste que <b>{name}</b>, matricule {st?.matricule},
+        exerce au sein de l’établissement la fonction de <b>{st?.poste}{st?.specialite ? ` (${st.specialite})` : ''}</b> depuis le {st?.dateEmbauche ? dateLong(st.dateEmbauche) : '—'},
+        {st?.typeContrat ? ` à ${st.typeContrat.toLowerCase()},` : ''} et est en fonction pour l’année scolaire {year?.libelle}.
+      </p>
+      <p style={{ fontSize: 13, lineHeight: 1.8 }}>La présente attestation est délivrée à l’intéressé(e) pour servir et valoir ce que de droit.</p>
+      <p style={{ fontSize: 12, marginTop: 20 }}>Fait à {school.commune}, le {dateLong(new Date().toISOString().slice(0, 10))}.</p>
+      <Signatures left="" right="La Direction" />
+    </A4>,
+  );
+}
