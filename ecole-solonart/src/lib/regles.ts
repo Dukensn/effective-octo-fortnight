@@ -1,5 +1,6 @@
 // Règles qui changent selon le niveau de la classe.
-// - Préscolaire : plusieurs co-titulaires à égalité (appel, évaluation de tous les domaines, livret).
+// - Chaque classe a une organisation (maître unique, équipe, un professeur par matière, co-titulaires).
+// - Co-titulaires (souvent au préscolaire) : à égalité sur tout (appel, évaluation de tous les domaines, livret).
 // - Préscolaire et fondamental : les professeurs de la classe font l'appel et peuvent écrire aux parents.
 // - Secondaire : l'appel est fait par le personnel désigné ; seuls l'administration écrit aux parents.
 // Partout : un seul appel par jour et par classe.
@@ -9,18 +10,37 @@ import { todayISO } from './format';
 
 export const isSecondaire = (c?: Pick<ClassRoom, 'niveau'> | null) => c?.niveau === 'Secondaire';
 
-/** Titulaire et co-titulaires (sans doublon). */
-export function classTeacherIds(c?: ClassRoom | null): ID[] {
-  if (!c) return [];
-  return [...new Set([c.titulaireId, ...(c.cotitulaireIds ?? [])].filter((x): x is ID => !!x))];
+export type Organisation = NonNullable<ClassRoom['organisation']>;
+export const ORGANISATIONS: { key: Organisation; label: string; desc: string; pour: ClassRoom['niveau'][] }[] = [
+  { key: 'unique', label: 'Maître unique', desc: 'Un seul enseignant fait toutes les matières de la classe.', pour: ['Préscolaire', 'Fondamental'] },
+  { key: 'equipe', label: 'Équipe', desc: 'Deux ou trois enseignants se partagent les matières.', pour: ['Fondamental'] },
+  { key: 'matiere', label: 'Un professeur par matière', desc: 'Chaque matière a son professeur, comme au secondaire.', pour: ['Fondamental', 'Secondaire'] },
+  { key: 'cotitulaires', label: 'Co-titulaires', desc: 'Plusieurs enseignants à égalité sur tout : appel, toutes les évaluations, livret.', pour: ['Préscolaire'] },
+];
+
+/** Organisation de la classe ; sans choix enregistré, on la déduit du niveau et des affectations. */
+export function organisationOf(c?: ClassRoom | null): Organisation {
+  if (!c) return 'matiere';
+  if (c.organisation) return c.organisation;
+  if (c.niveau === 'Préscolaire') return (c.cotitulaireIds?.length ?? 0) > 0 ? 'cotitulaires' : 'unique';
+  if (c.niveau === 'Secondaire') return 'matiere';
+  const profs = new Set(db.list('courses').filter((x) => x.classeId === c.id).map((x) => x.professeurId).filter(Boolean));
+  return profs.size <= 1 ? 'unique' : 'matiere';
 }
 
-/** Un professeur enseigne ce cours : il en est chargé, ou il est co-titulaire d'une classe du préscolaire. */
+/** Titulaire et membres de l'équipe (sans doublon). En maître unique : le titulaire seul. */
+export function classTeacherIds(c?: ClassRoom | null): ID[] {
+  if (!c) return [];
+  const team = organisationOf(c) === 'unique' ? [] : c.cotitulaireIds ?? [];
+  return [...new Set([c.titulaireId, ...team].filter((x): x is ID => !!x))];
+}
+
+/** Un professeur enseigne ce cours : il en est chargé, ou il est co-titulaire (à égalité sur tout). */
 export function teachesCourse(staffId: ID | undefined, course?: Course | null) {
   if (!staffId || !course) return false;
   if (course.professeurId === staffId) return true;
   const c = db.get('classes', course.classeId);
-  return c?.niveau === 'Préscolaire' && classTeacherIds(c).includes(staffId);
+  return organisationOf(c) === 'cotitulaires' && classTeacherIds(c).includes(staffId);
 }
 
 export function myCourses(staffId: ID | undefined) {

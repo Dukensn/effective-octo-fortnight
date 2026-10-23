@@ -7,7 +7,8 @@ import { classReport, classStudents, fmtNote, sortedPeriods, appreciation, isPre
 import { LevelPill } from '../../components/Level';
 import { civ, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
-import { callerLabel, classTeacherIds } from '../../lib/regles';
+import { ORGANISATIONS, callerLabel, classTeacherIds, organisationOf } from '../../lib/regles';
+import { ClassTeam } from './ClassTeam';
 import { ClassForm } from './Classes';
 import { ClassComite } from './ClassComite';
 import { roleLabel } from '../../lib/comite';
@@ -34,10 +35,8 @@ export default function ClassDetail() {
   if (!classe) return <Empty title="Classe introuvable" />;
   const students = classStudents(classe.id);
   const report = classReport(classe.id, scope);
-  const tit = staff.find((s) => s.id === classe.titulaireId);
   const pre = isPreschool(classe);
   const roleOf = (eleveId: string) => { const m = classe.comite?.find((x) => x.eleveId === eleveId); return m && roleLabel(m.role, students.find((x) => x.id === eleveId)?.sexe); };
-  const profs = staff.filter((s) => s.type === 'Professeur');
   const subjectOrder = subjects.map((s) => s.id);
   courses.sort((a, b) => subjectOrder.indexOf(a.matiereId) - subjectOrder.indexOf(b.matiereId));
 
@@ -53,7 +52,7 @@ export default function ClassDetail() {
       <PageHead
         back={<button className="back-link" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => nav('/classes')}><ArrowLeft size={16} />Classes</button>}
         title={classe.code}
-        sub={`${classe.nom} · ${classe.salle} · ${classe.niveau === 'Préscolaire' && (classe.cotitulaireIds?.length ?? 0) > 0 ? `Co-titulaires : ${classTeacherIds(classe).map((id) => civ(staff.find((s) => s.id === id))).join(', ')}` : `Titulaire : ${tit ? civ(tit) : '—'}`} · Appel : ${callerLabel(classe)}`}
+        sub={`${classe.nom} · ${classe.salle} · ${ORGANISATIONS.find((o) => o.key === organisationOf(classe))?.label} : ${classTeacherIds(classe).map((id) => civ(staff.find((s) => s.id === id))).join(', ') || '—'} · Appel : ${callerLabel(classe)}`}
         actions={<>
           <button className="btn" onClick={() => nav(`/documents/bulletins?classe=${classe.id}`)}><FileText />Bulletins</button>
           {canWrite && <button className="btn btn-primary" onClick={() => setEdit(true)}><Pencil />Modifier</button>}
@@ -73,7 +72,7 @@ export default function ClassDetail() {
           ? <StatCard tint="orange" icon={<Trophy />} value={`${Math.round((classReport(classe.id, 'annuel')?.students.filter((r) => levelOf(r.general)?.code === 'A').length ?? 0) / Math.max(1, students.length) * 100)}%`} label="Enfants « Acquis »" sub="Bilan de l’année" />
           : <StatCard tint="orange" icon={<Trophy />} value={fmtNote(classReport(classe.id, 'annuel')?.classGeneral)} label="Moyenne annuelle" sub={`${Math.round((classReport(classe.id, 'annuel')?.successRate ?? 0) * 100)}% de réussite`} />}
       </div>
-      <Tabs tabs={[['eleves', `Élèves (${students.length})`], ['comite', 'Comité'], ['matieres', pre ? 'Domaines' : 'Matières'], ['resultats', 'Résultats']]} value={tab} onChange={setTab} />
+      <Tabs tabs={[['eleves', `Élèves (${students.length})`], ['comite', 'Comité'], ['matieres', 'Équipe & matières'], ['resultats', 'Résultats']]} value={tab} onChange={setTab} />
 
       {tab === 'comite' && <ClassComite classe={classe} canWrite={canWrite} />}
 
@@ -90,32 +89,7 @@ export default function ClassDetail() {
         </Card>
       )}
 
-      {tab === 'matieres' && (
-        <Card pad={false}>
-          <div className="table-wrap"><table className="t">
-            <thead><tr><th>Matière</th><th>Professeur</th><th className="c">Coefficient</th><th className="c">Heures / sem.</th></tr></thead>
-            <tbody>{courses.map((c) => (
-              <tr key={c.id}>
-                <td style={{ color: 'var(--ink)', fontWeight: 500 }}>{subjects.find((s) => s.id === c.matiereId)?.nom}</td>
-                <td>{canWrite ? (
-                  <select className="select" style={{ minWidth: 200 }} value={c.professeurId ?? ''} onChange={(e) => { db.patch('courses', c.id, { professeurId: e.target.value || undefined }); toast('Professeur affecté'); }}>
-                    <option value="">— Non affecté —</option>{profs.map((p) => <option key={p.id} value={p.id}>{civ(p)} · {p.specialite}</option>)}
-                  </select>) : civ(staff.find((s) => s.id === c.professeurId))}
-                </td>
-                <td className="c">{canWrite ? <input type="number" min={1} max={10} className="input" style={{ width: 70, textAlign: 'center' }} value={c.coefficient} onChange={(e) => db.patch('courses', c.id, { coefficient: Math.max(1, Number(e.target.value)) })} /> : c.coefficient}</td>
-                <td className="c">{canWrite ? <input type="number" min={1} max={10} className="input" style={{ width: 70, textAlign: 'center' }} value={c.heuresSemaine} onChange={(e) => db.patch('courses', c.id, { heuresSemaine: Number(e.target.value) })} /> : c.heuresSemaine}</td>
-              </tr>))}</tbody>
-          </table></div>
-          {canWrite && (
-            <div className="card-pad row wrap">
-              <span className="small muted">Ajouter une matière :</span>
-              {subjects.filter((s) => !courses.some((c) => c.matiereId === s.id)).map((s) => (
-                <button key={s.id} className="btn btn-sm btn-soft" onClick={() => db.put('courses', { id: `${classe.id}-${s.id}`, classeId: classe.id, matiereId: s.id, coefficient: 2, heuresSemaine: 3 })}>+ {s.nom}</button>
-              ))}
-            </div>
-          )}
-        </Card>
-      )}
+      {tab === 'matieres' && <ClassTeam classe={classe} courses={courses} canWrite={canWrite} />}
 
       {tab === 'resultats' && report && (
         <Card pad={false}>

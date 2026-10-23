@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import QRCode from 'qrcode';
 import JsBarcode from 'jsbarcode';
 import { db } from '../data/store';
-import { classTeacherIds } from '../lib/regles';
+import { classTeacherIds, organisationOf } from '../lib/regles';
 import { classReport, sortedPeriods, appreciation, autoCouncil } from '../data/compute';
 import type { ID, ReportCardEntry, School, Student } from '../data/types';
 import { DefaultCrest } from '../components/Logo';
@@ -115,8 +115,8 @@ export function buildBulletin(studentId: ID, scope: ID | 'annuel'): BulletinData
   const days = new Set(db.list('attendance').filter((a) => a.classeId === student.classeId && !a.eleveId).map((a) => a.date)).size;
   const absJ = att.filter((a) => a.statut === 'Excusé').length;
   const absNJ = att.filter((a) => a.statut === 'Absent').length;
-  // Préscolaire : tous les co-titulaires figurent (et signent) sur le livret.
-  const tits = (report.classe.niveau === 'Préscolaire' ? classTeacherIds(report.classe) : [report.classe.titulaireId]).map((id) => db.get('staff', id)).filter((x): x is NonNullable<typeof x> => !!x);
+  // Co-titulaires : tous figurent (et signent) sur le bulletin ou le livret.
+  const tits = (organisationOf(report.classe) === 'cotitulaires' ? classTeacherIds(report.classe) : [report.classe.titulaireId]).map((id) => db.get('staff', id)).filter((x): x is NonNullable<typeof x> => !!x);
   const seuil = school.bareme === 100 ? school.seuilReussite / 5 : school.seuilReussite;
   const saved = db.list('reportEntries').find((e) => e.eleveId === studentId && e.periodeId === scope);
   // Valeurs automatiques, remplacées champ par champ par ce que le conseil de classe a saisi.

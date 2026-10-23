@@ -38,6 +38,16 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Organisation des classes (version 10)
+Classe → onglet **Équipe & matières** : la direction choisit comment la classe est organisée, et l'application
+en déduit le reste (affectations, appel, saisie des notes, signature du bulletin, messages aux parents).
+- **Maître unique** : un enseignant pour toutes les matières.
+- **Équipe** : 2 ou 3 enseignants se partagent les matières (répartition automatique par spécialité puis par charge).
+- **Un professeur par matière** : comme au secondaire.
+- **Co-titulaires** : plusieurs enseignants à égalité sur tout (courant au préscolaire).
+La charge de chaque enseignant (dans la classe et dans toute l'école) est affichée, avec une alerte au-delà de 30 h.
+Sans choix enregistré, l'organisation est déduite du niveau et des affectations.
+
 ## Messagerie, règles par niveau et espace parent recentré (version 9)
 - **Appel** : un seul par jour et par classe. Préscolaire et fondamental : le(s) titulaire(s) ; secondaire :
   le personnel désigné dans la fiche de la classe (« Appel fait par », le censeur par défaut) — les professeurs

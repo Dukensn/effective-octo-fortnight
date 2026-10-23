@@ -810,3 +810,22 @@ html { -webkit-tap-highlight-color: transparent; }
 .notif-row .todo-n.tint-orange { background: var(--orange); }
 .notif-row .todo-n.tint-green { background: var(--green); }
 .notif-row .todo-n.tint-blue { background: var(--primary); }
+
+/* ---------- Équipe pédagogique ---------- */
+.org-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.org-card { display: flex; flex-direction: column; gap: 4px; padding: 14px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; text-align: left; color: var(--text); min-width: 0; }
+.org-card b { color: var(--ink); font-size: 14.5px; }
+.org-card small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.org-card.on { border-color: var(--primary); background: var(--primary-50); }
+.org-card:disabled { cursor: default; opacity: 1; }
+.chip-x { border: 0; background: none; color: inherit; font-size: 16px; line-height: 1; padding: 0 0 0 4px; }
+.team-row { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) auto; gap: 12px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line-2); }
+.team-subj { color: var(--ink); font-weight: 500; font-size: 14px; }
+.team-prof .select { width: 100%; }
+.team-nums { display: flex; gap: 8px; }
+.team-nums label { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.team-nums .input { width: 54px; height: 34px; padding: 0 6px; text-align: center; }
+@media (max-width: 767px) {
+  .team-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px 12px; }
+  .team-prof { grid-column: 1 / -1; grid-row: 2; }
+}

@@ -99,14 +99,6 @@ export function ClassForm({ value, onClose, onSaved }: { value: Partial<ClassRoo
         {f.niveau === 'Secondaire' ? (
           <Field label="Appel fait par"><select className="select" value={f.appelParId ?? ''} onChange={(e) => set('appelParId', e.target.value || undefined)}><option value="">Administration (toute personne autorisée)</option>{allStaff.filter((s) => s.type !== 'Professeur').map((s) => <option key={s.id} value={s.id}>{civ(s)} · {s.poste}</option>)}</select></Field>
         ) : <div />}
-        {f.niveau === 'Préscolaire' && (
-          <Field label="Co-titulaires (à égalité : appel, évaluations, livret)" className="span-2">
-            <div className="row wrap" style={{ gap: 6 }}>{staff.filter((s) => s.id !== f.titulaireId).map((s) => {
-              const on = (f.cotitulaireIds ?? []).includes(s.id);
-              return <button key={s.id} type="button" className={`chip ${on ? 'active' : ''}`} onClick={() => set('cotitulaireIds', on ? (f.cotitulaireIds ?? []).filter((x) => x !== s.id) : [...(f.cotitulaireIds ?? []), s.id])}>{civ(s)}</button>;
-            })}</div>
-          </Field>
-        )}
         <Field label={`Frais d’inscription (${money(f.fraisInscription ?? 0)})`}><input type="number" className="input" value={f.fraisInscription} onChange={(e) => set('fraisInscription', Number(e.target.value))} /></Field>
         <Field label={`Scolarité annuelle (${money(f.fraisScolarite ?? 0)})`}><input type="number" className="input" value={f.fraisScolarite} onChange={(e) => set('fraisScolarite', Number(e.target.value))} /></Field>
       </div>

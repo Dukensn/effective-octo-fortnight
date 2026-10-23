@@ -64,7 +64,10 @@ export interface ClassRoom extends Meta {
   salle: string;
   capacite: number;
   titulaireId?: ID; // staff id
-  /** Préscolaire : co-titulaires à égalité avec le titulaire (appel, évaluation de tous les domaines, livret). */
+  /** Organisation de l'équipe : maître unique, équipe qui se partage les matières, un professeur par matière,
+   *  ou co-titulaires à égalité sur tout. Sans valeur : déduite du niveau et des affectations (voir lib/regles). */
+  organisation?: 'unique' | 'equipe' | 'matiere' | 'cotitulaires';
+  /** Autres membres de l'équipe (mode « équipe ») ou co-titulaires (mode « co-titulaires »). */
   cotitulaireIds?: ID[];
   /** Secondaire : membre du personnel chargé de l'appel quotidien (les professeurs ne font pas l'appel). */
   appelParId?: ID;
