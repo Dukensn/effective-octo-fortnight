@@ -207,3 +207,59 @@ export function IdCardBack({ school, tpl, kind }: { school: SchoolT; tpl: BadgeT
     </div>
   );
 }
+
+/** Badge au format paysage (86 × 54 mm, format carte bancaire). Reprend les couleurs du modèle choisi. */
+export function IdCardLandscape({ p, tpl, school, year }: { p: BadgePerson; tpl: BadgeTpl; school: SchoolT; year: string }) {
+  const verify = `${school.siteWeb}/badge?m=${p.matricule}`;
+  const dark = tpl.family === 'dark';
+  const ink = dark ? '#fff' : NAVY;
+  const isStudent = p.kind === 'eleve';
+  const rows: [ReactNode, string, string | undefined][] = isStudent
+    ? [[<School key="c" />, 'Classe', p.classe], [<Hash key="m" />, 'Matricule', p.matricule], [<CalendarDays key="d" />, 'Né(e) le', p.dateNaissance], [<Phone key="p" />, 'Parent', p.parentTel]]
+    : [[<User key="m" />, 'Matricule', p.matricule], [<Phone key="t" />, 'Téléphone', p.telephone], [<Mail key="e" />, 'Email', p.email]];
+  return (
+    <div className="idc idc-l" style={{ background: dark ? 'linear-gradient(160deg,#0f2a5c,#0a1f47)' : '#fff', color: ink }}>
+      <div style={{ position: 'absolute', inset: '0 0 auto 0', height: '12.5mm', background: dark ? 'transparent' : tpl.accent, display: 'flex', alignItems: 'center', gap: '2mm', padding: '0 3.5mm' }}>
+        <span style={{ background: '#fff', borderRadius: '1.6mm', padding: '.6mm', display: 'grid' }}><DocLogo school={school} size={20} /></span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <b style={{ display: 'block', color: '#fff', fontSize: '3.3mm', fontWeight: 800, whiteSpace: 'nowrap' }}>{school.nom}</b>
+          <span style={{ display: 'block', color: 'rgba(255,255,255,.8)', fontSize: '1.5mm', letterSpacing: '.06em', fontWeight: 600 }}>{school.devise.toUpperCase()}</span>
+        </div>
+        <span style={{ color: '#fff', fontWeight: 700, fontSize: '2.4mm', textAlign: 'right', lineHeight: 1.1, whiteSpace: 'pre-line' }}>{year.replace(' - ', '\n')}</span>
+      </div>
+      <div style={{ position: 'absolute', left: '3.5mm', top: '15mm', width: '21mm', height: '25mm', borderRadius: '2mm', overflow: 'hidden', border: dark ? `.6mm solid ${tpl.accent}` : undefined }}>
+        <PhotoOrSilhouette src={p.photo} style={{ width: '100%', height: '100%' }} />
+      </div>
+      <div style={{ position: 'absolute', left: '27.5mm', right: '3mm', top: '14.5mm' }}>
+        <div style={{ fontSize: (p.prenom + p.nom).length > 22 ? '3.2mm' : '3.8mm', fontWeight: 800, lineHeight: 1.1, color: ink }}>{p.prenom} {p.nom}</div>
+        <div style={{ marginTop: '1.2mm' }}><span className="pill" style={{ background: tpl.pill, color: tpl.pillText ?? '#fff', ...pillSize(p.role) }}>{p.role}</span>{p.sub && !isStudent && <span style={{ fontSize: '2.2mm', marginLeft: '1.5mm' }}>{p.sub}</span>}</div>
+      </div>
+      <div style={{ position: 'absolute', left: '27.5mm', right: '18mm', top: '26.5mm', display: 'grid', gridTemplateColumns: '3.4mm 12mm 1fr', rowGap: '.9mm', fontSize: '2.05mm', alignItems: 'center' }}>
+        {rows.map(([icon, k, v]) => (
+          <span key={k} style={{ display: 'contents' }}><span className="lic" style={{ color: tpl.accent, display: 'grid' }}>{icon}</span><span style={{ opacity: .75 }}>{k}</span><span style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v || '-'}</span></span>
+        ))}
+      </div>
+      <div style={{ position: 'absolute', right: '3mm', bottom: '4.5mm', background: '#fff', padding: '.6mm', borderRadius: '1mm' }}><QR text={verify} size="13mm" /></div>
+      <div style={{ position: 'absolute', left: '3.5mm', bottom: '4mm', fontSize: '1.9mm', color: ink, opacity: .85 }}>{isStudent ? 'Carte d’identité scolaire' : p.diplome ?? ''}</div>
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '2.2mm', background: dark ? tpl.accent : tpl.pill }} />
+    </div>
+  );
+}
+
+export function IdCardBackLandscape({ school, tpl, kind }: { school: SchoolT; tpl: BadgeTpl; kind: BadgeKind }) {
+  const lines = kind === 'eleve'
+    ? ['Carte personnelle, à porter dans l’enceinte de l’école.', 'En cas de perte, prévenir le secrétariat.', 'Si vous trouvez cette carte, merci de la rapporter à l’école.']
+    : ['Cette carte est la propriété de l’école.', 'À porter de manière visible pendant le service.', 'En cas de perte, prévenir l’administration.'];
+  return (
+    <div className="idc idc-l" style={{ background: tpl.family === 'dark' || tpl.family === 'header' ? tpl.accent : '#fff', color: tpl.family === 'dark' || tpl.family === 'header' ? '#fff' : NAVY }}>
+      <div style={{ position: 'absolute', inset: '5mm 5mm', display: 'flex', gap: '4mm', alignItems: 'center' }}>
+        <DocLogo school={school} size={52} mono={tpl.family === 'dark' || tpl.family === 'header' ? '#fff' : undefined} />
+        <div style={{ fontSize: '2.2mm', lineHeight: 1.55 }}>
+          <b style={{ fontSize: '3.4mm', display: 'block', marginBottom: '1mm' }}>{school.nom}</b>
+          {lines.map((l) => <div key={l}>• {l}</div>)}
+          <div style={{ marginTop: '1.5mm', opacity: .85 }}>{school.adresse}, {school.commune} · {school.telephone}<br />{school.email} · {school.siteWeb}</div>
+        </div>
+      </div>
+    </div>
+  );
+}

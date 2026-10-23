@@ -4,7 +4,7 @@ import { Lock, Unlock, Pencil, Trophy, Plus, Wand2, Save, FileText } from 'lucid
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Evaluation, ReportCardEntry } from '../../data/types';
 import { PageHead, Tabs, Field, StatusBadge, Badge, Menu, Modal, toast, Card, Avatar, Toggle, Empty } from '../../components/ui';
-import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, decision, generalComment } from '../../data/compute';
+import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, autoCouncil } from '../../data/compute';
 import { civ, dateShort, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 
@@ -159,7 +159,7 @@ function Periods() {
 }
 
 const CONDUITE = ['Excellente', 'Très bonne', 'Bonne', 'Assez bonne', 'Passable', 'Mauvaise'];
-const DECISIONS = ['Admis(e) en classe supérieure', 'Admis(e) sous condition', 'Redouble', 'Exclu(e)', 'En attente'];
+const DECISIONS = ['Admis(e) en classe supérieure', 'Admis(e) sous condition', 'Redouble', 'Exclu(e)', 'Félicitations', 'Tableau d’honneur', 'Encouragements', 'Avertissement', 'En attente'];
 
 function Council() {
   const nav = useNavigate();
@@ -173,6 +173,7 @@ function Council() {
   const [classe, setClasse] = useState('c-s4-a');
   const [scope, setScope] = useState<string>('annuel');
   const report = classReport(classe, scope);
+  const seuil = school?.bareme === 100 ? (school.seuilReussite ?? 50) / 5 : school?.seuilReussite ?? 10;
   const entryFor = (eleveId: string) => entries.find((e) => e.eleveId === eleveId && e.periodeId === scope);
   const upsert = (eleveId: string, patch: Partial<ReportCardEntry>) => {
     const cur = entryFor(eleveId);
@@ -183,8 +184,8 @@ function Council() {
     report?.students.forEach((r) => {
       const cur = entryFor(r.student.id);
       upsert(r.student.id, {
-        appreciation: cur?.appreciation || generalComment(r.student.prenom, r.general, r.student.sexe),
-        decision: cur?.decision || (scope === 'annuel' ? decision(r.general, school?.bareme === 100 ? (school.seuilReussite ?? 50) / 5 : school?.seuilReussite ?? 10) : undefined),
+        ...autoCouncil(r, scope, seuil),
+        ...(cur ? { appreciation: cur.appreciation || autoCouncil(r, scope, seuil).appreciation, decision: cur.decision || autoCouncil(r, scope, seuil).decision } : {}),
       });
     });
     toast('Appréciations et décisions proposées — vérifiez avant impression');
@@ -195,30 +196,32 @@ function Council() {
         <Field label="Classe"><select className="select" value={classe} onChange={(e) => setClasse(e.target.value)}>{classes.map((c) => <option key={c.id} value={c.id}>{c.nom}</option>)}</select></Field>
         <Field label="Période"><select className="select" value={scope} onChange={(e) => setScope(e.target.value)}><option value="annuel">Année complète</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.libelle}</option>)}</select></Field>
         <span className="grow" />
-        {canWrite && <button className="btn" onClick={autoFill}><Wand2 />Proposer automatiquement</button>}
+        {canWrite && <button className="btn" onClick={autoFill}><Wand2 />Figer les propositions</button>}
         <button className="btn btn-primary" onClick={() => nav(`/documents/bulletins?classe=${classe}&scope=${scope}`)}><FileText />Générer les bulletins</button>
       </div>
       {report && (
         <Card pad={false}>
           <div className="card-pad small muted">Moyenne de la classe : <b style={{ color: 'var(--ink)' }}>{fmtNote(report.classGeneral)}</b> · Réussite : <b style={{ color: 'var(--ink)' }}>{Math.round(report.successRate * 100)}%</b> · Effectif : {report.effectif}</div>
           <div className="table-wrap"><table className="t t-compact">
-            <thead><tr><th>Rang</th><th>Élève</th><th className="c">Moy.</th><th>Mention</th><th style={{ minWidth: 260 }}>Appréciation générale</th><th>Conduite</th>{scope === 'annuel' && <th>Décision</th>}</tr></thead>
+            <thead><tr><th>Rang</th><th>Élève</th><th className="c">Moy.</th><th>Mention</th><th style={{ minWidth: 260 }}>Appréciation générale</th><th>Conduite</th><th>{scope === 'annuel' ? 'Décision' : 'Avis du conseil'}</th></tr></thead>
             <tbody>{[...report.students].sort((a, b) => a.rank - b.rank).map((r) => {
-              const e = entryFor(r.student.id);
+              const saved = entryFor(r.student.id);
+              const auto = autoCouncil(r, scope, seuil);
+              const e = { appreciation: saved?.appreciation || auto.appreciation, decision: saved?.decision || auto.decision, comportement: { ...auto.comportement, ...(saved?.comportement ?? {}) }, updatedAt: saved?.updatedAt };
               return (
                 <tr key={r.student.id}>
                   <td className="bold">{r.rank || '-'}</td>
                   <td><div className="person"><Avatar src={r.student.photo} name={fullName(r.student)} size={28} /><b>{fullName(r.student)}</b></div></td>
                   <td className="c bold">{fmtNote(r.general)}</td>
                   <td>{appreciation(r.general).label}</td>
-                  <td><textarea className="textarea" style={{ minHeight: 44, fontSize: 12.5 }} disabled={!canWrite} defaultValue={e?.appreciation ?? ''} key={`${e?.updatedAt}`} onBlur={(ev) => ev.target.value !== (e?.appreciation ?? '') && upsert(r.student.id, { appreciation: ev.target.value })} placeholder="Appréciation..." /></td>
-                  <td><select className="select" disabled={!canWrite} value={e?.comportement.conduite ?? 'Très bonne'} onChange={(ev) => upsert(r.student.id, { comportement: { ...(e?.comportement ?? { collaboration: 'Bon', respect: 'Bon', participation: 'Active' }), conduite: ev.target.value } as ReportCardEntry['comportement'] })}>{CONDUITE.map((c) => <option key={c}>{c}</option>)}</select></td>
-                  {scope === 'annuel' && <td><select className="select" disabled={!canWrite} value={e?.decision ?? ''} onChange={(ev) => upsert(r.student.id, { decision: ev.target.value })}><option value="">—</option>{DECISIONS.map((d) => <option key={d}>{d}</option>)}</select></td>}
+                  <td><textarea className="textarea" style={{ minHeight: 44, fontSize: 12.5 }} disabled={!canWrite} defaultValue={e.appreciation} key={`${r.student.id}-${e.updatedAt}`} onBlur={(ev) => ev.target.value !== e.appreciation && upsert(r.student.id, { appreciation: ev.target.value })} placeholder="Appréciation..." /></td>
+                  <td><select className="select" disabled={!canWrite} value={e.comportement.conduite} onChange={(ev) => upsert(r.student.id, { comportement: { ...e.comportement, conduite: ev.target.value } as ReportCardEntry['comportement'] })}>{[...new Set([e.comportement.conduite, ...CONDUITE])].map((c) => <option key={c}>{c}</option>)}</select></td>
+                  <td><select className="select" disabled={!canWrite} value={e.decision} onChange={(ev) => upsert(r.student.id, { decision: ev.target.value })}>{[...new Set([e.decision, ...DECISIONS])].map((d) => <option key={d}>{d}</option>)}</select></td>
                 </tr>
               );
             })}</tbody>
           </table></div>
-          <div className="card-pad tiny muted row"><Save size={13} />Enregistrement automatique à chaque modification.</div>
+          <div className="card-pad tiny muted row"><Save size={13} />Tout est rempli automatiquement à partir des notes, des absences et de la discipline. Modifiez seulement ce qui doit l’être : vos changements sont enregistrés et apparaissent sur les bulletins.</div>
         </Card>
       )}
     </>

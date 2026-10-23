@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, ChevronDown, FileSpreadsheet, Printer, Eye, Pencil, IdCard, FileText, ChevronRight } from 'lucide-react';
+import { Plus, ChevronDown, FileSpreadsheet, Printer, Eye, Pencil, IdCard, FileText, ChevronRight, Upload, Camera } from 'lucide-react';
 import { useCollection } from '../../data/store';
 import { PageHead, Tabs, Field, SearchInput, Avatar, StatusBadge, Menu, Pager, usePaged, Empty, useIsDesktop, Card } from '../../components/ui';
 import { StudentPanel } from '../../components/StudentPanel';
@@ -54,7 +54,9 @@ export default function Students() {
             { label: 'Télécharger en Excel', icon: <FileSpreadsheet />, onClick: exportCSV },
             { label: 'Imprimer / PDF', icon: <Printer />, onClick: printList },
           ]} />
-          {session.can('inscriptions', 'write') && <button className="btn btn-primary" onClick={() => nav('/inscriptions/nouvelle')}><Plus />Inscrire un élève</button>}
+          {session.can('inscriptions', 'write') && <button className="btn" onClick={() => nav('/eleves/import')}><Upload />Importer Excel</button>}
+          {session.can('eleves', 'write') && <button className="btn" onClick={() => nav(`/eleves/photos${classe !== 'all' ? `?classe=${classe}` : ''}`)}><Camera />Photos</button>}
+          {session.can('inscriptions', 'write') && <button className="btn btn-primary" onClick={() => nav('/inscriptions/rapide')}><Plus />Inscrire un élève</button>}
         </>}
       />
       <Tabs tabs={[['liste', 'Liste des élèves'], ['stats', 'Statistiques'], ['attente', `Inscriptions en attente${pending.length ? ` (${pending.length})` : ''}`]]} value={tab} onChange={setTab} />
@@ -68,14 +70,14 @@ export default function Students() {
                 {classes.map((c) => <option key={c.id} value={c.id}>{c.nom}</option>)}
               </select>
             </Field>
-            <Field label="Statut">
+            <Field label="Statut" className="hide-mobile">
               <select className="select" value={statut} onChange={(e) => setStatut(e.target.value)}>
                 <option value="all">Tous les statuts</option>
                 {['Actif', 'En attente', 'Suspendu', 'Transféré', 'Archivé'].map((s) => <option key={s}>{s}</option>)}
               </select>
             </Field>
             <Field label="Rechercher"><SearchInput value={q} onChange={setQ} placeholder="Nom, prénom, matricule..." /></Field>
-            <button className="btn btn-soft" onClick={() => { setClasse('all'); setStatut('Actif'); setQ(''); }}>Réinitialiser les filtres</button>
+            <button className="btn btn-soft hide-mobile" onClick={() => { setClasse('all'); setStatut('Actif'); setQ(''); }}>Réinitialiser les filtres</button>
           </div>
 
           <div className="card">

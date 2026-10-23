@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ChevronRight, CheckCircle2, RefreshCcw } from 'lucide-react';
+import { Plus, ChevronRight, CheckCircle2, RefreshCcw, FileSpreadsheet } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
 import { PageHead, Tabs, Avatar, StatusBadge, Empty, Card, Badge, toast, StatCard } from '../../components/ui';
 import { fullName, dateShort } from '../../lib/format';
@@ -21,7 +21,7 @@ export default function Enrollments() {
   return (
     <>
       <PageHead title="Inscriptions" sub="Nouvelles inscriptions, dossiers en attente et réinscriptions."
-        actions={canWrite && <button className="btn btn-primary" onClick={() => nav('/inscriptions/nouvelle')}><Plus />Inscrire un élève</button>} />
+        actions={canWrite && <><button className="btn" onClick={() => nav('/eleves/import')}><FileSpreadsheet />Importer Excel</button><button className="btn" onClick={() => nav('/inscriptions/nouvelle')}>Formulaire complet</button><button className="btn btn-primary" onClick={() => nav('/inscriptions/rapide')}><Plus />Inscription rapide</button></>} />
       <div className="grid g-stats mb-16">
         <StatCard tint="blue" icon={<Users />} value={actifs.length} label="Élèves inscrits" />
         <StatCard tint="green" icon={<UserPlus />} value={actifs.filter((s) => s.typeInscription === 'Nouvelle inscription').length} label="Nouvelles inscriptions" />

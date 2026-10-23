@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import QRCode from 'qrcode';
 import JsBarcode from 'jsbarcode';
 import { db } from '../data/store';
-import { classReport, sortedPeriods, appreciation, decision, generalComment } from '../data/compute';
+import { classReport, sortedPeriods, appreciation, autoCouncil } from '../data/compute';
 import type { ID, ReportCardEntry, School, Student } from '../data/types';
 import { DefaultCrest } from '../components/Logo';
 
@@ -117,15 +117,15 @@ export function buildBulletin(studentId: ID, scope: ID | 'annuel'): BulletinData
   const tit = db.get('staff', report.classe.titulaireId);
   const seuil = school.bareme === 100 ? school.seuilReussite / 5 : school.seuilReussite;
   const saved = db.list('reportEntries').find((e) => e.eleveId === studentId && e.periodeId === scope);
-  const entry: ReportCardEntry = saved ?? {
-    id: '', updatedAt: 0, eleveId: studentId, periodeId: scope,
-    appreciation: generalComment(student.prenom, me.general, student.sexe),
-    decision: scope === 'annuel' ? decision(me.general, seuil) : undefined,
-    comportement: { conduite: me.general != null && me.general >= 14 ? 'Très bonne' : 'Bonne', collaboration: me.general != null && me.general >= 15 ? 'Excellent' : 'Bon', respect: 'Très bon', participation: me.general != null && me.general >= 12 ? 'Active' : 'Moyenne' },
+  // Valeurs automatiques, remplacées champ par champ par ce que le conseil de classe a saisi.
+  const auto = autoCouncil(me, scope, seuil);
+  const entry: ReportCardEntry = {
+    id: saved?.id ?? '', updatedAt: saved?.updatedAt ?? 0, eleveId: studentId, periodeId: scope,
+    appreciation: saved?.appreciation || auto.appreciation,
+    observations: saved?.observations || auto.observations,
+    decision: saved?.decision || auto.decision,
+    comportement: { ...auto.comportement, ...(saved?.comportement ?? {}) },
   };
-  if (scope === 'annuel' && !entry.decision) entry.decision = decision(me.general, seuil);
-  // Pour un bulletin de période, la « décision » affichée est l'avis du conseil.
-  if (scope !== 'annuel' && !entry.decision) entry.decision = me.general != null && me.general >= seuil ? 'Admis(e)' : 'Avertissement';
   return {
     school, student, scope, report, me, entry, periods,
     periodLabel: p ? p.libelle.replace('contrôle', 'Contrôle') : 'Annuel',

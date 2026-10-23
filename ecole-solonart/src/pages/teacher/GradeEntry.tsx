@@ -20,10 +20,18 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
   useCollection('grades');
   const students = ev ? classStudents(ev.classeId) : [];
   const existing = ev ? gradesForEvaluation(ev.id) : new Map();
-  const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(students.map((s) => {
-    const g = existing.get(s.id);
-    return [s.id, g ? (g.absent ? 'abs' : g.note !== null ? String(g.note).replace('.', ',') : '') : ''];
-  })));
+  const draftKey = `solonart:brouillon:${id}`;
+  const [values, setValuesRaw] = useState<Record<string, string>>(() => {
+    const saved = Object.fromEntries(students.map((s) => {
+      const g = existing.get(s.id);
+      return [s.id, g ? (g.absent ? 'abs' : g.note !== null ? String(g.note).replace('.', ',') : '') : ''];
+    }));
+    // Reprend un brouillon non enregistré (page fermée, batterie, coupure…)
+    try { const d = localStorage.getItem(draftKey); if (d) return { ...saved, ...JSON.parse(d) }; } catch { /* ignore */ }
+    return saved;
+  });
+  const [restored] = useState(() => { try { return !!localStorage.getItem(draftKey); } catch { return false; } });
+  const setValues = (v: Record<string, string>) => { setValuesRaw(v); try { localStorage.setItem(draftKey, JSON.stringify(v)); } catch { /* ignore */ } };
   const [done, setDone] = useState(false);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const max = ev?.noteMax ?? 20;
@@ -55,6 +63,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
       return [{ id: cur?.id ?? `gr-${ev.id}-${s.id}`, evaluationId: ev.id, eleveId: s.id, note: p.absent ? null : Math.round(p.note! * 100) / 100, absent: !!p.absent }];
     });
     db.bulkPut('grades', docs);
+    try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
     db.patch('evaluations', ev.id, { statut: ev.statut === 'Clôturé' ? 'Clôturé' : 'En cours', saisiePar: session.user.id, saisieLe: Date.now() });
     audit('Saisie des notes', `${subject?.nom} ${classe?.code} ${ev.titre} (${docs.length})`);
     setDone(true);
@@ -70,6 +79,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
         </div>
         <span className="badge b-blue" style={{ alignSelf: 'center' }}>{filled}/{students.length}</span>
       </div>
+      {restored && !locked && <div className="card card-pad mb-16 small" style={{ background: 'var(--primary-50)', border: 0 }}>Brouillon récupéré : vos notes non enregistrées ont été remises. Pensez à enregistrer.</div>}
       {locked && <div className="card card-pad mb-16 row" style={{ background: 'var(--orange-50)', border: 0 }}><Lock size={18} color="var(--orange)" /><span className="small">Notes verrouillées par la direction. Contactez l’administration pour toute correction.</span></div>}
       <div className="card">
         <table className="t">
@@ -98,7 +108,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
       <p className="tiny muted mt-8">Astuce : tapez « abs » pour un élève absent. Entrée passe à l’élève suivant. Les notes sont enregistrées sur l’appareil et synchronisées avec l’administration.</p>
       {!locked && (
         <div className="sticky-foot">
-          <button className="btn btn-soft btn-lg grow" onClick={back}>Annuler</button>
+          <button className="btn btn-soft btn-lg grow" onClick={() => { try { localStorage.removeItem(draftKey); } catch { /* ignore */ } back(); }}>Annuler</button>
           <button className="btn btn-primary btn-lg grow" onClick={save}>Enregistrer</button>
         </div>
       )}

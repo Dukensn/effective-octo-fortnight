@@ -263,3 +263,34 @@ export function scaleNote(note20: number | null, bareme: 20 | 100) {
   if (note20 === null) return null;
   return bareme === 100 ? note20 * 5 : note20;
 }
+
+/**
+ * Conseil de classe automatique : appréciation, conduite, observations et décision
+ * déduites des notes, des absences/retards et des incidents. Modifiable ensuite.
+ */
+export function autoCouncil(r: StudentReport, scope: ID | 'annuel', seuil20 = 10) {
+  const st = r.student;
+  const p = scope === 'annuel' ? undefined : db.get('periods', scope);
+  const inPeriod = (d: string) => !p || (d >= p.debut && d <= p.fin);
+  const att = db.list('attendance').filter((a) => a.eleveId === st.id && inPeriod(a.date));
+  const absNJ = att.filter((a) => a.statut === 'Absent').length;
+  const retards = att.filter((a) => a.statut === 'Retard').length;
+  const incidents = db.list('incidents').filter((i) => i.eleveId === st.id && i.type !== 'Félicitations' && inPeriod(i.date)).length;
+  const g = r.general;
+  const score = absNJ * 2 + retards + incidents * 3;
+  const conduite = score === 0 ? (g != null && g >= 15 ? 'Excellente' : 'Très bonne') : score <= 3 ? 'Bonne' : score <= 7 ? 'Assez bonne' : 'À améliorer';
+  const weak = r.lines.filter((l) => l.value != null && (l.value < 12 || (l.classAvg != null && l.value < l.classAvg - 1))).sort((a, b) => a.value! - b.value!).slice(0, 2).map((l) => l.subject.nom.split(' (')[0].toLowerCase());
+  const observations = weak.length ? `Renforcer les efforts en ${weak.join(' et en ')}.` + (absNJ + retards > 3 ? ' Améliorer la ponctualité et l’assiduité.' : '') : 'Maintenir ce bon niveau dans toutes les matières.';
+  const periodDecision = g == null ? 'En attente' : g >= 16 ? 'Félicitations' : g >= 14 ? 'Tableau d’honneur' : g >= seuil20 ? 'Encouragements' : 'Avertissement';
+  return {
+    appreciation: generalComment(st.prenom, g, st.sexe),
+    observations,
+    decision: scope === 'annuel' ? decision(g, seuil20) : periodDecision,
+    comportement: {
+      conduite,
+      collaboration: g != null && g >= 15 ? 'Excellent' : g != null && g >= 12 ? 'Bon' : 'Moyen',
+      respect: incidents === 0 ? 'Très bon' : 'À améliorer',
+      participation: g != null && g >= 12 ? 'Active' : g != null && g >= 10 ? 'Moyenne' : 'Faible',
+    },
+  };
+}

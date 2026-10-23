@@ -15,7 +15,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const roleOf = (id: string) => roles.find((r) => r.id === id);
-  const list = useMemo(() => users.filter((u) => u.actif && roleOf(u.roleId)?.espace === space), [users, roles, space]); // eslint-disable-line
+  const [q, setQ] = useState('');
+  const list = useMemo(() => users.filter((u) => u.actif && roleOf(u.roleId)?.espace === space && (!q || u.nom.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')))), [users, roles, space, q]); // eslint-disable-line
   const user = users.find((u) => u.id === selected);
 
   const submit = (code: string) => {
@@ -70,6 +71,7 @@ export default function Login() {
                 <button className={space === 'admin' ? 'active' : ''} onClick={() => setSpace('admin')}><ShieldCheck size={16} style={{ verticalAlign: -3, marginRight: 6 }} />Administration</button>
                 <button className={space === 'professeur' ? 'active' : ''} onClick={() => setSpace('professeur')}><GraduationCap size={16} style={{ verticalAlign: -3, marginRight: 6 }} />Professeur</button>
               </div>
+              {users.filter((u) => u.actif && roleOf(u.roleId)?.espace === space).length > 6 && <input className="input mb-12" placeholder="Rechercher mon nom…" value={q} onChange={(e) => setQ(e.target.value)} />}
               <div className="stack" style={{ gap: 8, maxHeight: '52dvh', overflowY: 'auto', paddingRight: 2 }}>
                 {list.map((u) => (
                   <button key={u.id} className="account" onClick={() => { setSelected(u.id); setTimeout(() => refs.current[0]?.focus(), 50); }}>

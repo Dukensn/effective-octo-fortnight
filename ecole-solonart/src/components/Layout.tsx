@@ -49,7 +49,7 @@ function SideNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => v
   );
 }
 
-function GlobalSearch() {
+function GlobalSearch({ autoFocus, onDone }: { autoFocus?: boolean; onDone?: () => void }) {
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const students = useCollection('students');
@@ -74,11 +74,11 @@ function GlobalSearch() {
   return (
     <div className="search" style={{ position: 'relative' }}>
       <Search />
-      <input value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 150)} placeholder="Rechercher un élève, un parent, une classe, un matricule..." />
+      <input autoFocus={autoFocus} value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 150)} placeholder="Rechercher un élève, un parent, une classe, un matricule..." />
       {open && results.length > 0 && (
         <div className="menu" style={{ left: 0, right: 0 }}>
           {results.map((r) => (
-            <button key={r.to} onMouseDown={() => { navigate(r.to); setQ(''); }}>
+            <button key={r.to} onMouseDown={() => { navigate(r.to); setQ(''); onDone?.(); }}>
               <Avatar src={r.photo} name={r.label} size={28} />
               <span className="grow"><b style={{ color: 'var(--ink)', fontWeight: 600 }}>{r.label}</b><br /><span className="tiny muted">{r.sub}</span></span>
             </button>
@@ -100,16 +100,16 @@ function SyncPill() {
 
 export function Shell({ items, bottom, children }: { items: NavItem[]; bottom: NavItem[]; children: ReactNode }) {
   const [drawer, setDrawer] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const session = useSession();
   const school = useDoc('school', 'main');
   const year = useDoc('years', school?.anneeCourante);
-  const years = useCollection('years');
   const online = useOnline();
   const navigate = useNavigate();
   const location = useLocation();
-  const events = useCollection('events');
   const pendingStudents = useCollection('students').filter((s) => s.statut === 'En attente').length;
-  const notifCount = session?.isTeacher ? events.length : pendingStudents + events.length;
+  const pendingPayments = useCollection('payments').filter((p) => p.statut === 'En attente').length;
+  const notifCount = session?.isTeacher ? 0 : pendingStudents + pendingPayments;
   useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
   if (!session) return null;
   const roleLabel = session.isTeacher ? 'Professeur' : session.role.nom;
@@ -129,18 +129,18 @@ export function Shell({ items, bottom, children }: { items: NavItem[]; bottom: N
           <div className="mobile-brand only-mobile"><SchoolLogo size={26} /><span className="ellipsis" style={{ maxWidth: 150 }}>{school?.nom.replace('École Mixte ', '')}</span></div>
           <GlobalSearch />
           <span className="spacer" />
+          {!session.isTeacher && <button className="icon-btn only-phone" aria-label="Rechercher" onClick={() => setSearchOpen(!searchOpen)}><Search /></button>}
           <SyncPill />
           <button className="icon-btn" aria-label="Notifications" onClick={() => navigate(session.isTeacher ? '/evenements' : '/evenements')}>
             <Bell />
             {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
           </button>
           {!session.isTeacher && (
-            <select className="select year-select" style={{ width: 196 }} value={year?.id} onChange={() => navigate('/parametres?tab=annee')} aria-label="Année scolaire">
-              {years.sort((a, b) => b.libelle.localeCompare(a.libelle)).map((y) => <option key={y.id} value={y.id}>Année {y.libelle}</option>)}
-            </select>
+            <button className="btn year-select" style={{ color: 'var(--ink)', fontWeight: 500 }} onClick={() => navigate('/parametres?tab=annee')} title="Changer d’année scolaire">Année {year?.libelle}</button>
           )}
           <UserMenu name={session.user.nom} photo={session.user.photo} role={roleLabel} />
         </header>
+        {searchOpen && <div className="mobile-search-bar only-phone"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>}
         <main className="content">{children}</main>
         <nav className="bottom-nav">
           {bottom.map((it) => (

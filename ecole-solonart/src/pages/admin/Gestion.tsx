@@ -16,7 +16,9 @@ const SECTIONS: { key: string; title: string; sub: string; icon: typeof Users; t
   ] },
   { key: 'eleves', title: 'Élèves', sub: 'Inscriptions et dossiers', icon: UserRound, tint: 'blue', links: [
     ['Liste des élèves', 'Rechercher et filtrer', '/eleves', 'eleves'],
-    ['Inscrire un élève', 'Nouvelle inscription', '/inscriptions/nouvelle', 'inscriptions'],
+    ['Inscrire un élève', 'Inscription rapide en un écran', '/inscriptions/rapide', 'inscriptions'],
+    ['Importer depuis Excel', 'Liste d’élèves (.xlsx ou .csv)', '/eleves/import', 'inscriptions'],
+    ['Photos des élèves', 'Avec l’appareil photo du téléphone', '/eleves/photos', 'eleves'],
     ['Inscriptions en attente', 'Valider les dossiers', '/inscriptions', 'inscriptions'],
     ['Parents / responsables', 'Gérer les contacts', '/parents', 'parents'],
     ['Présences', 'Appel et absences', '/presences', 'presences'],

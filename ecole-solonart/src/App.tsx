@@ -15,6 +15,9 @@ import Students from './pages/admin/Students';
 import StudentProfile from './pages/admin/StudentProfile';
 import Enrollment from './pages/admin/Enrollment';
 import Enrollments from './pages/admin/Enrollments';
+import QuickEnroll from './pages/admin/QuickEnroll';
+import ImportStudents from './pages/admin/ImportStudents';
+import ClassPhotos from './pages/admin/ClassPhotos';
 import Classes from './pages/admin/Classes';
 import ClassDetail from './pages/admin/ClassDetail';
 import Parents from './pages/admin/Parents';
@@ -91,8 +94,11 @@ function AdminApp() {
         <Route path="/" element={G('dashboard', <Dashboard />)} />
         <Route path="/gestion" element={<Gestion />} />
         <Route path="/eleves" element={G('eleves', <Students />)} />
+        <Route path="/eleves/import" element={G('inscriptions', <ImportStudents />)} />
+        <Route path="/eleves/photos" element={G('eleves', <ClassPhotos />)} />
         <Route path="/eleves/:id" element={G('eleves', <StudentProfile />)} />
         <Route path="/inscriptions" element={G('inscriptions', <Enrollments />)} />
+        <Route path="/inscriptions/rapide" element={G('inscriptions', <QuickEnroll />)} />
         <Route path="/inscriptions/nouvelle" element={G('inscriptions', <Enrollment />)} />
         <Route path="/inscriptions/:id" element={G('inscriptions', <Enrollment />)} />
         <Route path="/classes" element={G('classes', <Classes />)} />

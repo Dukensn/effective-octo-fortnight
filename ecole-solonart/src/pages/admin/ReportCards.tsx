@@ -1,18 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ChevronLeft, ChevronRight, Printer, CheckSquare, Square, Info } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Printer, Sparkles, User } from 'lucide-react';
 import { useCollection, useDoc } from '../../data/store';
-import { PageHead, Field, Avatar, SearchInput, toast, Badge } from '../../components/ui';
+import { PageHead } from '../../components/ui';
 import { Scaled, A4L } from '../../components/Scaled';
 import { BulletinPages, BULLETIN_MODELS, TRI_THEMES, type BulletinModel } from '../../docs/Bulletins';
 import { buildBulletin } from '../../docs/common';
 import { classStudents, sortedPeriods } from '../../data/compute';
-import { fullName, norm } from '../../lib/format';
+import { fullName } from '../../lib/format';
 import { printDocument } from '../../lib/print';
 import { audit } from '../../lib/session';
 
-const SWATCH: Record<string, string[]> = { bleu: ['#1d4fa8', '#c9dbf8'], vert: ['#2e8b4f', '#cfeedb'], gris: ['#4d566a', '#e3e6ec'], or: ['#e39a12', '#fff1d6'], marine: ['#0f2a5c', '#e0b03a'], violet: ['#5b52c9', '#e2defc'] };
+const SWATCH: Record<string, string> = { bleu: '#1d4fa8', vert: '#2e8b4f', gris: '#4d566a', or: '#e39a12', marine: '#0f2a5c', violet: '#5b52c9' };
 
+/** Générateur de bulletins : 3 choix (classe, période, modèle) puis « Imprimer ». */
 export default function ReportCards() {
   const nav = useNavigate();
   const [params] = useSearchParams();
@@ -21,123 +22,90 @@ export default function ReportCards() {
   useCollection('reportEntries');
   useDoc('school', 'main');
   const periods = sortedPeriods();
+  const [classe, setClasse] = useState(params.get('classe') ?? 'c-s4-a');
+  const [scope, setScope] = useState<string>(params.get('scope') ?? 'annuel');
   const [model, setModel] = useState<BulletinModel>(params.get('scope') && params.get('scope') !== 'annuel' ? 'tripliable' : 'annuel');
   const [theme, setTheme] = useState('bleu');
-  const [scope, setScope] = useState<string>(params.get('scope') ?? 'annuel');
-  const [classe, setClasse] = useState(params.get('classe') ?? 'c-s4-a');
-  const [mode, setMode] = useState<'classe' | 'selection'>(params.get('eleve') ? 'selection' : 'classe');
-  const [selected, setSelected] = useState<Record<string, boolean>>(params.get('eleve') ? { [params.get('eleve')!]: true } : {});
-  const [sides, setSides] = useState<'both' | 'recto' | 'verso'>('both');
-  const [q, setQ] = useState('');
-  const [idx, setIdx] = useState(0);
-  const info = BULLETIN_MODELS.find((m) => m.key === model)!;
-  useEffect(() => { if (info.annualOnly) setScope('annuel'); }, [info.annualOnly]);
+  const [duplex, setDuplex] = useState(true);
   const students = classStudents(classe);
-  const targets = mode === 'classe' ? students : students.filter((s) => selected[s.id]);
-  const current = targets[Math.min(idx, targets.length - 1)];
+  const startIdx = Math.max(0, students.findIndex((s) => s.id === params.get('eleve')));
+  const [idx, setIdx] = useState(startIdx);
+  const current = students[Math.min(idx, students.length - 1)];
   const t = TRI_THEMES.find((x) => x.key === theme)!;
+  const models = BULLETIN_MODELS.filter((m) => scope === 'annuel' || !m.annualOnly);
+  const activeModel = models.some((m) => m.key === model) ? model : 'tripliable';
   const data = useMemo(() => (current ? buildBulletin(current.id, scope) : null), [current, scope]); // eslint-disable-line
-  const twoSided = model === 'livret' || model === 'tripliable';
+  const twoSided = activeModel === 'livret' || activeModel === 'tripliable';
+  const sides = twoSided && !duplex ? 'recto' : 'both';
+  const c = classes.find((x) => x.id === classe);
 
-  const print = () => {
-    if (!targets.length) return toast('Aucun élève sélectionné', true);
-    const all = targets.map((s) => buildBulletin(s.id, scope)).filter(Boolean);
-    audit('Génération bulletins', `${all.length} × ${info.nom} · ${classes.find((c) => c.id === classe)?.code}`);
-    printDocument(<>{all.map((d) => <BulletinPages key={d!.student.id} d={d!} model={model} theme={t} sides={sides} />)}</>, 'A4 landscape', `Bulletins ${classes.find((c) => c.id === classe)?.code}`);
+  const printAll = (only?: string) => {
+    const list = only ? students.filter((s) => s.id === only) : students;
+    const all = list.map((s) => buildBulletin(s.id, scope)).filter(Boolean);
+    audit('Génération bulletins', `${all.length} × ${activeModel} · ${c?.code}`);
+    printDocument(<>{all.map((d) => <BulletinPages key={d!.student.id} d={d!} model={activeModel} theme={t} sides={sides} />)}</>, 'A4 landscape', only ? `Bulletin ${fullName(list[0])}` : `Bulletins ${c?.code}`);
   };
+  const pages = activeModel === 'annuel' || activeModel === 'annuel100' ? ['both'] : sides === 'both' ? ['recto', 'verso'] : ['recto'];
 
   return (
     <>
       <PageHead
         back={<button className="back-link" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => nav('/documents')}><ArrowLeft size={16} />Documents</button>}
-        title="Générateur de bulletins"
-        sub="Choisissez un modèle, une période et les élèves. Impression individuelle ou par lot (PDF)."
-        actions={<button className="btn btn-primary btn-lg" onClick={print}><Printer />Imprimer / PDF ({targets.length})</button>}
+        title="Bulletins"
+        sub="Choisissez la classe, la période et le modèle. Tout le reste est calculé automatiquement."
       />
-      <div className="gen-layout">
-        <div className="stack">
-          <div className="card card-pad">
-            <h3 style={{ fontSize: 15 }} className="mb-12">1. Modèle</h3>
-            <div className="stack" style={{ gap: 8 }}>
-              {BULLETIN_MODELS.map((m) => (
-                <button key={m.key} className="file-tile" style={{ borderColor: model === m.key ? 'var(--primary)' : undefined, background: model === m.key ? 'var(--primary-50)' : '#fff', textAlign: 'left' }} onClick={() => setModel(m.key)}>
-                  <span className="grow"><b style={{ color: 'var(--ink)', fontSize: 13.5 }}>{m.nom}</b><br /><span className="tiny muted">{m.desc}</span></span>
-                  <Badge tone="gray">{m.pages}</Badge>
-                </button>
+      <div className="card card-pad mb-16 stack" style={{ gap: 14 }}>
+        <div className="row wrap" style={{ gap: 10 }}>
+          <select className="select" style={{ width: 'auto', minWidth: 210, flex: '1 1 210px' }} value={classe} onChange={(e) => { setClasse(e.target.value); setIdx(0); }} aria-label="Classe">
+            {classes.map((x) => <option key={x.id} value={x.id}>{x.nom}</option>)}
+          </select>
+          <select className="select" style={{ width: 'auto', minWidth: 170, flex: '1 1 170px' }} value={scope} onChange={(e) => setScope(e.target.value)} aria-label="Période">
+            <option value="annuel">Bulletin annuel</option>
+            {periods.map((p) => <option key={p.id} value={p.id}>{p.libelle}</option>)}
+          </select>
+          <button className="btn btn-primary btn-lg" style={{ flex: '1 1 220px' }} onClick={() => printAll()}><Printer />Imprimer la classe ({students.length})</button>
+        </div>
+        <div className="row wrap" style={{ gap: 8 }}>
+          {models.map((m) => (
+            <button key={m.key} className={`chip ${activeModel === m.key ? 'active' : ''}`} onClick={() => setModel(m.key)}>{m.nom.replace(' (6 thèmes)', '')}</button>
+          ))}
+          {activeModel === 'tripliable' && (
+            <span className="row" style={{ gap: 6, marginLeft: 4 }}>
+              {TRI_THEMES.map((x) => (
+                <button key={x.key} title={x.nom} aria-label={x.nom} onClick={() => setTheme(x.key)}
+                  style={{ width: 26, height: 26, borderRadius: '50%', background: SWATCH[x.key], border: theme === x.key ? '3px solid var(--card)' : '0', boxShadow: theme === x.key ? `0 0 0 2px ${SWATCH[x.key]}` : 'none' }} />
+              ))}
+            </span>
+          )}
+          {twoSided && <label className="check small" style={{ marginLeft: 'auto' }}><input type="checkbox" checked={duplex} onChange={(e) => setDuplex(e.target.checked)} />Recto-verso</label>}
+        </div>
+        <div className="row small" style={{ gap: 8, color: 'var(--muted)' }}>
+          <Sparkles size={15} color="var(--primary)" style={{ flex: 'none' }} />
+          <span>Moyennes, rangs, appréciations, conduite, observations et décision sont remplis automatiquement. <a style={{ cursor: 'pointer' }} onClick={() => nav('/notes?tab=conseil')}>Modifier un élève</a></span>
+        </div>
+      </div>
+
+      <div className="card card-pad">
+        <div className="row mb-12 wrap" style={{ gap: 8 }}>
+          <button className="btn btn-sm btn-icon" disabled={idx <= 0} onClick={() => setIdx(idx - 1)} aria-label="Élève précédent"><ChevronLeft size={16} /></button>
+          <select className="select" style={{ width: 'auto', flex: '1 1 200px', height: 36 }} value={current?.id ?? ''} onChange={(e) => setIdx(students.findIndex((s) => s.id === e.target.value))} aria-label="Élève">
+            {students.map((s, i) => <option key={s.id} value={s.id}>{i + 1}. {fullName(s)}</option>)}
+          </select>
+          <button className="btn btn-sm btn-icon" disabled={idx >= students.length - 1} onClick={() => setIdx(idx + 1)} aria-label="Élève suivant"><ChevronRight size={16} /></button>
+          {current && <button className="btn btn-sm" onClick={() => printAll(current.id)}><User size={14} />Imprimer cet élève</button>}
+        </div>
+        <div className="preview-stage">
+          {!data ? <div className="muted center" style={{ alignSelf: 'center' }}>Aucun élève dans cette classe.</div> : (
+            <div className="preview-pages" style={{ width: '100%' }}>
+              {pages.map((side) => (
+                <Scaled key={side} width={A4L.w} height={A4L.h}>
+                  <BulletinPages d={data} model={activeModel} theme={t} sides={side as 'both' | 'recto' | 'verso'} />
+                </Scaled>
               ))}
             </div>
-            {model === 'tripliable' && (
-              <>
-                <div className="small bold mt-16 mb-8" style={{ color: 'var(--ink)' }}>Thème</div>
-                <div className="template-pick">
-                  {TRI_THEMES.map((x) => (
-                    <button key={x.key} className={theme === x.key ? 'active' : ''} onClick={() => setTheme(x.key)}>
-                      <span className="swatch">{SWATCH[x.key].map((c) => <i key={c} style={{ background: c }} />)}</span>{x.nom}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-          <div className="card card-pad stack" style={{ gap: 12 }}>
-            <h3 style={{ fontSize: 15 }}>2. Période et classe</h3>
-            <Field label="Période">
-              <select className="select" value={scope} onChange={(e) => setScope(e.target.value)} disabled={info.annualOnly}>
-                <option value="annuel">Bulletin annuel</option>
-                {periods.map((p) => <option key={p.id} value={p.id}>{p.libelle}</option>)}
-              </select>
-            </Field>
-            {info.annualOnly && <p className="tiny muted row" style={{ gap: 6 }}><Info size={13} />Ce modèle présente toute l’année.</p>}
-            <Field label="Classe"><select className="select" value={classe} onChange={(e) => { setClasse(e.target.value); setIdx(0); setSelected({}); }}>{classes.map((c) => <option key={c.id} value={c.id}>{c.nom}</option>)}</select></Field>
-            {twoSided && (
-              <Field label="Faces à imprimer">
-                <select className="select" value={sides} onChange={(e) => setSides(e.target.value as typeof sides)}><option value="both">Recto + verso (impression recto-verso)</option><option value="recto">Recto seulement</option><option value="verso">Verso seulement</option></select>
-              </Field>
-            )}
-          </div>
-          <div className="card card-pad">
-            <h3 style={{ fontSize: 15 }} className="mb-12">3. Élèves</h3>
-            <div className="seg mb-12"><button className={mode === 'classe' ? 'active' : ''} onClick={() => { setMode('classe'); setIdx(0); }}>Toute la classe ({students.length})</button><button className={mode === 'selection' ? 'active' : ''} onClick={() => { setMode('selection'); setIdx(0); }}>Sélection</button></div>
-            {mode === 'selection' && (
-              <>
-                <SearchInput value={q} onChange={setQ} placeholder="Rechercher..." />
-                <div className="list mt-8" style={{ maxHeight: 280, overflow: 'auto', border: '1px solid var(--line)', borderRadius: 10 }}>
-                  {students.filter((s) => !q || norm(fullName(s)).includes(norm(q))).map((s) => (
-                    <button key={s.id} className="list-item" style={{ border: 0, width: '100%', textAlign: 'left', padding: '8px 10px' }} onClick={() => setSelected({ ...selected, [s.id]: !selected[s.id] })}>
-                      {selected[s.id] ? <CheckSquare size={18} color="var(--primary)" /> : <Square size={18} color="var(--faint)" />}
-                      <Avatar src={s.photo} name={fullName(s)} size={26} /><span className="grow small">{fullName(s)}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="row mt-8"><button className="btn btn-sm" onClick={() => setSelected(Object.fromEntries(students.map((s) => [s.id, true])))}>Tout</button><button className="btn btn-sm" onClick={() => setSelected({})}>Aucun</button><span className="small muted">{targets.length} sélectionné(s)</span></div>
-              </>
-            )}
-          </div>
-          <button className="btn btn-primary btn-lg btn-block" onClick={print}><Printer />Imprimer / Enregistrer en PDF ({targets.length})</button>
-          <p className="tiny muted">Astuce : dans la fenêtre d’impression, choisissez « Enregistrer au format PDF », format A4 paysage, marges « Aucune ». Pour les modèles recto-verso, activez l’impression recto-verso (retourner sur le bord court).</p>
+          )}
         </div>
-
-        <div className="card card-pad">
-          <div className="row mb-12 wrap">
-            <b style={{ color: 'var(--ink)' }}>Aperçu</b>
-            {current && <span className="small muted grow">{fullName(current)} · {idx + 1} / {targets.length}</span>}
-            <button className="btn btn-sm btn-icon" disabled={idx <= 0} onClick={() => setIdx(idx - 1)} aria-label="Précédent"><ChevronLeft size={16} /></button>
-            <button className="btn btn-sm btn-icon" disabled={idx >= targets.length - 1} onClick={() => setIdx(idx + 1)} aria-label="Suivant"><ChevronRight size={16} /></button>
-            {current && <button className="btn btn-sm" onClick={() => { const d = buildBulletin(current.id, scope); if (d) printDocument(<BulletinPages d={d} model={model} theme={t} sides={sides} />, 'A4 landscape', `Bulletin ${fullName(current)}`); }}><Printer size={14} />Cet élève</button>}
-          </div>
-          <div className="preview-stage">
-            {!data ? <div className="muted center" style={{ alignSelf: 'center' }}>Sélectionnez au moins un élève.</div> : (
-              <div className="preview-pages" style={{ width: '100%' }}>
-                {(model === 'annuel' || model === 'annuel100' ? [0] : sides === 'both' ? [0, 1] : [0]).map((i) => (
-                  <Scaled key={i} width={A4L.w} height={A4L.h}>
-                    <BulletinPages d={data} model={model} theme={t} sides={model === 'annuel' || model === 'annuel100' ? 'both' : sides === 'both' ? (i === 0 ? 'recto' : 'verso') : sides} />
-                  </Scaled>
-                ))}
-              </div>
-            )}
-          </div>
-          <p className="tiny muted mt-12">Les notes, moyennes et rangs sont calculés automatiquement à partir des notes saisies par les professeurs. Les appréciations et décisions se modifient dans Notes / Examens → Conseil de classe. Le logo, la signature et le cachet se règlent dans Paramètres.</p>
-        </div>
+        <p className="tiny muted mt-12">À l’impression : A4 paysage, marges « Aucune ». Pour un PDF, choisissez « Enregistrer au format PDF ». Logo, signature et cachet : Paramètres → École.</p>
       </div>
     </>
   );

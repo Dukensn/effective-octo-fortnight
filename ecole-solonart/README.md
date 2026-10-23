@@ -28,6 +28,15 @@ npm run preview    # tester la version de production
 
 Les profils sont fictifs (photos tirées des maquettes). Paramètres → Données → « Réinitialiser la démo » remet tout à zéro.
 
+## Nouveautés (version 2)
+- **Inscription rapide** en un seul écran (téléphone) : classe, nom, prénom, sexe, naissance, téléphone du parent, photo. Le parent déjà connu (frères et sœurs) est reconnu par son numéro.
+- **Import Excel** (.xlsx / .csv) : colonnes reconnues automatiquement, aperçu, doublons ignorés, modèle à télécharger.
+- **Photos des élèves** : appareil photo du téléphone ou image, depuis la fiche ou en « séance photo » par classe (l’élève suivant s’ouvre tout seul).
+- **Badges portrait (63 × 86 mm) et paysage (86 × 54 mm)**.
+- **Bulletins en 3 choix** (classe, période, modèle) ; **conseil de classe automatique** : appréciation, conduite (absences, retards, incidents), observations (matières faibles), décision ou avis du conseil.
+- **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
+- Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
+
 ## Ce que contient l’application
 
 **Espace direction / administration** (menu de gauche sur ordinateur, barre du bas + menu ☰ sur téléphone)

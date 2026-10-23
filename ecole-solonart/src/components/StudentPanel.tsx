@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle } from 'lucide-react';
+import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle } from 'lucide-react';
 import { db, useCollection, useDoc } from '../data/store';
 import type { Student } from '../data/types';
 import { Avatar, Badge, Menu, StatusBadge, Confirm, toast, Modal, Field } from './ui';
@@ -10,6 +10,7 @@ import { balances } from '../lib/finance';
 import { useSession, audit } from '../lib/session';
 import { printDocument } from '../lib/print';
 import { StudentSheet } from '../docs/Sheets';
+import { PhotoCapture } from './PhotoCapture';
 
 type Tab = 'Aperçu' | 'Notes' | 'Finance' | 'Présences' | 'Documents' | 'Historique';
 
@@ -27,6 +28,7 @@ export function StudentPanel({ student }: { student: Student }) {
   const [tab, setTab] = useState<Tab>('Aperçu');
   const [archive, setArchive] = useState(false);
   const [transfer, setTransfer] = useState(false);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const periods = sortedPeriods();
   const principal = guardians.find((g) => g.principal) ?? guardians[0];
 
@@ -52,7 +54,9 @@ export function StudentPanel({ student }: { student: Student }) {
     <div className="stack">
       <div className="card card-pad">
         <div className="row" style={{ alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
-          <Avatar src={student.photo} name={fullName(student)} size={112} square />
+          {canEdit ? (
+            <button className="avatar-edit" onClick={() => setPhotoOpen(true)} aria-label="Changer la photo"><Avatar src={student.photo} name={fullName(student)} size={112} square /><span className="cam"><Camera size={15} /></span></button>
+          ) : <Avatar src={student.photo} name={fullName(student)} size={112} square />}
           <div className="grow" style={{ minWidth: 200 }}>
             <div className="row wrap" style={{ gap: 10 }}>
               <h2 style={{ fontSize: 20 }}>{fullName(student)}</h2>
@@ -206,6 +210,9 @@ export function StudentPanel({ student }: { student: Student }) {
       <Confirm open={archive} onClose={() => setArchive(false)} danger title="Archiver l’élève" confirmLabel="Archiver"
         message={`${fullName(student)} ne figurera plus dans les listes actives. Ses notes et paiements sont conservés.`}
         onConfirm={() => { db.patch('students', student.id, { statut: 'Archivé' }); audit('Archivage élève', fullName(student)); toast('Élève archivé'); nav('/eleves'); }} />
+      <PhotoCapture open={photoOpen} onClose={() => setPhotoOpen(false)} current={student.photo} title={fullName(student)}
+        onSave={(u) => { db.patch('students', student.id, { photo: u, documents: student.documents.map((d) => (d.type === "Photo d'identité" ? { ...d, fourni: true } : d)) }); toast('Photo enregistrée'); setPhotoOpen(false); }}
+        onRemove={student.photo ? () => db.patch('students', student.id, { photo: undefined }) : undefined} />
       <TransferModal open={transfer} onClose={() => setTransfer(false)} student={student} classes={classes} />
     </div>
   );
