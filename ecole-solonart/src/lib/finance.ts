@@ -32,9 +32,10 @@ export function balances() {
   return cache;
 }
 
+/** Numéro de reçu suivant : le plus grand numéro existant + 1 (jamais deux fois le même, même après une annulation). */
 export function nextReceipt() {
   const y = new Date().getFullYear();
-  const n = db.list('payments').length + 1;
+  const n = db.list('payments').reduce((m, p) => Math.max(m, Number(p.recu?.split('-').pop()) || 0), 0) + 1;
   return `REC-${y}-${String(n).padStart(4, '0')}`;
 }
 

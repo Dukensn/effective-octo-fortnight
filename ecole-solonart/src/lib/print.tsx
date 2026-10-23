@@ -7,7 +7,7 @@ let content: ReactNode = null;
 const ls = new Set<() => void>();
 const emit = () => ls.forEach((l) => l());
 
-export type PageFormat = 'A4 landscape' | 'A4 portrait';
+export type PageFormat = 'A4 landscape' | 'A4 portrait' | `${number}mm ${number}mm`;
 
 export async function printDocument(node: ReactNode, format: PageFormat = 'A4 landscape', title?: string) {
   content = node;

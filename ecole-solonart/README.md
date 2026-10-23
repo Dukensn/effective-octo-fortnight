@@ -38,6 +38,14 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Badges personnalisables, impression à l’unité, vérification (version 14)
+
+- **Vérifier un badge** : le QR de chaque badge ouvre la page *Vérification* de l’application (`#/verifier/<matricule>`), même sans être connecté. Elle dit si la personne fait partie de l’école (élève inscrit, membre du personnel, ou plus inscrit), avec sa photo à comparer. Bouton « Vérifier un badge » dans Badges ; scan par la caméra sur Android, ou saisie du matricule. Tant que la base n’est pas en ligne, la vérification ne marche que sur un appareil qui a les données de l’école.
+- **Plus de modèles** : 21 en tout (dont Minimal gris, Bleu & rouge, Violet & rose, Émeraude nuit ; pour les élèves : rouge, orange, violet, bleu & rouge, nuit).
+- **Personnaliser** : à partir de n’importe quel modèle, on change les couleurs (palettes prêtes ou couleurs libres), la forme de la photo (carrée, arrondie, ronde), les informations affichées et le texte du bas, avec l’aperçu en direct. Le modèle est enregistré pour l’école, modifiable et supprimable.
+- **Impression** : *Planche A4* (9 portraits ou 10 paysages par feuille) ou *Une par carte* : chaque badge sur sa propre page, à la taille réelle. En paysage, c’est le format des cartes PVC (86 × 54 mm, CR80) pour une imprimante à cartes ; en portrait (63 × 86 mm), pour un porte-badge.
+- **Finance vérifiée** : numéros de reçu sans doublon possible (plus grand numéro + 1), et avertissement quand un paiement dépasse le reste à payer.
+
 ## Paie fixe ou à l’heure, cours validés (version 13)
 
 - **Choix de la direction, professeur par professeur** (Personnel → fiche) : *Salaire fixe* ou *À l’heure*. Par défaut : à l’heure pour qui enseigne au secondaire, fixe pour le préscolaire et le fondamental. À l’heure, la direction peut fixer un taux propre au professeur ; sinon on prend le taux de la matière au niveau (Paramètres).

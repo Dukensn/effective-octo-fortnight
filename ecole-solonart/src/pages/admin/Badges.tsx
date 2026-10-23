@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Printer, CheckSquare, Square, RectangleVertical, RectangleHorizontal, Users2 } from 'lucide-react';
+import { ArrowLeft, Printer, CheckSquare, Square, RectangleVertical, RectangleHorizontal, Users2, Palette, ScanLine, Pencil } from 'lucide-react';
 import { useCollection, useDoc } from '../../data/store';
 import type { Staff, Student } from '../../data/types';
 import { PageHead, Tabs, Avatar, SearchInput, toast, Modal } from '../../components/ui';
 import { Scaled } from '../../components/Scaled';
-import { BADGE_TEMPLATES, IdCard, IdCardBack, IdCardLandscape, IdCardBackLandscape, type BadgeKind, type BadgePerson } from '../../docs/Badges';
+import { BadgeDesigner } from './BadgeDesigner';
+import { BADGE_TEMPLATES, modelToTpl, type BadgeTpl, IdCard, IdCardBack, IdCardLandscape, IdCardBackLandscape, type BadgeKind, type BadgePerson } from '../../docs/Badges';
 import { fullName, norm, dateShort } from '../../lib/format';
 import { printDocument } from '../../lib/print';
 import { audit } from '../../lib/session';
@@ -38,7 +39,8 @@ export default function Badges() {
   const guardians = useCollection('guardians');
   const initialKind = (params.get('type') as BadgeKind) ?? (params.get('staff') ? staffKind(staff.find((s) => s.id === params.get('staff'))!) : 'professeur');
   const [kind, setKind] = useState<BadgeKind>(initialKind);
-  const templates = BADGE_TEMPLATES.filter((t) => t.kinds.includes(kind));
+  const customs = (school.badgeModeles ?? []).map(modelToTpl).filter((t): t is BadgeTpl => !!t);
+  const templates = [...BADGE_TEMPLATES, ...customs].filter((t) => t.kinds.includes(kind));
   const [tplKey, setTplKey] = useState<Record<BadgeKind, string>>({ professeur: 'classique', direction: 'bordeaux', personnel: 'ciel', eleve: 'eleve-bleu' });
   const tpl = templates.find((t) => t.key === tplKey[kind]) ?? templates[0];
   const [classe, setClasse] = useState(params.get('classe') ?? students.find((s) => s.id === params.get('eleve'))?.classeId ?? 'c-s4-a');
@@ -49,6 +51,8 @@ export default function Badges() {
   const [landscape, setLandscape] = useState(false);
   const [picker, setPicker] = useState(false);
   const [q, setQ] = useState('');
+  const [unit, setUnit] = useState(false);
+  const [design, setDesign] = useState(false);
 
   const people: BadgePerson[] = useMemo(() => {
     if (kind === 'eleve') {
@@ -66,6 +70,22 @@ export default function Badges() {
 
   const print = () => {
     if (!targets.length) return toast('Aucune personne sélectionnée', true);
+    if (unit) {
+      // Une carte par page, à la taille réelle : imprimante à cartes PVC ou porte-badge.
+      audit('Génération badges', `${targets.length} × ${tpl.nom} (à l’unité, ${landscape ? 'paysage' : 'portrait'})`);
+      const [w, h] = landscape ? [86, 54] : [63, 86];
+      const page = { width: `${w}mm`, height: `${h}mm` };
+      printDocument(
+        <>{targets.map((p) => (
+          <div key={p.id}>
+            <div className="print-page print-card" style={page}><Front p={p} tpl={tpl} school={school} year={year} /></div>
+            {verso && <div className="print-page print-card" style={page}><Back school={school} tpl={tpl} kind={kind} /></div>}
+          </div>
+        ))}</>,
+        `${w}mm ${h}mm`, `Badges ${kind}`,
+      );
+      return;
+    }
     const sheets: BadgePerson[][] = [];
     for (let i = 0; i < targets.length; i += perSheet) sheets.push(targets.slice(i, i + perSheet));
     audit('Génération badges', `${targets.length} × ${tpl.nom} (${landscape ? 'paysage' : 'portrait'})`);
@@ -87,6 +107,7 @@ export default function Badges() {
         back={<button className="back-link" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => nav('/documents')}><ArrowLeft size={16} />Documents</button>}
         title="Badges"
         sub="Choisissez la catégorie, le format et le modèle, puis imprimez."
+        actions={<button className="btn" onClick={() => nav('/verifier')}><ScanLine />Vérifier un badge</button>}
       />
       <Tabs tabs={[['professeur', 'Professeurs'], ['direction', 'Direction'], ['personnel', 'Personnel'], ['eleve', 'Élèves']]} value={kind} onChange={(k) => { setKind(k); setSelected({}); setMode('tous'); }} />
       <div className="card card-pad mb-16 stack" style={{ gap: 14 }}>
@@ -97,6 +118,10 @@ export default function Badges() {
           </div>
           {kind === 'eleve' && <select className="select" style={{ width: 'auto', minWidth: 200 }} value={classe} onChange={(e) => { setClasse(e.target.value); setSelected({}); }}>{classes.map((c) => <option key={c.id} value={c.id}>{c.nom}</option>)}</select>}
           <button className="btn" onClick={() => setPicker(true)}><Users2 />{mode === 'tous' ? `Tous (${people.length})` : `${targets.length} sélectionné(s)`}</button>
+          <div className="seg" style={{ minWidth: 250 }}>
+            <button className={!unit ? 'active' : ''} onClick={() => setUnit(false)}>Planche A4</button>
+            <button className={unit ? 'active' : ''} onClick={() => setUnit(true)}>Une par carte</button>
+          </div>
           <label className="check small"><input type="checkbox" checked={verso} onChange={(e) => setVerso(e.target.checked)} />Avec verso</label>
           <span className="grow" />
           <button className="btn btn-primary btn-lg" onClick={print}><Printer />Imprimer {targets.length} badge{targets.length > 1 ? 's' : ''}</button>
@@ -105,9 +130,10 @@ export default function Badges() {
           <span className="small muted">Modèle :</span>
           {templates.map((t) => (
             <button key={t.key} className={`chip ${tpl.key === t.key ? 'active' : ''}`} onClick={() => setTplKey({ ...tplKey, [kind]: t.key })}>
-              <i style={{ background: t.accent }} /><i style={{ background: t.pill }} />{t.nom}
+              <i style={{ background: t.accent }} /><i style={{ background: t.pill }} />{t.nom}{t.custom && <Pencil size={11} style={{ marginLeft: 2, opacity: 0.6 }} />}
             </button>
           ))}
+          <button className="chip" onClick={() => setDesign(true)} style={{ borderStyle: 'dashed' }}><Palette size={14} />{tpl.custom ? 'Modifier ce modèle' : 'Personnaliser'}</button>
         </div>
       </div>
       <div className="preview-stage" style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${landscape ? 300 : 220}px, 1fr))`, gap: 18, alignItems: 'start', justifyItems: 'center' }}>
@@ -118,7 +144,15 @@ export default function Badges() {
         {targets.length > 12 && <div className="muted small" style={{ alignSelf: 'center' }}>+ {targets.length - 12} autres à l’impression</div>}
         {targets.length === 0 && <div className="muted">Sélectionnez au moins une personne.</div>}
       </div>
-      <p className="tiny muted mt-12">{landscape ? '86 × 54 mm (format carte), 10 par feuille A4.' : '63 × 86 mm, 9 par feuille A4.'} Imprimez à l’échelle 100 %, sans marges, sur papier cartonné ou PVC. Le QR code permet de vérifier l’identité.</p>
+      <p className="tiny muted mt-12">
+        {unit
+          ? landscape
+            ? 'Une carte par page, 86 × 54 mm : le format des cartes PVC (CR80), pour une imprimante à cartes.'
+            : 'Une carte par page, 63 × 86 mm : pour un porte-badge ou une pochette. Les imprimantes à cartes PVC utilisent le format paysage (86 × 54 mm).'
+          : landscape ? '86 × 54 mm (format carte), 10 par feuille A4.' : '63 × 86 mm, 9 par feuille A4.'}
+        {' '}Imprimez à l’échelle 100 %, sans marges. Le QR code ouvre la fiche de vérification de la personne.
+      </p>
+      {design && <BadgeDesigner from={tpl} kind={kind} sample={targets[0] ?? people[0]} school={school} year={year} landscape={landscape} onClose={() => setDesign(false)} onSaved={(k) => { setDesign(false); setTplKey({ ...tplKey, [kind]: k || (kind === 'eleve' ? 'eleve-bleu' : templates[0].key) }); }} />}
 
       <Modal open={picker} onClose={() => setPicker(false)} title="Qui imprimer ?" footer={<button className="btn btn-primary" onClick={() => setPicker(false)}>Terminé</button>}>
         <div className="seg mb-12"><button className={mode === 'tous' ? 'active' : ''} onClick={() => setMode('tous')}>Tous ({people.length})</button><button className={mode === 'selection' ? 'active' : ''} onClick={() => setMode('selection')}>Choisir</button></div>

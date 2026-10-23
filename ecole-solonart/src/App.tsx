@@ -12,6 +12,7 @@ import { canTeacherCall, canTeacherMessage } from './lib/regles';
 import { canMultiSchool } from './lib/prof';
 import type { ModuleKey } from './data/types';
 import Login from './pages/Login';
+import Verify from './pages/Verify';
 import Dashboard from './pages/admin/Dashboard';
 import Gestion from './pages/admin/Gestion';
 import Students from './pages/admin/Students';
@@ -247,7 +248,11 @@ export default function App() {
   const session = useSession();
   return (
     <HashRouter>
-      {!session ? <Login /> : session.isParent ? <ParentApp /> : session.isTeacher ? <TeacherApp /> : <AdminApp />}
+      <Routes>
+        {/* Vérification d'un badge (QR) : ouverte même sans connexion */}
+        <Route path="/verifier/:code?" element={<Verify />} />
+        <Route path="*" element={!session ? <Login /> : session.isParent ? <ParentApp /> : session.isTeacher ? <TeacherApp /> : <AdminApp />} />
+      </Routes>
       <Toasts />
       <PrintRoot />
     </HashRouter>

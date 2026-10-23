@@ -121,3 +121,7 @@
 .idc.idc-l { width: 86mm; height: 54mm; }
 .badge-sheet.landscape { grid-template-columns: repeat(2, 86mm); grid-auto-rows: 54mm; gap: 2.5mm 6mm; padding: 8mm 16mm; }
 .idc-l .lic svg { width: 2.6mm; height: 2.6mm; }
+
+/* Badge imprimé à l'unité, à la taille réelle de la carte (imprimante PVC, porte-badge). */
+.print-card { overflow: hidden; }
+.print-card .idc { border-radius: 0; box-shadow: none; }

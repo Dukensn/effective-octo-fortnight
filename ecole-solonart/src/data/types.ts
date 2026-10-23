@@ -21,6 +21,8 @@ export interface School extends Meta {
   telephone: string;
   email: string;
   siteWeb: string;
+  /** Modèles de badges personnalisés par l'école. */
+  badgeModeles?: BadgeModel[];
   logo?: string; // dataURL (ou URL Storage)
   signatureDirecteur?: string; // dataURL
   cachet?: string; // dataURL
@@ -500,3 +502,19 @@ export const COLLECTIONS: CollectionName[] = [
   'evaluations', 'grades', 'reportEntries', 'attendance', 'staffAttendance', 'timetable', 'payments',
   'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'remplacements', 'agenda', 'pointages', 'roles', 'users', 'audit',
 ];
+
+/** Modèle de badge créé par l'école à partir d'un modèle de base. */
+export interface BadgeModel {
+  key: string;
+  nom: string;
+  base: string;
+  kinds: ('professeur' | 'direction' | 'personnel' | 'eleve')[];
+  accent: string;
+  pill: string;
+  pillText?: string;
+  ink?: string;
+  photo?: 'carre' | 'arrondi' | 'rond';
+  champs?: string[];
+  footBar?: string;
+  words?: string[];
+}

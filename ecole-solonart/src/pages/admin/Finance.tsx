@@ -279,6 +279,8 @@ function PaymentForm({ eleveId, prefill, onClose }: { eleveId: string; prefill?:
     if (!s) return toast('Choisissez un élève', true);
     const montant = f.montant || Math.round(bal?.rest ?? 0);
     if (montant <= 0) return toast('Montant invalide', true);
+    const counted = f.motif === 'Scolarité' || f.motif === 'Inscription';
+    if (counted && bal && montant > bal.rest && !window.confirm(`Ce montant dépasse le reste à payer (${money(bal.rest)}). Enregistrer quand même ${money(montant)} ?`)) return;
     const p = db.put('payments', { recu: nextReceipt(), eleveId: s.id, classeId: s.classeId, date: f.date, montant, mode: f.mode, motif: f.motif, versement: f.motif === 'Scolarité' ? ['1er versement', '2e versement', '3e versement'][existing] ?? 'Complément' : undefined, reference: f.reference || undefined, statut: 'Payé' });
     audit('Paiement', `${p.recu} ${fullName(s)} ${money(montant)}`, { domaine: 'finance' });
     toast(`Paiement enregistré — ${p.recu}`);
@@ -305,6 +307,7 @@ function PaymentForm({ eleveId, prefill, onClose }: { eleveId: string; prefill?:
             <Field label="Montant (G)"><input type="number" className="input" value={f.montant || Math.round(bal?.rest ?? 0) || ''} onChange={(e) => setF({ ...f, montant: Number(e.target.value) })} /></Field>
             <Field label="Mode de paiement"><select className="select" value={f.mode} onChange={(e) => setF({ ...f, mode: e.target.value as PaymentMode })}>{MODES.map((m) => <option key={m}>{m}</option>)}</select></Field>
             <Field label="Date"><input type="date" className="input" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
+            {(f.motif === 'Scolarité' || f.motif === 'Inscription') && bal && f.montant > bal.rest && <p className="span-2 tiny" style={{ color: 'var(--orange)', margin: 0 }}>Attention : {money(f.montant - bal.rest)} de plus que le reste à payer.</p>}
             {f.mode !== 'Espèces' && <Field label={f.mode === 'Chèque' ? 'N° de chèque' : 'N° de transaction'} className="span-2"><input className="input" value={f.reference} onChange={(e) => setF({ ...f, reference: e.target.value })} placeholder={f.mode === 'MonCash' ? 'Ex. MC12345678' : ''} /></Field>}
           </div>
         </>

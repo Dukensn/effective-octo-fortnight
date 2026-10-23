@@ -885,3 +885,24 @@ html { -webkit-tap-highlight-color: transparent; }
 .check-chip.valide { background: var(--green-50); color: var(--green); }
 .check-chip.refuse { background: var(--red-50); color: var(--red); }
 .check-chip.none { background: var(--bg); color: var(--muted); }
+
+/* Personnalisation des badges */
+.designer { display: grid; gap: 18px; }
+.designer-preview { background: var(--bg); border-radius: 14px; padding: 16px; }
+@media (min-width: 820px) { .designer { grid-template-columns: 300px 1fr; align-items: start; } .designer-preview { position: sticky; top: 0; } }
+.color-input { padding: 3px; height: 40px; cursor: pointer; }
+
+/* Vérification de badge */
+.verify { max-width: 480px; margin: 0 auto; padding: 16px; min-height: 100dvh; background: var(--bg); }
+.verify-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.verify-head b { color: var(--ink); }
+.verify-card { background: #fff; border-radius: 18px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; border: 2px solid var(--line); }
+.verify-card.ok { border-color: var(--green); }
+.verify-card.warn { border-color: var(--orange); }
+.verify-card.bad { border-color: var(--red); }
+.verify-status { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 10px; }
+.verify-card.ok .verify-status { color: var(--green); }
+.verify-card.warn .verify-status { color: var(--orange); }
+.verify-card.bad .verify-status { color: var(--red); }
+.verify-name { font-size: 20px; color: var(--ink); margin-top: 8px; }
+.verify-video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 1; object-fit: cover; }
