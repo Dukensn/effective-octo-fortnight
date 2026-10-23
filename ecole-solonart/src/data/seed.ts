@@ -269,6 +269,15 @@ export function seedDatabase() {
   }
   db.bulkPut('guardians', guardians);
   db.bulkPut('students', students);
+  // Comités de classe : élèves élus (pas de comité au préscolaire).
+  const comiteRoles = ['Président', 'Vice-président', 'Secrétaire', 'Trésorier', 'Conseiller', 'Responsable discipline'];
+  for (const c of classes) {
+    if (c.niveau === 'Préscolaire') continue;
+    const pool = students.filter((x) => x.classeId === c.id && x.statut === 'Actif');
+    const jp = pool.find((x) => x.id === 'e-jean-philippe');
+    const picked = [...(jp ? [jp] : []), ...pool.filter((x) => x !== jp).sort(() => rnd() - 0.5)].slice(0, comiteRoles.length);
+    c.comite = picked.map((x, i) => ({ eleveId: x.id, role: comiteRoles[i], depuis: '2024-10-07' }));
+  }
   classes.forEach((c) => delete (c as Partial<ClassRoom & { _n: number }>)._n);
   db.bulkPut('classes', classes);
 

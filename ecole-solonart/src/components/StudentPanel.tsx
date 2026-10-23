@@ -12,6 +12,7 @@ import { useSession, audit } from '../lib/session';
 import { printDocument } from '../lib/print';
 import { StudentSheet } from '../docs/Sheets';
 import { PhotoCapture } from './PhotoCapture';
+import { studentRoles } from '../lib/comite';
 
 type Tab = 'Aperçu' | 'Notes' | 'Finance' | 'Présences' | 'Documents' | 'Historique';
 
@@ -20,6 +21,7 @@ export function StudentPanel({ student }: { student: Student }) {
   const session = useSession()!;
   const canEdit = session.can('eleves', 'write');
   const classe = useDoc('classes', student.classeId);
+  const yearDoc = useDoc('years', student.anneeId);
   const guardians = useCollection('guardians').filter((g) => student.tuteurIds.includes(g.id));
   const payments = useCollection('payments').filter((p) => p.eleveId === student.id);
   const attendance = useCollection('attendance');
@@ -64,6 +66,7 @@ export function StudentPanel({ student }: { student: Student }) {
             <div className="row wrap" style={{ gap: 10 }}>
               <h2 style={{ fontSize: 20 }}>{fullName(student)}</h2>
               <StatusBadge s={student.statut} />
+              {studentRoles(student.id).map((r) => <span key={r} className="badge b-violet">{r}</span>)}
             </div>
             <div className="small" style={{ color: 'var(--text)', lineHeight: 1.75, marginTop: 6 }}>
               Matricule : {student.matricule}<br />
@@ -101,7 +104,7 @@ export function StudentPanel({ student }: { student: Student }) {
             : <div className="card kpi"><div className="t">Moyenne générale</div><div className="v">{fmtNote(last?.r?.general)} <small>/ 20</small></div><div className="s">{delta !== 0 && <span className={delta > 0 ? 'trend-up' : 'trend-down'}>{delta > 0 ? <ArrowUp size={12} /> : <ArrowDown size={12} />} {delta > 0 ? '+' : ''}{fmtNote(delta)}</span>}<br />{last?.p.libelle}</div></div>}
             {!pre && <div className="card kpi"><div className="t">Rang de la classe</div><div className="v">{last?.r?.rank ?? '-'} <small>/ {annual?.effectif}</small></div></div>}
             <div className="card kpi"><div className="t">Présence</div><div className="v">{Math.round(att.rate * 100)}%</div><div className="s">{att.present} / {att.total} jours</div></div>
-            <div className="card kpi"><div className="t">Situation financière</div><div style={{ margin: '10px 0 6px' }}>{bal && bal.rest === 0 ? <Badge tone="green"><ArrowUp />À jour</Badge> : <Badge tone="orange">Reste {money(bal?.rest ?? 0)}</Badge>}</div><div className="s">Année {useDoc('years', student.anneeId)?.libelle}</div></div>
+            <div className="card kpi"><div className="t">Situation financière</div><div style={{ margin: '10px 0 6px' }}>{bal && bal.rest === 0 ? <Badge tone="green"><ArrowUp />À jour</Badge> : <Badge tone="orange">Reste {money(bal?.rest ?? 0)}</Badge>}</div><div className="s">Année {yearDoc?.libelle}</div></div>
           </div>
           <div className="card">
             <div className="card-head"><h3>Derniers résultats</h3><button className="link" style={{ border: 0, background: 'none', color: 'var(--primary)' }} onClick={() => setTab('Notes')}>Voir tous</button></div>

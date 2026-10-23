@@ -66,7 +66,16 @@ export interface ClassRoom extends Meta {
   titulaireId?: ID; // staff id
   fraisScolarite: number; // montant annuel
   fraisInscription: number;
+  comite?: ComiteMember[]; // comité de classe (élèves)
+  /** Responsable de la classe. Au secondaire : toujours un élève (le président par défaut).
+   *  Au fondamental et au préscolaire : un professeur (le titulaire par défaut) ou un élève. */
+  responsable?: { type: 'eleve' | 'professeur'; id: ID };
 }
+
+export interface ComiteMember { eleveId: ID; role: string; depuis?: string }
+/** Rôles proposés, dans l'ordre d'affichage. Les quatre premiers n'ont qu'un titulaire par classe. */
+export const COMITE_ROLES = ['Président', 'Vice-président', 'Secrétaire', 'Trésorier', 'Conseiller', 'Responsable discipline', 'Responsable propreté', 'Responsable sport et culture'];
+export const ROLES_UNIQUES = COMITE_ROLES.slice(0, 4);
 
 export interface Subject extends Meta {
   nom: string;

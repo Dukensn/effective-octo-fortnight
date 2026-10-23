@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell, ChevronDown, ChevronRight, HelpCircle, LayoutGrid, LogOut, Plus, Search, UserCircle2, WifiOff, Cloud, CloudOff, RefreshCw, type LucideIcon } from 'lucide-react';
 import { SchoolLogo } from './Logo';
-import { AppBarCtx, Avatar, Sheet, useIsDesktop } from './ui';
+import { AppBarCtx, Avatar, Sheet, useIsDesktop, useIsMobile } from './ui';
+import { watchTables } from '../lib/stackTables';
 import { useCollection, useDoc } from '../data/store';
 import { logout, useSession } from '../lib/session';
 import { useSyncState } from '../data/sync';
@@ -126,6 +127,9 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
   const pendingPayments = useCollection('payments').filter((p) => p.statut === 'En attente').length;
   const notifCount = session?.isTeacher ? 0 : pendingStudents + pendingPayments;
   useEffect(() => { window.scrollTo(0, 0); setSearchOpen(false); setPlus(false); setMore(false); }, [location.pathname, location.search]);
+  const phone = useIsMobile();
+  const [contentEl, setContentEl] = useState<HTMLElement | null>(null);
+  useEffect(() => (phone && contentEl ? watchTables(contentEl) : undefined), [phone, contentEl]);
   if (!session) return null;
   const roleLabel = session.isTeacher ? 'Professeur' : session.role.nom;
   const path = location.pathname;
@@ -171,7 +175,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
           </header>
         )}
         {searchOpen && !desktop && <div className="mobile-search-bar"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>}
-        <main className="content" key={desktop ? 'd' : path}>{children}</main>
+        <main className="content" key={desktop ? 'd' : path} ref={setContentEl}>{children}</main>
         <nav className="bottom-nav">
           {tabs.slice(0, half).map((it) => <NavLink key={it.to} to={it.to} end={it.end}><it.icon />{it.label}</NavLink>)}
           {quick.length > 0 && <button className="tab-plus" aria-label="Nouveau" onClick={() => setPlus(true)}><span><Plus /></span></button>}

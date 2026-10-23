@@ -1,6 +1,6 @@
 import { Children, cloneElement, createContext, Fragment, isValidElement, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Inbox, MoreHorizontal, MoreVertical, X, AlertCircle, Search } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Inbox, MoreHorizontal, MoreVertical, X, AlertCircle, Search } from 'lucide-react';
 import { initials } from '../lib/format';
 
 // ---------------- Avatar ----------------
@@ -87,12 +87,32 @@ export const scrollIntoRow = (el: HTMLElement | null) => {
   row.scrollLeft = Math.max(0, el.offsetLeft - row.offsetLeft - 14);
 };
 export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: (T | [T, string])[]; value: T; onChange: (v: T) => void }) {
+  const phone = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const items = tabs.map((t) => (Array.isArray(t) ? t : [t, t]) as [T, string]);
+  // Téléphone : au-delà de 4 onglets, un sélecteur plutôt qu'une rangée à faire glisser.
+  if (phone && items.length > 4) {
+    const current = items.find(([k]) => k === value)?.[1] ?? '';
+    return (
+      <>
+        <div className="tabs tabs-picker">
+          <button className="tab-select" onClick={() => setOpen(true)} aria-haspopup="dialog"><span className="grow ellipsis">{current}</span><ChevronDown size={18} /></button>
+        </div>
+        <Sheet open={open} onClose={() => setOpen(false)}>
+          <div className="sheet-list">
+            {items.map(([k, label]) => (
+              <button key={k} className={`sheet-row ${k === value ? 'selected' : ''}`} onClick={() => { setOpen(false); onChange(k); }}>
+                <span className="grow">{label}</span>{k === value && <Check size={18} />}
+              </button>
+            ))}
+          </div>
+        </Sheet>
+      </>
+    );
+  }
   return (
-    <div className="tabs" role="tablist">
-      {tabs.map((t) => {
-        const [k, label] = Array.isArray(t) ? t : [t, t];
-        return <button key={k} role="tab" className={value === k ? 'active' : ''} ref={value === k ? scrollIntoRow : undefined} onClick={() => onChange(k)}>{label}</button>;
-      })}
+    <div className={`tabs ${phone ? 'tabs-seg' : ''}`} role="tablist">
+      {items.map(([k, label]) => <button key={k} role="tab" className={value === k ? 'active' : ''} ref={value === k ? scrollIntoRow : undefined} onClick={() => onChange(k)}>{label}</button>)}
     </div>
   );
 }

@@ -37,6 +37,24 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Comité de classe, épuration (version 5)
+- **Comité de classe** (Classes → une classe → Comité) :
+  - on nomme un président, un vice-président, un secrétaire, un trésorier, des conseillers et des responsables (discipline, propreté, sport…), ou un rôle libre ;
+  - on peut changer le rôle d'un membre ou le retirer ;
+  - un seul président, secrétaire… par classe : le précédent est remplacé automatiquement.
+- **Responsable de la classe** :
+  - au **secondaire**, c'est toujours un élève (le président par défaut) ;
+  - au **fondamental et au préscolaire**, on choisit un professeur (le titulaire par défaut) ou un élève.
+  - Le rôle apparaît sur la fiche de l'élève, dans la liste de la classe et sur la carte de la classe.
+- **Téléphone : plus rien ne glisse de gauche à droite** :
+  - au-delà de 4 onglets, un sélecteur ; jusqu'à 4, ils se partagent la largeur ;
+  - les tableaux trop larges deviennent des fiches empilées ;
+  - l'emploi du temps s'affiche jour par jour ;
+  - les mois du rapport se choisissent avec ‹ › ;
+  - les étapes d'inscription tiennent sur une ligne.
+- **Plus épuré** : plus d'ombres sur les cartes et les boutons (seuls les menus, fenêtres et le bouton ＋ en gardent une légère).
+- Correction : la fiche élève plantait en changeant d'onglet.
+
 ## Application mobile et rapport mensuel (version 4)
 - **Sur téléphone et tablette, l’interface devient une vraie application** :
   - barre du haut avec le nom de l’écran, un bouton retour et un menu ⋮ qui regroupe les actions de la page ;

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle } from 'lucide-react';
+import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Expense, Payment, PaymentMode, Project, Salary } from '../../data/types';
-import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, Empty, scrollIntoRow } from '../../components/ui';
+import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, Empty, scrollIntoRow, useIsMobile } from '../../components/ui';
 import { BarChart, Donut } from '../../components/charts';
 import { money, moneyShort, dateShort, fullName, monthLabel, monthShort, todayISO, downloadCSV, norm, civ } from '../../lib/format';
 import { activeMonths, balances, monthlyReport, nextReceipt } from '../../lib/finance';
@@ -461,6 +461,8 @@ function Reports() {
   // Par défaut : le dernier mois où l'école a encaissé quelque chose.
   const [ym, setYm] = useState(() => months.find((m) => monthlyReport(m).recettes > 0) ?? months[0] ?? todayISO().slice(0, 7));
   const r = monthlyReport(ym);
+  const phone = useIsMobile();
+  const mi = months.indexOf(ym);
   const pct = (cur: number, prev?: number) => (prev ? Math.round(((cur - prev) / Math.abs(prev)) * 100) : null);
   const print = () => printDocument(<MonthlyReportSheet ym={ym} />, 'A4 portrait', `Rapport financier ${monthLabel(ym)}`);
   const share = () => {
@@ -489,9 +491,17 @@ function Reports() {
   );
   return (
     <div className="stack">
-      <div className="chips-scroll" role="tablist" aria-label="Mois">
-        {months.map((m) => <button key={m} ref={m === ym ? scrollIntoRow : undefined} className={`chip ${m === ym ? 'active' : ''}`} onClick={() => setYm(m)}>{monthLabel(m)}</button>)}
-      </div>
+      {phone ? (
+        <div className="month-step">
+          <button className="icon-btn" aria-label="Mois précédent" disabled={mi >= months.length - 1} onClick={() => setYm(months[mi + 1])}><ChevronLeft /></button>
+          <b>{monthLabel(ym)}</b>
+          <button className="icon-btn" aria-label="Mois suivant" disabled={mi <= 0} onClick={() => setYm(months[mi - 1])}><ChevronRight /></button>
+        </div>
+      ) : (
+        <div className="chips-scroll" role="tablist" aria-label="Mois">
+          {months.map((m) => <button key={m} ref={m === ym ? scrollIntoRow : undefined} className={`chip ${m === ym ? 'active' : ''}`} onClick={() => setYm(m)}>{monthLabel(m)}</button>)}
+        </div>
+      )}
       <div className="kpis kpis-3">
         {kpi('Recettes', r.recettes, 'var(--green)', pct(r.recettes, r.precedent?.recettes))}
         {kpi('Sorties', r.totalSorties, 'var(--red)', pct(r.totalSorties, r.precedent?.totalSorties), true)}

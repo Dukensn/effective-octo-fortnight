@@ -179,6 +179,7 @@ function Enrollment() {
             </span>
           ))}
         </div>
+        {!desktop && <div className="small muted" style={{ padding: '0 14px 12px' }}>Étape {step + 1} sur {STEPS.length} · <b style={{ color: 'var(--ink)' }}>{STEPS[step]}</b></div>}
       </div>
 
       <div className="split split-side">

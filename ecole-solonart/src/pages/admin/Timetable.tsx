@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Plus, User, MapPin, UtensilsCrossed, Printer, AlertTriangle, CalendarPlus, Copy, School, Users, BookOpen, CalendarRange, Pencil, Trash2 } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
 import type { TimetableSlot } from '../../data/types';
-import { PageHead, Tabs, Field, Modal, toast, Card, Badge } from '../../components/ui';
+import { PageHead, Tabs, Field, Modal, toast, Card, Badge, useIsMobile } from '../../components/ui';
 import { civ } from '../../lib/format';
 import { useSession } from '../../lib/session';
 import { printDocument } from '../../lib/print';
@@ -18,6 +18,35 @@ export function TimetableGrid({ slots, onSlot, showClass, title }: { slots: Time
   const subjects = useCollection('subjects');
   const staff = useCollection('staff');
   const classes = useCollection('classes');
+  const phone = useIsMobile();
+  const today = new Date().getDay(); // 0 = dimanche
+  const [day, setDay] = useState(today >= 1 && today <= 5 ? today : 1);
+  if (phone) {
+    // Téléphone : un jour à la fois, pas de grille à faire glisser.
+    const daySlots = slots.filter((x) => x.jour === day).sort((a, b) => a.debut.localeCompare(b.debut));
+    return (
+      <div aria-label={title}>
+        <div className="day-pick">
+          {DAYS.map((d, i) => <button key={d} className={day === i + 1 ? 'active' : ''} onClick={() => setDay(i + 1)}>{d.slice(0, 3)}<small>{slots.filter((x) => x.jour === i + 1).length}</small></button>)}
+        </div>
+        <div className="card day-list">
+          {daySlots.length === 0 && <div className="small muted" style={{ padding: 16 }}>Aucun cours ce jour-là.</div>}
+          {daySlots.map((s) => {
+            const sub = subjects.find((x) => x.id === s.matiereId);
+            const prof = staff.find((x) => x.id === s.professeurId);
+            return (
+              <button key={s.id} className="day-slot" onClick={() => onSlot?.(s)} style={{ cursor: onSlot ? 'pointer' : 'default' }}>
+                <span className="t">{hourLabel(s.debut)}<small>{hourLabel(s.fin)}</small></span>
+                <span className={`bar c-${sub?.couleur ?? 'slate'}`} />
+                <span className="grow"><b>{sub ? sub.nom.split(' (')[0] : s.libelle}</b><small>{prof ? `${prof.sexe === 'F' ? 'Mme' : 'M.'} ${prof.nom}` : 'Équipe'} · {showClass ? classes.find((c) => c.id === s.classeId)?.code : s.salle}</small></span>
+              </button>
+            );
+          })}
+          {onSlot && <button className="sheet-row" style={{ color: 'var(--primary)' }} onClick={() => onSlot({ jour: day, debut: HOURS.find(([h]) => !daySlots.some((x) => x.debut === h))?.[0] ?? '07:00', fin: HOURS.find(([h]) => !daySlots.some((x) => x.debut === h))?.[1] ?? '07:50' })}><Plus />Ajouter un cours le {DAYS[day - 1].toLowerCase()}</button>}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="table-wrap">
       <div className="tt" aria-label={title}>

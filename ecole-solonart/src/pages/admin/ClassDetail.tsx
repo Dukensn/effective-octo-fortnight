@@ -8,6 +8,8 @@ import { LevelPill } from '../../components/Level';
 import { civ, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 import { ClassForm } from './Classes';
+import { ClassComite } from './ClassComite';
+import { roleLabel } from '../../lib/comite';
 import { Users, GraduationCap, BookOpen, Trophy } from 'lucide-react';
 import { printDocument } from '../../lib/print';
 import { StudentListSheet } from '../../docs/Sheets';
@@ -23,7 +25,7 @@ export default function ClassDetail() {
   const staff = useCollection('staff');
   useCollection('students');
   useCollection('grades');
-  const [tab, setTab] = useState<'eleves' | 'matieres' | 'resultats'>('eleves');
+  const [tab, setTab] = useState<'eleves' | 'comite' | 'matieres' | 'resultats'>('eleves');
   const [edit, setEdit] = useState(false);
   const [del, setDel] = useState(false);
   const periods = sortedPeriods();
@@ -33,6 +35,7 @@ export default function ClassDetail() {
   const report = classReport(classe.id, scope);
   const tit = staff.find((s) => s.id === classe.titulaireId);
   const pre = isPreschool(classe);
+  const roleOf = (eleveId: string) => { const m = classe.comite?.find((x) => x.eleveId === eleveId); return m && roleLabel(m.role, students.find((x) => x.id === eleveId)?.sexe); };
   const profs = staff.filter((s) => s.type === 'Professeur');
   const subjectOrder = subjects.map((s) => s.id);
   courses.sort((a, b) => subjectOrder.indexOf(a.matiereId) - subjectOrder.indexOf(b.matiereId));
@@ -69,7 +72,9 @@ export default function ClassDetail() {
           ? <StatCard tint="orange" icon={<Trophy />} value={`${Math.round((classReport(classe.id, 'annuel')?.students.filter((r) => levelOf(r.general)?.code === 'A').length ?? 0) / Math.max(1, students.length) * 100)}%`} label="Enfants « Acquis »" sub="Bilan de l’année" />
           : <StatCard tint="orange" icon={<Trophy />} value={fmtNote(classReport(classe.id, 'annuel')?.classGeneral)} label="Moyenne annuelle" sub={`${Math.round((classReport(classe.id, 'annuel')?.successRate ?? 0) * 100)}% de réussite`} />}
       </div>
-      <Tabs tabs={[['eleves', `Élèves (${students.length})`], ['matieres', 'Matières & professeurs'], ['resultats', 'Résultats']]} value={tab} onChange={setTab} />
+      <Tabs tabs={[['eleves', `Élèves (${students.length})`], ['comite', 'Comité'], ['matieres', pre ? 'Domaines' : 'Matières'], ['resultats', 'Résultats']]} value={tab} onChange={setTab} />
+
+      {tab === 'comite' && <ClassComite classe={classe} canWrite={canWrite} />}
 
       {tab === 'eleves' && (
         <Card pad={false}>
@@ -77,7 +82,7 @@ export default function ClassDetail() {
             <thead><tr><th>#</th><th>Élève</th><th>Matricule</th><th className="only-desktop">Sexe</th><th>Statut</th></tr></thead>
             <tbody>{students.map((s, i) => (
               <tr key={s.id} className="clickable" onClick={() => nav(`/eleves/${s.id}`)}>
-                <td className="muted">{i + 1}</td><td><div className="person"><Avatar src={s.photo} name={fullName(s)} size={32} /><b>{fullName(s)}</b></div></td>
+                <td className="muted">{i + 1}</td><td><div className="person"><Avatar src={s.photo} name={fullName(s)} size={32} /><b>{fullName(s)}</b>{roleOf(s.id) && <span className="badge b-violet">{roleOf(s.id)}</span>}</div></td>
                 <td>{s.matricule}</td><td className="only-desktop">{s.sexe}</td><td><StatusBadge s={s.statut} /></td>
               </tr>))}</tbody>
           </table></div>

@@ -5,8 +5,9 @@ import { db, useCollection } from '../../data/store';
 import type { ClassRoom } from '../../data/types';
 import { PageHead, Modal, Field, toast, SearchInput, Avatar, Pills } from '../../components/ui';
 import { classReport, fmtNote, sortedPeriods } from '../../data/compute';
-import { civ, money, norm } from '../../lib/format';
+import { civ, fullName, money, norm } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
+import { responsableOf } from '../../lib/comite';
 
 export default function Classes() {
   const nav = useNavigate();
@@ -35,7 +36,8 @@ export default function Classes() {
       <div className="grid g-3">
         {list.map((c) => {
           const n = students.filter((s) => s.classeId === c.id && s.statut === 'Actif').length;
-          const tit = staff.find((s) => s.id === c.titulaireId);
+          const resp = responsableOf(c);
+          const tit = resp?.type === 'eleve' ? students.find((s) => s.id === resp.id) : staff.find((s) => s.id === resp?.id);
           const r = classReport(c.id, last?.id ?? 'annuel');
           return (
             <button key={c.id} className="card card-pad" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 12 }} onClick={() => nav(`/classes/${c.id}`)}>
@@ -49,7 +51,7 @@ export default function Classes() {
                 <div className="bar mt-8"><i style={{ width: `${Math.min(100, (n / c.capacite) * 100)}%`, background: n >= c.capacite ? 'var(--red)' : 'var(--primary)' }} /></div>
               </div>
               <div className="row between small" style={{ borderTop: '1px solid var(--line-2)', paddingTop: 10 }}>
-                <span className="row" style={{ gap: 8 }}>{tit && <Avatar src={tit.photo} name={civ(tit)} size={26} />}<span className="ellipsis" style={{ maxWidth: 160 }}>{tit ? civ(tit) : 'Aucun titulaire'}</span></span>
+                <span className="row" style={{ gap: 8 }}>{tit && <Avatar src={tit.photo} name={civ(tit)} size={26} />}<span className="ellipsis" style={{ maxWidth: 170 }}>{tit ? (resp?.type === 'eleve' ? `${fullName(tit)} · élève` : civ(tit)) : 'Aucun responsable'}</span></span>
                 {c.niveau === 'Préscolaire' ? <span>Compétences</span> : <span>Moy. {last?.court} : <b>{fmtNote(r?.classGeneral)}</b></span>}
               </div>
             </button>
