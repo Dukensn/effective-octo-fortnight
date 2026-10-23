@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { celebrate } from '../lib/celebrate';
 import { Check, Clock, X, FileCheck2, MessageCircle, Users } from 'lucide-react';
 import { db, useCollection } from '../data/store';
 import type { Attendance, Student } from '../data/types';
@@ -96,7 +97,7 @@ export function RollCall({ classeId, date, readOnly }: { classeId: string; date:
           })}</div>
         </div>
       )}
-      {!readOnly && <div className="sticky-foot"><button className="btn btn-primary btn-lg btn-block" onClick={save}>Enregistrer l’appel ({present} présent{present > 1 ? 's' : ''})</button></div>}
+      {!readOnly && <div className="sticky-foot"><button className="btn btn-primary btn-lg btn-block" onClick={(e) => { save(); celebrate(e.clientX, e.clientY); }}>Enregistrer l’appel ({present} présent{present > 1 ? 's' : ''})</button></div>}
     </div>
   );
 }

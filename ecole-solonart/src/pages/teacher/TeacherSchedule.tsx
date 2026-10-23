@@ -11,6 +11,7 @@ import { useSession } from '../../lib/session';
 import { canTeacherCall } from '../../lib/regles';
 import { canMultiSchool, clashes, dayItems, iso, weekday, type DayItem } from '../../lib/prof';
 import { canValidate, checkOf, validateCourse } from '../../lib/paie';
+import { giveCourse } from '../../lib/celebrate';
 import { HOURS, hourLabel } from '../admin/Timetable';
 
 const JOURS_COURTS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -26,14 +27,15 @@ export function DayCard({ it, onOpen, date }: { it: DayItem; onOpen: (it: DayIte
   const can = !!date && !check && canValidate(it, date);
   const missed = !!date && !check && it.kind !== 'externe' && date < todayISO();
   return (
-    <div className="day-card" style={{ borderLeftColor: it.color }}>
+    <div className={`day-card${check?.statut === 'valide' ? ' done' : ''}`} style={{ '--c': it.color } as React.CSSProperties}>
+      <div className="dc-time"><b>{hourLabel(it.debut)}</b><span>{hourLabel(it.fin)}</span></div>
+      <i className="dc-bar" />
       <button className="day-main" onClick={() => onOpen(it)}>
-        <span className="tiny muted">{hourLabel(it.debut)} – {hourLabel(it.fin)}</span>
         <b>{it.matiere}</b>
-        <span className="small muted">{it.classe}{it.kind === 'externe' ? ` · ${it.ecole}` : ''}{it.salle && it.salle !== it.classe ? ` · ${it.salle}` : ''}</span>
+        <span>{it.classe}{it.kind === 'externe' ? ` · ${it.ecole}` : ''}{it.salle && it.salle !== it.classe ? ` · ${it.salle}` : ''}</span>
       </button>
       {check ? <span className={`check-chip ${check.statut}`}>{check.statut === 'valide' ? <><Check size={13} strokeWidth={3} />Donné</> : 'Refusé'}</span>
-        : can ? <button className="btn btn-sm btn-success" onClick={() => { validateCourse(it, date!, session.user.staffId!, session.user.id); toast('Cours validé'); }}><Check size={14} />Cours donné</button>
+        : can ? <button className="btn btn-sm btn-success" onClick={(e) => giveCourse(it, date!, session.user.staffId!, session.user.id, e)}><Check size={14} />Donné ?</button>
         : missed ? <span className="check-chip none">Non validé</span>
         : <ChevronRight size={18} className="chev" />}
     </div>

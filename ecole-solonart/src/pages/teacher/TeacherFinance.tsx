@@ -93,7 +93,7 @@ function Overview() {
           <ChevronRight size={18} className="chev" />
         </button>
       )}
-      <div className="grid g-2 mb-16" style={{ gap: 10 }}>
+      <div className="stat-pair mb-16">
         <div className="card card-pad"><div className="tiny muted">Total versé</div><b style={{ fontSize: 19, color: 'var(--ink)' }}>{money(paid.reduce((a, s) => a + net(s), 0), school?.monnaie)}</b><div className="tiny muted">Cette année</div></div>
         <div className="card card-pad"><div className="tiny muted">Total à venir</div><b style={{ fontSize: 19, color: 'var(--ink)' }}>{money(toCome, school?.monnaie)}</b><div className="tiny muted">{pending.length + missing.length} mois</div></div>
       </div>
@@ -228,7 +228,7 @@ function HistoryView() {
       <Card title={db.get('years', school?.anneeCourante)?.libelle ?? ''}>
         <BarChart labels={months.map((m) => monthLabel(m).slice(0, 3))} series={[{ label: 'Versé', color: '#1463f3', values }]} format={(x) => `${Math.round(x / 1000)}k`} ticks={3} />
       </Card>
-      <div className="grid g-2 mt-12 mb-12" style={{ gap: 10 }}>
+      <div className="stat-pair mt-12 mb-12">
         <div className="card card-pad"><div className="tiny muted">Total année</div><b style={{ fontSize: 19, color: 'var(--ink)' }}>{money(total, school?.monnaie)}</b></div>
         <div className="card card-pad"><div className="tiny muted">Moyenne mensuelle</div><b style={{ fontSize: 19, color: 'var(--ink)' }}>{money(n ? total / n : 0, school?.monnaie)}</b></div>
       </div>

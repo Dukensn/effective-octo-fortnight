@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import '@fontsource-variable/inter';
 import './styles/app.css';
 import './styles/docs.css';
+import './styles/theme.css';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
 import { loadDatabase } from './data/store';

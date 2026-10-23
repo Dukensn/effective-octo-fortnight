@@ -147,7 +147,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
   const half = Math.ceil(tabs.length / 2);
   return (
     <AppBarCtx.Provider value={slots}>
-    <div className="shell">
+    <div className={`shell${path === '/' && session.isTeacher ? ' bare-home' : ''}`}>
       <aside className="sidebar"><SideNav items={items} /></aside>
       <div className="main">
         {!online && <div className="offline-banner"><WifiOff size={13} style={{ verticalAlign: -2 }} /> Hors ligne — tout est enregistré sur l’appareil et sera synchronisé.</div>}

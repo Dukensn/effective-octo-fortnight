@@ -38,6 +38,15 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Nouveau design mobile (version 15)
+
+Refait selon le guide *mobile-app-ui-design* (github.com/Dukensn/mobile-app-ui-design) :
+- **Fond blanc, plus aucun contour autour des widgets** : la profondeur vient d’ombres douces teintées de bleu ; les listes sont séparées par l’espace, pas par des traits ; les champs sont « remplis » (fond gris très clair) au lieu d’encadrés.
+- **Règle 60/30/10** : blanc, encre bleu nuit, et le bleu de l’école réservé aux actions et à la carte principale. Grille de 8 points, zones tactiles d’au moins 44 px.
+- **Accueil du professeur refait** : salutation, carte « En cours / Prochain cours » avec le bouton « J’ai donné ce cours » sous le pouce et la progression de la journée, alertes (appel, remplacement), 4 raccourcis ronds, frise de la journée, notes à saisir avec barres de progression.
+- **Moments forts** (règle pic-fin) : étincelles et message d’encouragement quand un cours est validé ou l’appel enregistré ; carte « Journée complète » quand tous les cours sont donnés.
+- Frise des cours (heure · couleur · cours · action) dans l’accueil et l’horaire ; appel plus lisible sur téléphone (les noms ne sont plus coupés) ; finance du professeur avec carte de salaire et totaux côte à côte.
+
 ## Badges personnalisables, impression à l’unité, vérification (version 14)
 
 - **Vérifier un badge** : le QR de chaque badge ouvre la page *Vérification* de l’application (`#/verifier/<matricule>`), même sans être connecté. Elle dit si la personne fait partie de l’école (élève inscrit, membre du personnel, ou plus inscrit), avec sa photo à comparer. Bouton « Vérifier un badge » dans Badges ; scan par la caméra sur Android, ou saisie du matricule. Tant que la base n’est pas en ligne, la vérification ne marche que sur un appareil qui a les données de l’école.
