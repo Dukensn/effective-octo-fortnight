@@ -45,13 +45,17 @@ service cloud.firestore {
       allow write: if collection in ['students', 'guardians'] && (canWrite(ecole, 'eleves') || canWrite(ecole, 'inscriptions') || canWrite(ecole, 'parents'));
       allow write: if collection in ['payments', 'expenses', 'salaries', 'projects'] && canWrite(ecole, 'finance');
       allow write: if collection == 'remplacements' && canWrite(ecole, 'presences');
+      // Cours donnés : le professeur valide ses propres cours (jamais un refus) ; la direction valide ou refuse ; on ne supprime pas.
+      allow create: if collection == 'pointages' && isTeacher(ecole) && request.resource.data.staffId == userDoc(ecole).staffId
+        && request.resource.data.statut == 'valide' && request.resource.data.source in ['prof', 'cahier', 'appel'];
+      allow create, update: if collection == 'pointages' && (canWrite(ecole, 'presences') || canWrite(ecole, 'finance'));
       allow write: if collection in ['users', 'roles'] && canWrite(ecole, 'utilisateurs');
       // Le secrétariat (module Parents) crée les accès parent, uniquement avec le rôle « Parent ».
       allow write: if collection == 'users' && canWrite(ecole, 'parents') && request.resource.data.roleId == 'r-par';
       // Un parent ne modifie que son code et sa date de visite.
       allow update: if collection == 'users' && isParent(ecole) && id == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pin', 'dernierAcces', 'photo', 'updatedAt']);
-      allow write: if !(collection in ['audit', 'chat']) && isDirection(ecole);
+      allow write: if !(collection in ['audit', 'chat']) && isDirection(ecole) && !(collection == 'pointages' && request.method == 'delete');
     }
   }
 }

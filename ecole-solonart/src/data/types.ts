@@ -190,6 +190,27 @@ export interface Staff extends Meta {
   /** Professeurs du secondaire : autres établissements où ils enseignent (pour leur emploi du temps complet). */
   autresEcoles?: OtherSchool[];
   typeContrat?: 'Temps plein' | 'Temps partiel' | 'Vacataire';
+  /** Professeurs : salaire fixe (montant « salaire ») ou paie à l'heure (heures validées × taux).
+   *  Sans valeur : à l'heure s'il enseigne au secondaire, fixe sinon (voir lib/paie). */
+  remuneration?: 'fixe' | 'horaire';
+  /** Taux horaire propre à ce professeur (remplace le taux de la matière). */
+  tauxPerso?: number;
+}
+
+/** Cours donné, validé par le professeur (ou par la direction) : base de la paie à l'heure. */
+export interface CourseCheck extends Meta {
+  date: string;
+  slotId: ID;
+  staffId: ID; // qui a donné le cours (le remplaçant en cas de remplacement)
+  classeId: ID;
+  matiereId?: ID;
+  debut: string;
+  fin: string;
+  statut: 'valide' | 'refuse';
+  source: 'prof' | 'cahier' | 'appel' | 'direction';
+  le: number; // horodatage de la validation
+  parId?: ID; // utilisateur
+  motif?: string; // refus ou validation tardive par la direction
 }
 
 export interface OtherSchool { id: ID; nom: string; commune?: string; actif: boolean }
@@ -303,6 +324,9 @@ export interface Salary extends Meta {
   staffId: ID;
   periode: string; // "2025-04"
   montant: number;
+  /** Paie à l'heure : heures validées et détail par matière / niveau. */
+  heures?: number;
+  detail?: { matiereId: ID; niveau: Niveau; heures: number; taux: number }[];
   primes: number;
   retenues: number;
   statut: 'Payé' | 'En attente';
@@ -464,6 +488,7 @@ export interface Collections {
   chat: ChatMessage;
   remplacements: Replacement;
   agenda: ExternalSlot;
+  pointages: CourseCheck;
   roles: Role;
   users: User;
   audit: AuditLog;
@@ -473,5 +498,5 @@ export type CollectionName = keyof Collections;
 export const COLLECTIONS: CollectionName[] = [
   'school', 'years', 'periods', 'classes', 'subjects', 'courses', 'guardians', 'students', 'staff',
   'evaluations', 'grades', 'reportEntries', 'attendance', 'staffAttendance', 'timetable', 'payments',
-  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'remplacements', 'agenda', 'roles', 'users', 'audit',
+  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'chat', 'remplacements', 'agenda', 'pointages', 'roles', 'users', 'audit',
 ];

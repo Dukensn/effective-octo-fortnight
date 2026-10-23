@@ -880,3 +880,8 @@ html { -webkit-tap-highlight-color: transparent; }
 .rc-dot.on.k2 { background: var(--red); border-color: var(--red); }
 .rc-dot.on.k3 { background: var(--violet); border-color: var(--violet); }
 @media (max-width: 380px) { .rc-row { grid-template-columns: 22px minmax(0, 1fr) repeat(4, 34px); padding: 8px; } .rc-name .avatar, .rc-name img { display: none; } }
+.day-card .day-main { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; border: 0; background: none; padding: 0; text-align: left; color: var(--text); }
+.check-chip { display: inline-flex; align-items: center; gap: 3px; padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; flex: none; }
+.check-chip.valide { background: var(--green-50); color: var(--green); }
+.check-chip.refuse { background: var(--red-50); color: var(--red); }
+.check-chip.none { background: var(--bg); color: var(--muted); }

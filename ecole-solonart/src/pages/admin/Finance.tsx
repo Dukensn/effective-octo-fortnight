@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Expense, Payment, PaymentMode, Project, Salary } from '../../data/types';
 import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, scrollIntoRow, useIsMobile } from '../../components/ui';
@@ -11,6 +11,7 @@ import { useSession, audit } from '../../lib/session';
 import { printDocument } from '../../lib/print';
 import { ReceiptSheet, FinanceReportSheet, MonthlyReportSheet } from '../../docs/Sheets';
 import Relances from './Relances';
+import { computeHourlySalaries, monthPay, remunerationOf } from '../../lib/paie';
 
 type Tab = 'apercu' | 'paiements' | 'salaires' | 'depenses' | 'comptabilite' | 'projets' | 'rapports';
 const MODES: PaymentMode[] = ['MonCash', 'NatCash', 'Espèces', 'Virement', 'Chèque'];
@@ -324,22 +325,30 @@ function Salaries({ canWrite }: { canWrite: boolean }) {
     const next = new Date(m + '-15'); next.setMonth(next.getMonth() + 1);
     const p = next.toISOString().slice(0, 7);
     if (salaries.some((s) => s.periode === p)) return toast('Ce mois existe déjà', true);
-    db.bulkPut('salaries', staff.filter((s) => s.statut === 'Actif').map((s) => ({ id: `sal-${s.id}-${p.replace('-', '')}`, staffId: s.id, periode: p, montant: s.salaire, primes: 0, retenues: Math.round(s.salaire * 0.02), statut: 'En attente' as const, mode: s.modePaiement })));
+    // Salaire fixe : montant du contrat. À l'heure : heures validées du mois (à recalculer en fin de mois).
+    db.bulkPut('salaries', staff.filter((s) => s.statut === 'Actif').map((s) => {
+      const h = remunerationOf(s) === 'horaire' ? monthPay(s.id, p) : null;
+      const montant = h ? h.montant : s.salaire;
+      return { id: `sal-${s.id}-${p.replace('-', '')}`, staffId: s.id, periode: p, montant, heures: h?.heures, detail: h?.detail, primes: 0, retenues: Math.round(montant * 0.02), statut: 'En attente' as const, mode: s.modePaiement };
+    }));
     setM(p);
     toast(`Fiches de paie de ${monthLabel(p)} créées`);
   };
+  const hourly = list.some((x) => remunerationOf(staff.find((y) => y.id === x.staffId)) === 'horaire');
+  const recompute = () => { const n = computeHourlySalaries(m).length; toast(`${n} fiche(s) à l’heure recalculée(s) d’après les cours validés`); };
   return (
     <>
       <div className="card card-pad row wrap mb-16" style={{ gap: 12 }}>
         <select className="select" style={{ width: 200 }} value={m} onChange={(e) => setM(e.target.value)}>{months.map((x) => <option key={x} value={x}>{monthLabel(x)}</option>)}</select>
         <span className="small muted grow">Total net : <b style={{ color: 'var(--ink)' }}>{money(list.reduce((a, s) => a + s.montant + s.primes - s.retenues, 0))}</b> · {pending.length} en attente</span>
         {canWrite && pending.length > 0 && <button className="btn btn-success" onClick={() => { pending.forEach(pay); toast(`${pending.length} salaires payés`); }}><CheckCircle2 />Tout valider</button>}
+        {canWrite && hourly && <button className="btn" onClick={recompute} title="Heures validées × taux"><Clock />Calculer les heures</button>}
         {canWrite && <button className="btn btn-primary" onClick={generate}><Plus />Mois suivant</button>}
       </div>
       <div className="card"><div className="table-wrap"><table className="t">
-        <thead><tr><th>Nom</th><th className="only-desktop">Poste</th><th className="num">Salaire</th><th className="num">Primes</th><th className="num">Retenues</th><th className="num">Net</th><th className="only-desktop">Mode</th><th>Statut</th><th /></tr></thead>
+        <thead><tr><th>Nom</th><th className="only-desktop">Poste</th><th className="num">Salaire</th><th className="num only-desktop">Heures</th><th className="num">Primes</th><th className="num">Retenues</th><th className="num">Net</th><th className="only-desktop">Mode</th><th>Statut</th><th /></tr></thead>
         <tbody>{list.map((x) => { const s = staff.find((y) => y.id === x.staffId); return (
-          <tr key={x.id}><td><div className="person"><Avatar src={s?.photo} name={fullName(s)} size={28} /><b>{fullName(s)}</b></div></td><td className="only-desktop">{s?.poste}</td><td className="num">{money(x.montant)}</td>
+          <tr key={x.id}><td><div className="person"><Avatar src={s?.photo} name={fullName(s)} size={28} /><b>{fullName(s)}</b></div></td><td className="only-desktop">{s?.poste}<small className="muted" style={{ display: 'block', fontSize: 11.5 }}>{remunerationOf(s) === 'horaire' ? 'À l’heure' : 'Salaire fixe'}</small></td><td className="num">{money(x.montant)}</td><td className="num only-desktop">{x.heures != null ? `${x.heures} h` : '—'}</td>
             <td className="num">{canWrite && x.statut === 'En attente' ? <input type="number" className="input" style={{ width: 100 }} value={x.primes} onChange={(e) => db.patch('salaries', x.id, { primes: Number(e.target.value) })} /> : money(x.primes)}</td>
             <td className="num">{money(x.retenues)}</td><td className="num bold">{money(x.montant + x.primes - x.retenues)}</td><td className="only-desktop">{x.mode}</td><td><StatusBadge s={x.statut} /></td>
             <td>{canWrite && x.statut === 'En attente' && <button className="btn btn-sm btn-soft" onClick={() => { pay(x); toast('Salaire payé'); }}>Payer</button>}</td></tr>); })}</tbody>

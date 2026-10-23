@@ -13,7 +13,7 @@ type Data = { [K in CollectionName]: Table<K> };
 const DB_KEY = (c: string) => `solonart:${c}`;
 const OUTBOX_KEY = 'solonart:outbox';
 const SCHEMA_KEY = 'solonart:schema';
-export const SCHEMA_VERSION = 12;
+export const SCHEMA_VERSION = 13;
 
 const data = Object.fromEntries(COLLECTIONS.map((c) => [c, {}])) as unknown as Data;
 const versions = Object.fromEntries(COLLECTIONS.map((c) => [c, 0])) as Record<CollectionName, number>;

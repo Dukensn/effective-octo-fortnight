@@ -38,6 +38,13 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Paie fixe ou à l’heure, cours validés (version 13)
+
+- **Choix de la direction, professeur par professeur** (Personnel → fiche) : *Salaire fixe* ou *À l’heure*. Par défaut : à l’heure pour qui enseigne au secondaire, fixe pour le préscolaire et le fondamental. À l’heure, la direction peut fixer un taux propre au professeur ; sinon on prend le taux de la matière au niveau (Paramètres).
+- **Valider un cours, en un geste** : sur l’accueil et l’horaire du professeur, chaque cours de la journée a un bouton « Cours donné » (actif le jour même, à partir de 10 minutes avant le début). Le cours est aussi validé **sans rien toucher** quand le professeur remplit le cahier de textes de ce cours ou fait l’appel de la classe ce jour-là.
+- **Contrôle** : Présences → *Cours donnés* : par date et par professeur, chaque cours avec son état (donné, non validé, refusé, à venir) et la façon dont il a été validé. La direction valide un oubli ou refuse un cours non assuré (motif obligatoire, gardé au journal).
+- **Paie** : Finance → Salaires. « Mois suivant » crée les fiches : montant du contrat pour un salaire fixe, heures validées × taux pour un professeur à l’heure. « Calculer les heures » met à jour les fiches à l’heure du mois (les fiches déjà payées ne bougent pas). Le professeur voit dans Finance ses heures validées du mois et le montant estimé, et le détail heures × taux sur sa fiche.
+
 ## Espace professeur refait (version 12)
 Barre du bas : **Accueil · Horaire · Notes · Appel** (ou **Finance** si le professeur ne fait pas l'appel) · Menu.
 - **Accueil** : les cours du jour, l'appel à faire, un remplacement éventuel, puis Mes classes, Mes matières,

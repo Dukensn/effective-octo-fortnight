@@ -5,7 +5,8 @@ import { db, useCollection } from '../data/store';
 import type { Course, Lesson } from '../data/types';
 import { Field, Modal, toast } from './ui';
 import { todayISO } from '../lib/format';
-import { audit } from '../lib/session';
+import { audit, useSession } from '../lib/session';
+import { autoValidate } from '../lib/paie';
 import { HOURS, hourLabel } from '../pages/admin/Timetable';
 
 /** Heure du cours ce jour-là d'après l'emploi du temps (pour préremplir). */
@@ -31,6 +32,7 @@ export function LessonForm({ value, courses, onClose }: { value: Partial<Lesson>
     const date = value.date ?? todayISO();
     return { date, coursId: co?.id, heure: co ? slotHour(co, date) : undefined, ...value };
   });
+  const session = useSession();
   const [devoir, setDevoir] = useState(!!value.devoirs);
   const set = <K extends keyof Lesson>(k: K, v: Lesson[K]) => setF((x) => ({ ...x, [k]: v }));
   const course = courses.find((c) => c.id === f.coursId);
@@ -43,7 +45,9 @@ export function LessonForm({ value, courses, onClose }: { value: Partial<Lesson>
       contenu: f.contenu?.trim() ?? '', devoirs: devoir ? f.devoirs?.trim() || undefined : undefined, pourLe: devoir && f.devoirs ? f.pourLe : undefined,
     } as Lesson);
     audit(value.id ? 'Cahier de textes modifié' : 'Cahier de textes', `${label(course)} · ${f.date}`);
-    toast('Séance enregistrée');
+    // Remplir le cahier de textes le jour du cours vaut « cours donné » (paie à l'heure).
+    const n = session?.isTeacher ? autoValidate(session.user.staffId, f.date!, course.classeId, course.matiereId, 'cahier', session.user.id) : 0;
+    toast(n ? 'Séance enregistrée · cours validé' : 'Séance enregistrée');
     onClose();
   };
   return (

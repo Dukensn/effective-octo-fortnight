@@ -1,7 +1,8 @@
 // Données de démonstration (profils fictifs) — contexte haïtien, École Mixte Solonart, Léogâne.
 import { db } from './store';
+import { dayItems } from '../lib/prof';
 import type {
-  ChatMessage, ExternalSlot,
+  ChatMessage, CourseCheck, ExternalSlot,
   ClassRoom, Course, Evaluation, Grade, Guardian, Period, Role, Staff, Student, Subject, TimetableSlot,
   Payment, Expense, Salary, Attendance, ModuleKey, Access, User, Sexe, Incident, Lesson,
 } from './types';
@@ -600,6 +601,20 @@ export function seedDatabase() {
     ext.push({ id: `ag-${i}`, staffId: robert.id, ecoleId: 'ext-lumiere', jour, debut, fin, matiere, classe, salle, eleves });
   });
   db.bulkPut('agenda', ext as ExternalSlot[]);
+
+  // ---------- Cours validés des trois dernières semaines (paie à l'heure de Robert) ----------
+  const checks: Omit<CourseCheck, 'updatedAt'>[] = [];
+  for (let k = 21; k >= 1; k--) {
+    const d = new Date(); d.setDate(d.getDate() - k);
+    const date = `${d.getFullYear()}-${pad(d.getMonth() + 1, 2)}-${pad(d.getDate(), 2)}`;
+    for (const it of dayItems(robert.id, date)) {
+      if (it.kind === 'externe' || !it.slot || rnd() < 0.08) continue; // quelques oublis
+      const src = rnd();
+      const [h, m] = it.debut.split(':').map(Number);
+      checks.push({ id: `pt-${date}-${it.slot.id}`, date, slotId: it.slot.id, staffId: robert.id, classeId: it.slot.classeId, matiereId: it.slot.matiereId, debut: it.slot.debut, fin: it.slot.fin, statut: 'valide', source: src < 0.6 ? 'prof' : src < 0.9 ? 'cahier' : 'appel', le: new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m + 5).getTime() });
+    }
+  }
+  db.bulkPut('pointages', checks as CourseCheck[]);
 
   // ---------- Messagerie (démonstration) ----------
   const now = Date.now();

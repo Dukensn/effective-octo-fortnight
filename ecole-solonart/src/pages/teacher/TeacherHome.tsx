@@ -48,7 +48,7 @@ export default function TeacherHome() {
         <button className="row between" style={{ width: '100%', border: 0, background: 'none', padding: 0, textAlign: 'left' }} onClick={() => nav('/prof/emploi?vue=jour')}>
           <span><b style={{ color: 'var(--ink)', fontSize: 16 }}>{dateFull()}</b><div className="small muted">{today.length ? `Vous avez ${today.length} cours aujourd’hui` : 'Pas de cours aujourd’hui'}</div></span><ChevronRight className="chev" />
         </button>
-        {today.length > 0 && <div className="stack mt-12" style={{ gap: 8 }}>{today.slice(0, 4).map((it) => <DayCard key={it.id} it={it} onOpen={(x) => nav(x.kind === 'externe' ? '/prof/emploi?vue=jour' : `/prof/cours/${x.slot!.id}`)} />)}</div>}
+        {today.length > 0 && <div className="stack mt-12" style={{ gap: 8 }}>{today.slice(0, 4).map((it) => <DayCard key={it.id} it={it} date={todayISO()} onOpen={(x) => nav(x.kind === 'externe' ? '/prof/emploi?vue=jour' : `/prof/cours/${x.slot!.id}`)} />)}</div>}
         <button className="btn btn-primary btn-block mt-12" onClick={() => nav('/prof/emploi')}>Voir mon emploi du temps<ChevronRight size={18} /></button>
       </div>
 

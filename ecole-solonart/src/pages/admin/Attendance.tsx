@@ -1,28 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CheckCircle2, Circle, UserCheck, UserX, Clock, Percent, LogIn, LogOut } from 'lucide-react';
+import { CheckCircle2, Circle, UserCheck, UserX, Clock, Percent, LogIn, LogOut, CalendarDays } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
 import type { StaffAttendance } from '../../data/types';
-import { PageHead, Tabs, Field, Card, StatCard, Avatar, StatusBadge, Modal, toast } from '../../components/ui';
+import { PageHead, Tabs, Field, Card, StatCard, Avatar, StatusBadge, Modal, Pills, Empty, toast } from '../../components/ui';
 import { RollCall } from '../../components/RollCall';
 import { BarChart } from '../../components/charts';
 import { todayISO, dateFull, civ } from '../../lib/format';
 import { classStudents } from '../../data/compute';
 import { useSession } from '../../lib/session';
-import { callerLabel, classesOfAbsent, slotsOnDay } from '../../lib/regles';
+import { callerLabel, classesOfAbsent, replacementsOn, slotsOnDay } from '../../lib/regles';
+import { dayItems, type DayItem } from '../../lib/prof';
+import { checkOf, decideCourse, remunerationOf } from '../../lib/paie';
+import { hourLabel } from './Timetable';
 import { audit } from '../../lib/session';
 
 export default function AttendancePage() {
   const [params] = useSearchParams();
-  const [tab, setTab] = useState<'eleves' | 'personnel' | 'stats'>((params.get('tab') as 'personnel') ?? 'eleves');
+  const [tab, setTab] = useState<'eleves' | 'personnel' | 'cours' | 'stats'>((params.get('tab') as 'personnel') ?? 'eleves');
   // Un lien vers un autre onglet (cloche, tableau de bord) doit changer d'onglet même si la page est déjà ouverte.
   useEffect(() => { const t = params.get('tab') as typeof tab | null; if (t) setTab(t); }, [params]);
   return (
     <>
       <PageHead title="Présences & ponctualité" sub={`${dateFull()} · un appel par jour et par classe ; au secondaire, il est fait par le personnel désigné.`} />
-      <Tabs tabs={[['eleves', 'Élèves'], ['personnel', 'Personnel'], ['stats', 'Statistiques']]} value={tab} onChange={setTab} />
+      <Tabs tabs={[['eleves', 'Élèves'], ['personnel', 'Personnel'], ['cours', 'Cours donnés'], ['stats', 'Statistiques']]} value={tab} onChange={setTab} />
       {tab === 'eleves' && <Students />}
       {tab === 'personnel' && <StaffAtt />}
+      {tab === 'cours' && <CoursesGiven />}
       {tab === 'stats' && <Stats />}
     </>
   );
@@ -168,6 +172,65 @@ function ReplacementForm({ absentId, date, onClose }: { absentId: string; date: 
       <Field label="Note (facultatif)" className="mt-12"><input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex. maladie, la 7AF fait de l’étude en salle B" /></Field>
       <p className="tiny muted mt-12">Le remplaçant voit les classes sur son accueil et peut faire l’appel ce jour-là (préscolaire et fondamental). Les plus disponibles sont en tête de liste.</p>
     </Modal>
+  );
+}
+
+/** Cours donnés : validation par les professeurs (bouton, cahier de textes, appel) et décision de la direction. */
+function CoursesGiven() {
+  const session = useSession()!;
+  const canWrite = session.can('presences', 'write') || session.can('finance', 'write');
+  const staff = useCollection('staff').filter((s) => s.type === 'Professeur' && s.statut === 'Actif');
+  useCollection('pointages'); useCollection('timetable'); useCollection('remplacements'); useCollection('staffAttendance');
+  const [date, setDate] = useState(todayISO());
+  const [only, setOnly] = useState<'tous' | 'non'>('tous');
+  const [refuse, setRefuse] = useState<{ it: DayItem; staffId: string } | null>(null);
+  const [motif, setMotif] = useState('');
+  const replaced = new Set(replacementsOn(date).filter((r) => r.remplacantId).map((r) => r.absentId));
+  const rows = staff.filter((s) => !replaced.has(s.id)).map((s) => ({ s, items: dayItems(s.id, date).filter((it) => it.kind !== 'externe' && it.slot) })).filter((x) => x.items.length);
+  const now = new Date().toTimeString().slice(0, 5);
+  const later = (it: DayItem) => date === todayISO() && it.debut > now;
+  const all = rows.flatMap((r) => r.items.filter((it) => !later(it)).map((it) => ({ r, it, c: checkOf(date, it.slot!.id) })));
+  const ok = all.filter((x) => x.c?.statut === 'valide').length;
+  const ko = all.filter((x) => x.c?.statut === 'refuse').length;
+  const SRC: Record<string, string> = { prof: 'bouton', cahier: 'cahier de textes', appel: 'appel', direction: 'direction' };
+  return (
+    <>
+      <div className="row wrap mb-16" style={{ gap: 12, alignItems: 'flex-end' }}>
+        <Field label="Date"><input type="date" className="input" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value)} /></Field>
+        <Pills items={[['tous', `Tous (${all.length})`], ['non', `Non validés (${all.length - ok - ko})`]]} value={only} onChange={setOnly} />
+      </div>
+      <div className="grid g-stats mb-16">
+        <StatCard tint="blue" icon={<CalendarDays />} value={all.length} label={date === todayISO() ? 'Cours déjà commencés' : 'Cours prévus'} />
+        <StatCard tint="green" icon={<CheckCircle2 />} value={ok} label="Validés" />
+        <StatCard tint="orange" icon={<Clock />} value={all.length - ok - ko} label="Non validés" />
+        <StatCard tint="red" icon={<UserX />} value={ko} label="Refusés" />
+      </div>
+      <p className="tiny muted mb-12">Un cours est validé quand le professeur touche « Cours donné », remplit le cahier de textes de ce cours ou fait l’appel le jour même. Les cours validés servent à la paie des professeurs payés à l’heure.</p>
+      <div className="stack">{rows.map(({ s, items }) => {
+        const list = items.filter((it) => only === 'tous' || (!later(it) && !checkOf(date, it.slot!.id)));
+        if (!list.length) return null;
+        return (
+          <Card key={s.id} title={<span className="row" style={{ gap: 10 }}><Avatar src={s.photo} name={civ(s)} size={28} />{civ(s)} <span className="badge b-gray">{remunerationOf(s) === 'horaire' ? 'À l’heure' : 'Fixe'}</span></span>} pad={false}>
+            {list.map((it) => { const c = checkOf(date, it.slot!.id); return (
+              <div key={it.id} className="sheet-row" style={{ gap: 10 }}>
+                <span className="grow small"><b>{hourLabel(it.debut)} · {it.matiere}</b> <span className="muted">{it.classe}</span>{c && <small className="muted" style={{ display: 'block', fontSize: 11.5 }}>{c.statut === 'valide' ? `Validé par ${SRC[c.source]} à ${new Date(c.le).toTimeString().slice(0, 5)}` : `Refusé${c.motif ? ` : ${c.motif}` : ''}`}</small>}</span>
+                {c ? <span className={`check-chip ${c.statut}`}>{c.statut === 'valide' ? 'Donné' : 'Refusé'}</span> : <span className="check-chip none">{later(it) ? 'À venir' : 'Non validé'}</span>}
+                {canWrite && !later(it) && (!c || c.statut === 'refuse') && <button className="btn btn-sm btn-soft" onClick={() => { decideCourse(it, date, s.id, 'valide', session.user.id, 'Validation par la direction'); toast('Cours validé'); }}>Valider</button>}
+                {canWrite && !later(it) && c?.statut !== 'refuse' && <button className="btn btn-sm" onClick={() => { setRefuse({ it, staffId: s.id }); setMotif(''); }}>Refuser</button>}
+              </div>
+            ); })}
+          </Card>
+        );
+      })}</div>
+      {rows.length === 0 && <Empty title="Aucun cours ce jour-là" />}
+      {refuse && (
+        <Modal open onClose={() => setRefuse(null)} title="Refuser ce cours" footer={<><button className="btn" onClick={() => setRefuse(null)}>Annuler</button><button className="btn btn-danger" disabled={motif.trim().length < 4} onClick={() => { decideCourse(refuse.it, date, refuse.staffId, 'refuse', session.user.id, motif.trim()); toast('Cours refusé'); setRefuse(null); }}>Refuser</button></>}>
+          <p className="small mb-12">{refuse.it.matiere} · {refuse.it.classe} · {hourLabel(refuse.it.debut)}</p>
+          <Field label="Motif"><input className="input" value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Ex. professeur absent, cours non assuré" /></Field>
+          <p className="tiny muted mt-8">Un cours refusé n’est pas payé ; le refus est gardé au journal.</p>
+        </Modal>
+      )}
+    </>
   );
 }
 

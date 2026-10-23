@@ -6,6 +6,7 @@ import { classStudents } from '../data/compute';
 import { Avatar, SearchInput, toast } from './ui';
 import { civ, dateShort, fullName, norm } from '../lib/format';
 import { notifyAttendance } from '../lib/chat';
+import { autoValidate } from '../lib/paie';
 import { contactOf, phoneDigits } from '../lib/relance';
 import { useSession, audit } from '../lib/session';
 
@@ -46,6 +47,8 @@ export function RollCall({ classeId, date, readOnly }: { classeId: string; date:
     setAlerted(alerts);
     db.put('attendance', { id: doneId, date, classeId, eleveId: '', statut: 'Présent', saisiePar: session.user.id });
     audit('Appel', `${db.get('classes', classeId)?.code} ${date}`);
+    // L'appel fait par le professeur valide aussi son cours en cours dans cette classe.
+    if (session.isTeacher) autoValidate(session.user.staffId, date, classeId, undefined, 'appel', session.user.id);
     toast(`Appel enregistré : ${counts[2]} absent(s), ${counts[1]} retard(s)`);
   };
 

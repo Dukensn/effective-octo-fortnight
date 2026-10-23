@@ -6,6 +6,7 @@ import type { Staff } from '../../data/types';
 import { PageHead, Tabs, Field, SearchInput, Avatar, StatusBadge, Empty, Modal, toast, useIsDesktop, StatCard, Badge } from '../../components/ui';
 import { civ, fullName, norm, money, dateLong, downloadCSV, readFileAsDataURL } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
+import { remunerationOf } from '../../lib/paie';
 
 export default function StaffPage() {
   const session = useSession()!;
@@ -122,7 +123,7 @@ function StaffPanel({ s, onEdit }: { s: Staff; onEdit: () => void }) {
         <div className="card card-pad">
           <h3 style={{ fontSize: 15 }} className="mb-8">Contrat & salaire</h3>
           <div className="info">
-            <div>Salaire mensuel</div><div>{money(s.salaire)}</div>
+            <div>Rémunération</div><div>{s.type === 'Professeur' && remunerationOf(s) === 'horaire' ? `À l’heure${s.tauxPerso ? ` · ${money(s.tauxPerso)} / h` : ' · taux des matières'}` : `Fixe · ${money(s.salaire)} / mois`}</div>
             <div>Mode de paiement</div><div>{s.modePaiement}</div>
             <div>Dernier paiement</div><div>{salaries[0] ? <StatusBadge s={salaries[0].statut} /> : '-'}</div>
             <div>NIF</div><div>{s.nif ?? '-'}</div>
@@ -173,7 +174,18 @@ export function StaffForm({ value, onClose }: { value: Partial<Staff>; onClose: 
         <Field label="Email"><input className="input" type="email" value={f.email ?? ''} onChange={(e) => set('email', e.target.value)} /></Field>
         <Field label="Adresse" className="span-2"><input className="input" value={f.adresse ?? ''} onChange={(e) => set('adresse', e.target.value)} /></Field>
         <Field label="Date d’embauche"><input type="date" className="input" value={f.dateEmbauche ?? ''} onChange={(e) => set('dateEmbauche', e.target.value)} /></Field>
-        <Field label="Salaire mensuel (G)"><input type="number" className="input" value={f.salaire} onChange={(e) => set('salaire', Number(e.target.value))} /></Field>
+        {f.type === 'Professeur' && (
+          <Field label="Rémunération" className="span-2">
+            <div className="seg">
+              <button type="button" className={remunerationOf(f as Staff) === 'fixe' ? 'active' : ''} onClick={() => set('remuneration', 'fixe')}>Salaire fixe</button>
+              <button type="button" className={remunerationOf(f as Staff) === 'horaire' ? 'active' : ''} onClick={() => set('remuneration', 'horaire')}>À l’heure</button>
+            </div>
+            <span className="tiny muted">{remunerationOf(f as Staff) === 'horaire' ? 'Payé selon les cours validés dans le mois × taux de la matière (Paramètres → Matières & règles).' : 'Même montant chaque mois.'}{!f.remuneration ? ' Choix par défaut selon le niveau enseigné.' : ''}</span>
+          </Field>
+        )}
+        {f.type === 'Professeur' && remunerationOf(f as Staff) === 'horaire'
+          ? <Field label="Taux horaire propre (G / h)" opt><input type="number" className="input" value={f.tauxPerso ?? ''} placeholder="Taux de la matière" onChange={(e) => set('tauxPerso', e.target.value === '' ? undefined : Number(e.target.value))} /></Field>
+          : <Field label="Salaire mensuel (G)"><input type="number" className="input" value={f.salaire} onChange={(e) => set('salaire', Number(e.target.value))} /></Field>}
         <Field label="Mode de paiement"><select className="select" value={f.modePaiement} onChange={(e) => set('modePaiement', e.target.value)}>{['MonCash', 'NatCash', 'Espèces', 'Virement', 'Chèque'].map((t) => <option key={t}>{t}</option>)}</select></Field>
         <Field label="NIF" opt><input className="input" value={f.nif ?? ''} onChange={(e) => set('nif', e.target.value)} /></Field>
         <Field label="Statut"><select className="select" value={f.statut} onChange={(e) => set('statut', e.target.value)}>{['Actif', 'Congé', 'Inactif'].map((t) => <option key={t}>{t}</option>)}</select></Field>

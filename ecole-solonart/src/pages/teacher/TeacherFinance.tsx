@@ -1,5 +1,5 @@
 // Finance du professeur : salaire, versements, taux horaires, heures de cours, historique, documents.
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { ChevronRight, CalendarCheck, Wallet, Clock, BarChart3, FileText, UserCog, Download, CheckCircle2, Hourglass, Info, School } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
@@ -11,6 +11,9 @@ import { useSession, audit } from '../../lib/session';
 import { printDocument } from '../../lib/print';
 import { AttestationSheet, PaySlipSheet } from '../../docs/Sheets';
 import { canMultiSchool, monthHours, rateFor } from '../../lib/prof';
+import { monthPay, remunerationOf } from '../../lib/paie';
+
+const thisMonth = () => new Date().toISOString().slice(0, 7);
 
 const net = (s: Salary) => s.montant + s.primes - s.retenues;
 const Wrap = ({ title, back, children }: { title: string; back: string; children: React.ReactNode }) => {
@@ -59,7 +62,10 @@ function Overview() {
   const paid = salaries.filter((s) => s.statut === 'Payé' && months.includes(s.periode));
   const pending = salaries.filter((s) => s.statut === 'En attente');
   const missing = months.filter((m) => !salaries.some((s) => s.periode === m) && m > (last?.periode ?? ''));
-  const toCome = pending.reduce((a, s) => a + net(s), 0) + missing.length * (me?.salaire ?? 0);
+  const hourly = remunerationOf(me) === 'horaire';
+  useCollection('pointages');
+  const cur = hourly ? monthPay(me?.id, thisMonth()) : null;
+  const toCome = pending.reduce((a, s) => a + net(s), 0) + (hourly ? 0 : missing.length * (me?.salaire ?? 0));
   const links: [string, string, React.ReactNode, string][] = [
     ['versements', 'Mes versements', <CalendarCheck key="v" />, 'tint-blue'],
     ['taux', 'Taux par matière', <Wallet key="t" />, 'tint-green'],
@@ -80,6 +86,13 @@ function Overview() {
           <ChevronRight />
         </button>
       ) : <Empty title="Aucun salaire enregistré" />}
+      {cur && (
+        <button className="card card-pad row mb-12" style={{ gap: 12, width: '100%', textAlign: 'left' }} onClick={() => nav('heures')}>
+          <span className="tint-orange" style={{ width: 40, height: 40, borderRadius: 10, display: 'grid', placeItems: 'center' }}><Clock /></span>
+          <span className="grow"><div className="tiny muted">Payé à l’heure · {monthLabel(thisMonth())}</div><b style={{ color: 'var(--ink)' }}>{cur.heures} h validées ≈ {money(cur.montant, school?.monnaie)}</b><div className="tiny muted">Touchez « Cours donné » après chaque cours</div></span>
+          <ChevronRight size={18} className="chev" />
+        </button>
+      )}
       <div className="grid g-2 mb-16" style={{ gap: 10 }}>
         <div className="card card-pad"><div className="tiny muted">Total versé</div><b style={{ fontSize: 19, color: 'var(--ink)' }}>{money(paid.reduce((a, s) => a + net(s), 0), school?.monnaie)}</b><div className="tiny muted">Cette année</div></div>
         <div className="card card-pad"><div className="tiny muted">Total à venir</div><b style={{ fontSize: 19, color: 'var(--ink)' }}>{money(toCome, school?.monnaie)}</b><div className="tiny muted">{pending.length + missing.length} mois</div></div>
@@ -128,7 +141,8 @@ function PaymentDetail() {
         <div className="info small">
           <div>École</div><div>{school?.nom}</div>
           <div>Période</div><div>{monthLabel(s.periode)}</div>
-          <div>Salaire de base</div><div>{money(s.montant)}</div>
+          {s.detail?.length ? s.detail.map((d) => <Fragment key={`${d.matiereId}${d.niveau}`}><div>{db.get('subjects', d.matiereId)?.nom.split(' (')[0]} · {d.niveau}</div><div>{d.heures} h × {money(d.taux)}</div></Fragment>) : null}
+          <div>{s.heures != null ? `Salaire (${s.heures} h validées)` : 'Salaire de base'}</div><div>{money(s.montant)}</div>
           <div>Primes</div><div>{money(s.primes)}</div>
           <div>Retenues</div><div>− {money(s.retenues)}</div>
           <div>Mode</div><div>{s.mode}</div>
@@ -141,7 +155,7 @@ function PaymentDetail() {
 }
 
 function Rates() {
-  const { session } = useMine();
+  const { session, me } = useMine();
   const courses = useCollection('courses').filter((c) => c.professeurId === session.user.staffId);
   const classes = useCollection('classes');
   const subjects = useCollection('subjects');
@@ -151,25 +165,28 @@ function Rates() {
     <Wrap title="Taux par matière" back="/prof/finance">
       <div className="card mb-12">
         <div className="team-row tiny muted"><span>Matière</span><span>Niveau</span><span className="right">Taux / heure</span></div>
-        {pairs.map(({ m, n }) => { const t = rateFor(m, n!); return (
+        {pairs.map(({ m, n }) => { const t = me?.tauxPerso ?? rateFor(m, n!); return (
           <div key={`${m}${n}`} className="team-row rate-row"><span className="small" style={{ color: 'var(--ink)' }}>{subjects.find((s) => s.id === m)?.nom.split(' (')[0]}</span><span className="small muted">{n}</span><b className="right small">{t ? money(t) : '—'}</b></div>
         ); })}
         {pairs.length === 0 && <Empty title="Aucune matière payée à l’heure" />}
       </div>
-      <div className="card card-pad small row" style={{ gap: 10, background: 'var(--primary-50)', border: 0 }}><Info size={18} color="var(--primary)" />Les taux horaires sont définis par l’administration (Paramètres → Matières & règles).</div>
+      <div className="card card-pad small row" style={{ gap: 10, background: 'var(--primary-50)', border: 0 }}><Info size={18} color="var(--primary)" />{remunerationOf(me) === 'horaire' ? (me?.tauxPerso ? 'La direction vous a fixé un taux horaire propre, pour toutes vos matières.' : 'Les taux horaires sont définis par l’administration (Paramètres → Matières & règles).') : 'Vous êtes payé au salaire fixe : ces taux ne servent qu’aux heures de remplacement.'}</div>
     </Wrap>
   );
 }
 
 function Hours() {
   const { session, me } = useMine();
-  useCollection('timetable'); useCollection('staffAttendance'); useCollection('remplacements');
+  useCollection('timetable'); useCollection('staffAttendance'); useCollection('remplacements'); useCollection('pointages');
   const months = yearMonths();
-  const [ym, setYm] = useState(months[months.length - 1] ?? new Date().toISOString().slice(0, 7));
+  if (!months.includes(thisMonth())) months.push(thisMonth());
+  const [ym, setYm] = useState(thisMonth());
   const h = monthHours(session.user.staffId, ym);
   const pct = h.prevues ? Math.min(100, Math.round((h.effectuees / h.prevues) * 100)) : 0;
   const rates = db.list('courses').filter((c) => c.professeurId === me?.id).map((c) => rateFor(c.matiereId, db.get('classes', c.classeId)?.niveau ?? 'Secondaire')).filter((x): x is number => !!x);
   const avg = rates.length ? Math.round(rates.reduce((a, b) => a + b, 0) / rates.length) : 0;
+  const hourly = remunerationOf(me) === 'horaire';
+  const v = monthPay(me?.id, ym);
   return (
     <Wrap title="Mes heures de cours" back="/prof/finance">
       <select className="select mb-16" value={ym} onChange={(e) => setYm(e.target.value)} aria-label="Mois">{months.map((m) => <option key={m} value={m}>{monthLabel(m)}</option>)}</select>
@@ -184,6 +201,11 @@ function Hours() {
           <div><i className="legend-dot" style={{ background: 'var(--red)' }} />Heures annulées</div><div>{h.annulees} h</div>
         </div>
         <p className="tiny muted mt-8">Calcul à partir de votre emploi du temps : les absences annulent des heures, les remplacements en ajoutent.</p>
+      </div>
+      <div className="card card-pad mb-12">
+        <div className="row" style={{ gap: 10 }}><CheckCircle2 size={18} color="var(--green)" /><b className="grow" style={{ color: 'var(--ink)' }}>{v.heures} h validées</b>{hourly && <b>{money(v.montant)}</b>}</div>
+        {v.detail.map((d) => <div key={`${d.matiereId}${d.niveau}`} className="row small mt-8"><span className="grow muted">{db.get('subjects', d.matiereId)?.nom.split(' (')[0]} · {d.niveau}</span>{d.heures} h × {money(d.taux)}</div>)}
+        <p className="tiny muted mt-8">{hourly ? 'Vous êtes payé à l’heure : seuls les cours validés (« Cours donné », cahier de textes ou appel) comptent.' : 'Vous êtes payé au salaire fixe ; la validation des cours sert au suivi.'}</p>
       </div>
       <Card title="Détail par semaine" pad={false}>
         {h.weeks.map((w) => <div key={w.label} className="sheet-row"><span className="grow">{w.label}</span><b>{w.heures} h</b></div>)}
@@ -258,7 +280,8 @@ function Infos() {
       <div className="card card-pad mb-12"><div className="info small">
         <div>Type de contrat</div><div>{me?.typeContrat ?? 'Temps plein'}</div>
         <div>Date de début</div><div>{me?.dateEmbauche ? dateLong(me.dateEmbauche) : '—'}</div>
-        <div>Salaire de base mensuel</div><div>{money(me?.salaire ?? 0, school?.monnaie)}</div>
+        <div>Rémunération</div><div>{remunerationOf(me) === 'horaire' ? 'À l’heure (cours validés)' : 'Salaire fixe'}</div>
+        {remunerationOf(me) === 'horaire' ? <><div>Taux horaire</div><div>{me?.tauxPerso ? money(me.tauxPerso) : 'Selon la matière'}</div></> : <><div>Salaire de base mensuel</div><div>{money(me?.salaire ?? 0, school?.monnaie)}</div></>}
         <div>Mode de paiement</div><div>{me?.modePaiement}</div>
       </div></div>
       <button className="btn btn-soft btn-block" onClick={ask}><UserCog size={16} />Demander une mise à jour</button>
