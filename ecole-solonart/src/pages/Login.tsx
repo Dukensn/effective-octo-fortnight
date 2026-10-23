@@ -1,0 +1,110 @@
+import { useMemo, useRef, useState } from 'react';
+import { ArrowLeft, ShieldCheck, GraduationCap, WifiOff } from 'lucide-react';
+import { useCollection, useDoc } from '../data/store';
+import { login } from '../lib/session';
+import { Avatar } from '../components/ui';
+import { SchoolLogo } from '../components/Logo';
+
+export default function Login() {
+  const school = useDoc('school', 'main');
+  const users = useCollection('users');
+  const roles = useCollection('roles');
+  const [space, setSpace] = useState<'admin' | 'professeur'>('admin');
+  const [selected, setSelected] = useState<string | null>(null);
+  const [pin, setPin] = useState(['', '', '', '']);
+  const [error, setError] = useState('');
+  const refs = useRef<(HTMLInputElement | null)[]>([]);
+  const roleOf = (id: string) => roles.find((r) => r.id === id);
+  const list = useMemo(() => users.filter((u) => u.actif && roleOf(u.roleId)?.espace === space), [users, roles, space]); // eslint-disable-line
+  const user = users.find((u) => u.id === selected);
+
+  const submit = (code: string) => {
+    if (!selected) return;
+    const err = login(selected, code);
+    if (err) {
+      setError(err);
+      setPin(['', '', '', '']);
+      refs.current[0]?.focus();
+    }
+  };
+  const setDigit = (i: number, v: string) => {
+    const d = v.replace(/\D/g, '').slice(-1);
+    const next = [...pin];
+    next[i] = d;
+    setPin(next);
+    setError('');
+    if (d && i < 3) refs.current[i + 1]?.focus();
+    if (next.every(Boolean)) submit(next.join(''));
+  };
+
+  return (
+    <div className="login">
+      <div className="login-hero">
+        <div className="row" style={{ gap: 14 }}>
+          <SchoolLogo size={56} />
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 22 }}>{school?.nom}</div>
+            <div style={{ color: '#c8d6f5', fontSize: 13 }}>{school?.devise}</div>
+          </div>
+        </div>
+        <div>
+          <h2>Gérer l’école,<br />simplement.</h2>
+          <p>Élèves, notes, bulletins, badges, présences et finance — sur téléphone, tablette et ordinateur, même sans connexion Internet.</p>
+        </div>
+        <div style={{ color: '#9fb4e3', fontSize: 13 }}>« {school?.slogan} »</div>
+      </div>
+      <div className="login-panel">
+        <div className="login-box">
+          <div className="row mb-16" style={{ gap: 12 }}>
+            <SchoolLogo size={44} />
+            <div>
+              <h2 style={{ fontSize: 22 }}>{school?.nom}</h2>
+              <div className="small muted">{school?.devise}</div>
+            </div>
+          </div>
+          {!user ? (
+            <>
+              <h3 style={{ fontSize: 18 }} className="mt-16">Connexion</h3>
+              <p className="muted small mt-8 mb-16">Choisissez votre espace puis votre compte.</p>
+              <div className="seg mb-16">
+                <button className={space === 'admin' ? 'active' : ''} onClick={() => setSpace('admin')}><ShieldCheck size={16} style={{ verticalAlign: -3, marginRight: 6 }} />Administration</button>
+                <button className={space === 'professeur' ? 'active' : ''} onClick={() => setSpace('professeur')}><GraduationCap size={16} style={{ verticalAlign: -3, marginRight: 6 }} />Professeur</button>
+              </div>
+              <div className="stack" style={{ gap: 8, maxHeight: '52dvh', overflowY: 'auto', paddingRight: 2 }}>
+                {list.map((u) => (
+                  <button key={u.id} className="account" onClick={() => { setSelected(u.id); setTimeout(() => refs.current[0]?.focus(), 50); }}>
+                    <Avatar src={u.photo} name={u.nom} size={40} />
+                    <span className="grow">
+                      <b style={{ color: 'var(--ink)', display: 'block' }}>{u.nom}</b>
+                      <span className="small muted">{roleOf(u.roleId)?.nom}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <button className="back-link btn-ghost" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => { setSelected(null); setPin(['', '', '', '']); setError(''); }}><ArrowLeft size={16} />Changer de compte</button>
+              <div className="card card-pad center mt-12">
+                <div style={{ display: 'flex', justifyContent: 'center' }}><Avatar src={user.photo} name={user.nom} size={72} /></div>
+                <h3 className="mt-12">{user.nom}</h3>
+                <div className="small muted">{roleOf(user.roleId)?.nom}</div>
+                <p className="small mt-16 mb-12">Entrez votre code à 4 chiffres</p>
+                <div className="pin">
+                  {pin.map((d, i) => (
+                    <input key={i} ref={(el) => (refs.current[i] = el)} value={d} inputMode="numeric" type="password" maxLength={1} aria-label={`Chiffre ${i + 1}`}
+                      onChange={(e) => setDigit(i, e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Backspace' && !pin[i] && i > 0) refs.current[i - 1]?.focus(); }} />
+                  ))}
+                </div>
+                {error && <p className="small mt-12" style={{ color: 'var(--red)' }}>{error}</p>}
+                <p className="tiny muted mt-16">Démonstration : le code de tous les comptes est <b>1234</b>.</p>
+              </div>
+            </>
+          )}
+          <p className="tiny muted center mt-24"><WifiOff size={12} style={{ verticalAlign: -2 }} /> Fonctionne aussi hors ligne · Installable sur téléphone et ordinateur</p>
+        </div>
+      </div>
+    </div>
+  );
+}
