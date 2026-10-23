@@ -308,18 +308,39 @@ export interface SchoolEvent extends Meta {
   description?: string;
 }
 
+export const INCIDENT_TYPES = ['Retard', 'Indiscipline', 'Absence injustifiée', 'Tenue non conforme', 'Bavardage', 'Insolence', 'Bagarre / violence', 'Fraude', 'Dégradation', 'Téléphone', 'Félicitations', 'Autre'] as const;
+export const SANCTIONS = ['Avertissement oral', 'Avertissement écrit', 'Retenue', 'Travail d’intérêt général', 'Convocation des parents', 'Exclusion temporaire', 'Conseil de discipline'] as const;
 export interface Incident extends Meta {
   eleveId: ID;
+  classeId?: ID;
   date: string;
-  type: 'Retard' | 'Indiscipline' | 'Absence injustifiée' | 'Félicitations' | 'Autre';
+  type: (typeof INCIDENT_TYPES)[number];
+  gravite?: 'Légère' | 'Moyenne' | 'Grave';
   description: string;
   sanction?: string;
-  auteurId?: ID;
+  joursExclusion?: number;
+  parentsPrevenus?: boolean;
+  statut?: 'Ouvert' | 'Clôturé';
+  auteurId?: ID; // membre du personnel qui a signalé
+}
+
+/** Une séance du cahier de textes : ce qui a été fait en classe et les devoirs donnés. */
+export interface Lesson extends Meta {
+  coursId: ID;
+  classeId: ID;
+  matiereId: ID;
+  professeurId?: ID;
+  date: string;
+  heure?: string; // "08:00"
+  titre: string; // chapitre / leçon
+  contenu: string; // ce qui a été fait
+  devoirs?: string;
+  pourLe?: string; // date de remise des devoirs
 }
 
 export type ModuleKey =
   | 'dashboard' | 'eleves' | 'inscriptions' | 'classes' | 'parents' | 'personnel'
-  | 'emploi' | 'notes' | 'presences' | 'finance' | 'documents' | 'communication'
+  | 'emploi' | 'notes' | 'presences' | 'discipline' | 'cahier' | 'finance' | 'documents' | 'communication'
   | 'rapports' | 'parametres' | 'utilisateurs';
 
 export type Access = 'none' | 'read' | 'write';
@@ -374,6 +395,7 @@ export interface Collections {
   messages: Message;
   events: SchoolEvent;
   incidents: Incident;
+  lessons: Lesson;
   roles: Role;
   users: User;
   audit: AuditLog;
@@ -383,5 +405,5 @@ export type CollectionName = keyof Collections;
 export const COLLECTIONS: CollectionName[] = [
   'school', 'years', 'periods', 'classes', 'subjects', 'courses', 'guardians', 'students', 'staff',
   'evaluations', 'grades', 'reportEntries', 'attendance', 'staffAttendance', 'timetable', 'payments',
-  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'roles', 'users', 'audit',
+  'expenses', 'salaries', 'projects', 'messages', 'events', 'incidents', 'lessons', 'roles', 'users', 'audit',
 ];

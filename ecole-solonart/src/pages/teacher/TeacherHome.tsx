@@ -45,7 +45,7 @@ export default function TeacherHome() {
       <div className="quote mb-16">« {school?.slogan ?? 'Former aujourd’hui, les leaders de demain.'} »</div>
       <div className="tiles mb-16">
         <button className="tile" onClick={() => nav('/prof/classes')}><span className="ic"><Users /></span><b>Mes classes</b><span>{classIds.length} classes</span></button>
-        <button className="tile" onClick={() => nav('/prof/classes')}><span className="ic"><BookOpen /></span><b>Mes matières</b><span>{subjectIds.length} matière{subjectIds.length > 1 ? 's' : ''}</span></button>
+        <button className="tile" onClick={() => nav('/prof/cahier')}><span className="ic"><BookOpen /></span><b>Cahier de textes</b><span>{subjectIds.length} matière{subjectIds.length > 1 ? 's' : ''}</span></button>
         <button className="tile" onClick={() => nav('/prof/notes')}><span className="ic"><PenSquare /></span><b>Saisir des notes</b><span>Contrôles / Examens</span></button>
         <button className="tile" onClick={() => nav('/prof/palmares')}><span className="ic"><Trophy /></span><b>Palmarès</b><span>Voir les résultats</span></button>
       </div>

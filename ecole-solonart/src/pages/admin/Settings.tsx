@@ -11,7 +11,7 @@ import { SchoolLogo } from '../../components/Logo';
 import { Signature, Seal } from '../../docs/common';
 
 type Tab = 'ecole' | 'annee' | 'scolarite' | 'utilisateurs' | 'roles' | 'donnees';
-const MODULES: [ModuleKey, string][] = [['dashboard', 'Tableau de bord'], ['eleves', 'Élèves'], ['inscriptions', 'Inscriptions'], ['classes', 'Classes'], ['parents', 'Parents'], ['personnel', 'Personnel'], ['emploi', 'Emploi du temps'], ['notes', 'Notes / Examens'], ['presences', 'Présences'], ['finance', 'Finance'], ['documents', 'Documents'], ['communication', 'Communication'], ['rapports', 'Rapports'], ['parametres', 'Paramètres'], ['utilisateurs', 'Utilisateurs & rôles']];
+const MODULES: [ModuleKey, string][] = [['dashboard', 'Tableau de bord'], ['eleves', 'Élèves'], ['inscriptions', 'Inscriptions'], ['classes', 'Classes'], ['parents', 'Parents'], ['personnel', 'Personnel'], ['emploi', 'Emploi du temps'], ['notes', 'Notes / Examens'], ['presences', 'Présences'], ['discipline', 'Discipline'], ['cahier', 'Cahier de textes'], ['finance', 'Finance'], ['documents', 'Documents'], ['communication', 'Communication'], ['rapports', 'Rapports'], ['parametres', 'Paramètres'], ['utilisateurs', 'Utilisateurs & rôles']];
 
 export default function SettingsPage() {
   const [params] = useSearchParams();

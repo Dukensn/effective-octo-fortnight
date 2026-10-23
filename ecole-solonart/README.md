@@ -37,6 +37,22 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Registre de discipline et cahier de textes (version 6)
+- **Discipline** (menu Discipline, ou ＋ → Incident) :
+  - on signale un incident ou des félicitations : élève, date, type, gravité, faits, mesure prise (avertissement, retenue, convocation, exclusion de N jours…) ;
+  - on suit le dossier : parents prévenus, dossier clôturé ;
+  - un bouton prépare le message WhatsApp au parent ;
+  - registre filtrable (classe, type, dossiers ouverts) et imprimable en PDF ;
+  - statistiques par classe et par type, liste des élèves à suivre ;
+  - les incidents comptent déjà dans la conduite des bulletins ;
+  - le professeur signale depuis son espace, pour les élèves de ses classes ;
+  - le censeur a les droits d'écriture ;
+  - « Incidents à traiter » apparaît sur l'accueil.
+- **Cahier de textes** :
+  - le professeur note chaque séance (leçon, travail fait, devoirs et date de remise) ; l'heure est préremplie d'après l'emploi du temps ;
+  - la direction consulte par classe et par matière, voit les devoirs donnés, et suit le remplissage (« en retard » si rien depuis 7 jours) ;
+  - impression PDF par classe.
+
 ## Comité de classe, épuration (version 5)
 - **Comité de classe** (Classes → une classe → Comité) :
   - on nomme un président, un vice-président, un secrétaire, un trésorier, des conseillers et des responsables (discipline, propreté, sport…), ou un rôle libre ;

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle } from 'lucide-react';
+import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle, ShieldAlert } from 'lucide-react';
 import { db, useCollection, useDoc } from '../data/store';
 import type { Student } from '../data/types';
 import { Avatar, Badge, Menu, StatusBadge, Confirm, toast, Modal, Field } from './ui';
@@ -80,6 +80,7 @@ export function StudentPanel({ student }: { student: Student }) {
             <Menu items={[
               { label: 'Voir le bulletin', icon: <FileText />, onClick: () => nav(`/documents/bulletins?classe=${student.classeId}&eleve=${student.id}`) },
               { label: 'Générer le badge', icon: <IdCard />, onClick: () => nav(`/documents/badges?type=eleve&eleve=${student.id}`) },
+              ...(session.can('discipline', 'write') ? [{ label: 'Signaler un incident', icon: <ShieldAlert />, onClick: () => nav(`/discipline?new=1&eleve=${student.id}`) }] : []),
               { label: 'Imprimer la fiche', icon: <Printer />, onClick: printSheet },
               ...(canEdit ? ['sep' as const, { label: 'Changer de classe', icon: <ArrowRightLeft />, onClick: () => setTransfer(true) }, { label: 'Archiver l’élève', icon: <Archive />, onClick: () => setArchive(true), danger: true }] : []),
             ]} />

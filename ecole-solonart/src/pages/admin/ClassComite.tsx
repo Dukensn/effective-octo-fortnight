@@ -116,7 +116,7 @@ function NommerModal({ classe, value, onClose, onSave }: { classe: ClassRoom; va
         </Field>
         {role === 'Autre' && <Field label="Nom du rôle"><input className="input" value={autre} onChange={(e) => setAutre(e.target.value)} placeholder="Ex. Responsable bibliothèque" /></Field>}
         {holderStudent && <div className="small" style={{ background: 'var(--orange-50)', color: '#8a5300', padding: '8px 12px', borderRadius: 10 }}>{fullName(holderStudent)} est actuellement {roleLabel(finalRole, holderStudent.sexe).toLowerCase()} : il ou elle sera remplacé(e).</div>}
-        {!editing && <Field label="Élève"><StudentPicker classeId={classe.id} value={eleveId} onChange={setEleveId} /></Field>}
+        {!editing && <div className="field"><span>Élève</span><StudentPicker classeId={classe.id} value={eleveId} onChange={setEleveId} /></div>}
       </div>
     </Modal>
   );

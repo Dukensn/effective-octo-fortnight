@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, GraduationCap, ClipboardCheck, Wallet, UserPlus, FileText, Receipt, CalendarDays, ChevronRight, Camera, FileWarning, PenSquare, Smartphone, BadgeDollarSign, IdCard } from 'lucide-react';
+import { Users, GraduationCap, ClipboardCheck, Wallet, UserPlus, FileText, Receipt, CalendarDays, ChevronRight, Camera, FileWarning, PenSquare, Smartphone, BadgeDollarSign, IdCard, ShieldAlert } from 'lucide-react';
 import { useCollection, useDoc } from '../../data/store';
 import { StatCard, Card, Avatar, StatusBadge } from '../../components/ui';
 import { BarChart } from '../../components/charts';
@@ -24,6 +24,7 @@ export default function Dashboard() {
   const events = useCollection('events');
   const evaluations = useCollection('evaluations');
   const salaries = useCollection('salaries');
+  const incidents = useCollection('incidents');
   useCollection('grades');
   const actifs = students.filter((s) => s.statut === 'Actif');
   const profs = staff.filter((s) => s.type === 'Professeur' && s.statut === 'Actif');
@@ -54,6 +55,7 @@ export default function Dashboard() {
     const notes = evs.filter((e) => gradesForEvaluation(e.id).size < classStudents(e.classeId).length).length;
     const moncash = payments.filter((p) => p.statut === 'En attente').length;
     const photos = actifs.filter((s) => !s.photo).length;
+    const incOuverts = incidents.filter((i) => i.statut === 'Ouvert').length;
     const docs = actifs.filter((s) => s.documents.some((d) => !d.fourni && d.type !== 'Certificat médical' && d.type !== 'Photo des parents')).length;
     const lastMonth = [...new Set(salaries.map((s) => s.periode))].sort().pop();
     const sal = salaries.filter((s) => s.periode === lastMonth && s.statut === 'En attente').length;
@@ -64,10 +66,11 @@ export default function Dashboard() {
       { n: finance.late, label: 'Élèves en retard de paiement', sub: 'Envoyer un rappel WhatsApp', to: '/finance?tab=paiements', icon: BadgeDollarSign, tint: 'red', m: 'finance' },
       { n: sal, label: 'Salaires du mois à payer', sub: 'Personnel en attente', to: '/finance?tab=salaires', icon: Wallet, tint: 'green', m: 'finance' },
       { n: photos, label: 'Élèves sans photo', sub: 'Séance photo avec le téléphone', to: '/eleves/photos', icon: Camera, tint: 'blue', m: 'eleves' },
+      { n: incOuverts, label: 'Incidents à traiter', sub: 'Registre de discipline', to: '/discipline', icon: ShieldAlert, tint: 'red', m: 'discipline' },
       { n: docs, label: 'Dossiers incomplets', sub: 'Acte de naissance ou bulletin manquant', to: '/eleves', icon: FileWarning, tint: 'orange', m: 'eleves' },
     ];
     return items.filter((i) => i.n > 0 && session.can(i.m));
-  }, [attendance, evaluations, payments, actifs, salaries, current, finance.late, sortedClasses, session]); // eslint-disable-line
+  }, [attendance, evaluations, payments, actifs, salaries, incidents, current, finance.late, sortedClasses, session]); // eslint-disable-line
 
   // Le préscolaire est évalué par compétences : il n'entre pas dans les moyennes.
   const gradedClasses = sortedClasses.filter((c) => c.niveau !== 'Préscolaire');

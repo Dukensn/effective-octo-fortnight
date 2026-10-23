@@ -1,7 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
-  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard,
+  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen,
 } from 'lucide-react';
 import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
@@ -42,6 +42,10 @@ import Palmares from './pages/teacher/Palmares';
 import GradeEntry from './pages/teacher/GradeEntry';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
 import TeacherTimetable from './pages/teacher/TeacherTimetable';
+import TeacherCahier from './pages/teacher/TeacherCahier';
+import TeacherDiscipline from './pages/teacher/TeacherDiscipline';
+import Discipline from './pages/admin/Discipline';
+import Cahier from './pages/admin/Cahier';
 
 const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/', label: 'Tableau de bord', icon: Home, end: true, m: 'dashboard' },
@@ -53,6 +57,8 @@ const ADMIN_NAV: (NavItem & { m: ModuleKey })[] = [
   { to: '/emploi-du-temps', label: 'Emploi du temps', icon: CalendarDays, m: 'emploi' },
   { to: '/notes', label: 'Notes / Examens', icon: FileText, m: 'notes' },
   { to: '/presences', label: 'Présences', icon: ClipboardCheck, m: 'presences' },
+  { to: '/discipline', label: 'Discipline', icon: ShieldAlert, m: 'discipline' },
+  { to: '/cahier', label: 'Cahier de textes', icon: NotebookPen, m: 'cahier' },
   { to: '/finance', label: 'Finance', icon: BadgeDollarSign, m: 'finance' },
   { to: '/documents', label: 'Documents', icon: FolderOpen, m: 'documents' },
   { to: '/communication', label: 'Communication', icon: Mail, m: 'communication' },
@@ -67,6 +73,8 @@ const TEACHER_NAV: NavItem[] = [
   { to: '/prof/palmares', label: 'Palmarès', icon: Trophy },
   { to: '/prof/appel', label: 'Faire l’appel', icon: ClipboardCheck },
   { to: '/prof/emploi', label: 'Emploi du temps', icon: CalendarClock },
+  { to: '/prof/cahier', label: 'Cahier de textes', icon: NotebookPen },
+  { to: '/prof/discipline', label: 'Discipline', icon: ShieldAlert },
   { to: '/evenements', label: 'Événements', icon: CalendarHeart },
 ];
 
@@ -93,6 +101,7 @@ function AdminApp() {
     { label: 'Encaisser', sub: 'Paiement + reçu', icon: Receipt, to: '/finance?new=1', tint: 'green', m: 'finance', w: true },
     { label: 'Dépense', sub: 'Enregistrer une sortie', icon: TrendingDown, to: '/finance?tab=depenses&depense=1', tint: 'red', m: 'finance', w: true },
     { label: 'Faire l’appel', sub: 'Présences du jour', icon: ClipboardCheck, to: '/presences', tint: 'violet', m: 'presences', w: true },
+    { label: 'Incident', sub: 'Registre de discipline', icon: ShieldAlert, to: '/discipline?new=1', tint: 'red', m: 'discipline', w: true },
     { label: 'Notes', sub: 'Saisie et conseil', icon: FileText, to: '/notes', tint: 'orange', m: 'notes', w: false },
     { label: 'Bulletins', sub: 'Classe ou élève', icon: BookOpenCheck, to: '/documents/bulletins', tint: 'navy', m: 'documents', w: false },
     { label: 'Badges', sub: 'Portrait ou paysage', icon: IdCard, to: '/documents/badges', tint: 'blue', m: 'documents', w: false },
@@ -122,6 +131,8 @@ function AdminApp() {
         <Route path="/notes/saisie/:id" element={G('notes', <GradeEntry admin />)} />
         <Route path="/notes/palmares/:id" element={G('notes', <Palmares admin />)} />
         <Route path="/presences" element={G('presences', <AttendancePage />)} />
+        <Route path="/discipline" element={G('discipline', <Discipline />)} />
+        <Route path="/cahier" element={G('cahier', <Cahier />)} />
         <Route path="/finance" element={G('finance', <Finance />)} />
         <Route path="/documents" element={G('documents', <Documents />)} />
         <Route path="/documents/bulletins" element={G('documents', <ReportCards />)} />
@@ -157,6 +168,8 @@ function TeacherApp() {
         <Route path="/prof/evaluation/:id/saisie" element={<GradeEntry />} />
         <Route path="/prof/appel" element={<TeacherAttendance />} />
         <Route path="/prof/emploi" element={<TeacherTimetable />} />
+        <Route path="/prof/cahier" element={<TeacherCahier />} />
+        <Route path="/prof/discipline" element={<TeacherDiscipline />} />
         <Route path="/evenements" element={<Events />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/aide" element={<Help />} />

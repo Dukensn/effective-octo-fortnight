@@ -319,3 +319,38 @@ export function MonthlyReportSheet({ ym }: { ym: string }) {
     </A4>,
   );
 }
+
+/** Registre de discipline (A4 portrait), filtré par classe et période. */
+export function DisciplineSheet({ incidents, title, sub }: { incidents: import('../data/types').Incident[]; title: string; sub: string }) {
+  const per = 22;
+  const list = [...incidents].sort((a, b) => a.date.localeCompare(b.date));
+  const pages = Math.max(1, Math.ceil(list.length / per));
+  return <>{Array.from({ length: pages }, (_, pi) => page(
+    <A4 title={title} sub={`${sub} · page ${pi + 1}/${pages}`}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead><tr><th style={th}>Date</th><th style={th}>Élève</th><th style={th}>Classe</th><th style={th}>Type</th><th style={th}>Faits</th><th style={th}>Mesure</th><th style={th}>Parents</th></tr></thead>
+        <tbody>{list.slice(pi * per, pi * per + per).map((i) => {
+          const s = db.get('students', i.eleveId);
+          return <tr key={i.id}><td style={{ ...td, whiteSpace: 'nowrap' }}>{dateShort(i.date)}</td><td style={td}>{fullName(s)}</td><td style={td}>{db.get('classes', i.classeId ?? s?.classeId)?.code}</td><td style={td}>{i.type}{i.gravite ? ` (${i.gravite.toLowerCase()})` : ''}</td><td style={td}>{i.description}</td><td style={td}>{i.sanction ?? '-'}{i.joursExclusion ? ` · ${i.joursExclusion} j` : ''}</td><td style={td}>{i.type === 'Félicitations' ? '-' : i.parentsPrevenus ? 'Oui' : 'Non'}</td></tr>;
+        })}</tbody>
+      </table>
+      {pi === pages - 1 && <Signatures left="Le Censeur" right="La Direction" />}
+    </A4>, pi,
+  ))}</>;
+}
+
+/** Cahier de textes d'une classe (A4 portrait). */
+export function CahierSheet({ classeId, lessons }: { classeId: string; lessons: import('../data/types').Lesson[] }) {
+  const c = db.get('classes', classeId);
+  const per = 18;
+  const list = [...lessons].sort((a, b) => a.date.localeCompare(b.date) || (a.heure ?? '').localeCompare(b.heure ?? ''));
+  const pages = Math.max(1, Math.ceil(list.length / per));
+  return <>{Array.from({ length: pages }, (_, pi) => page(
+    <A4 title={`Cahier de textes — ${c?.nom}`} sub={`${list.length} séance${list.length > 1 ? 's' : ''}${list.length ? ` · du ${dateShort(list[0].date)} au ${dateShort(list[list.length - 1].date)}` : ''} · page ${pi + 1}/${pages}`}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead><tr><th style={th}>Date</th><th style={th}>Matière</th><th style={th}>Leçon et travail fait</th><th style={th}>Devoirs</th><th style={th}>Prof.</th></tr></thead>
+        <tbody>{list.slice(pi * per, pi * per + per).map((l) => <tr key={l.id}><td style={{ ...td, whiteSpace: 'nowrap' }}>{dateShort(l.date)}</td><td style={td}>{db.get('subjects', l.matiereId)?.court}</td><td style={td}><b>{l.titre}</b>{l.contenu ? ` — ${l.contenu}` : ''}</td><td style={td}>{l.devoirs ? `${l.devoirs}${l.pourLe ? ` (pour le ${dateShort(l.pourLe)})` : ''}` : '-'}</td><td style={td}>{db.get('staff', l.professeurId)?.nom}</td></tr>)}</tbody>
+      </table>
+    </A4>, pi,
+  ))}</>;
+}

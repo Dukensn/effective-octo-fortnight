@@ -2,7 +2,7 @@
 import { db } from './store';
 import type {
   ClassRoom, Course, Evaluation, Grade, Guardian, Period, Role, Staff, Student, Subject, TimetableSlot,
-  Payment, Expense, Salary, Attendance, ModuleKey, Access, User, Sexe,
+  Payment, Expense, Salary, Attendance, ModuleKey, Access, User, Sexe, Incident, Lesson,
 } from './types';
 
 let seedState = 20240905;
@@ -23,7 +23,7 @@ const PROFESSIONS = ['Commerçant(e)', 'Enseignant(e)', 'Agriculteur(trice)', 'I
 const phone = () => `+509 ${pick(['31', '32', '33', '34', '36', '37', '38', '39', '41', '42', '43', '44', '46', '48'])} ${pad(Math.floor(rnd() * 100), 2)} ${pad(Math.floor(rnd() * 100), 2)} ${pad(Math.floor(rnd() * 100), 2)}`;
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]+/g, '.').replace(/^\.|\.$/g, '');
 
-export const ALL_MODULES: ModuleKey[] = ['dashboard', 'eleves', 'inscriptions', 'classes', 'parents', 'personnel', 'emploi', 'notes', 'presences', 'finance', 'documents', 'communication', 'rapports', 'parametres', 'utilisateurs'];
+export const ALL_MODULES: ModuleKey[] = ['dashboard', 'eleves', 'inscriptions', 'classes', 'parents', 'personnel', 'emploi', 'notes', 'presences', 'discipline', 'cahier', 'finance', 'documents', 'communication', 'rapports', 'parametres', 'utilisateurs'];
 const perms = (a: Access, over: Partial<Record<ModuleKey, Access>> = {}) => ({ ...Object.fromEntries(ALL_MODULES.map((m) => [m, a])), ...over });
 
 export function seedDatabase() {
@@ -454,18 +454,97 @@ export function seedDatabase() {
     { id: 'msg2', date: Date.parse('2025-05-28T15:30:00'), canal: 'WhatsApp', objet: 'Rappel 3e versement', contenu: 'Rappel : le 3e versement de la scolarité est attendu avant le 30 mai. Paiement possible par MonCash.', cible: 'Tous les parents', destinataires: 284 },
     { id: 'msg3', date: Date.parse('2025-05-20T08:00:00'), canal: 'Annonce', objet: 'Calendrier du 5e contrôle', contenu: 'Le calendrier du 5e contrôle est disponible au secrétariat.', cible: 'Classe', classeId: 'c-s4-a', destinataires: 32 },
   ]);
-  db.bulkPut('incidents', [
-    { id: 'inc1', eleveId: students.find((x) => x.prenom === 'Ricardo')!.id, date: '2025-04-11', type: 'Retard', description: 'Trois retards consécutifs.', sanction: 'Avertissement verbal' },
-    { id: 'inc2', eleveId: 'e-jean-philippe', date: '2025-03-20', type: 'Félicitations', description: 'Premier prix au concours de lecture.' },
-  ]);
+  // ---------- Registre de discipline ----------
+  const SURV = [staff.find((x) => x.poste === 'Censeur (Préfet de discipline)')!, ...Object.values(P).slice(0, 6)];
+  const INC: [Incident['type'], Incident['gravite'], string, string?][] = [
+    ['Retard', 'Légère', 'Arrivé après la prière du matin.', 'Avertissement oral'],
+    ['Retard', 'Légère', 'Troisième retard de la semaine.', 'Retenue'],
+    ['Bavardage', 'Légère', 'Bavardages répétés pendant le cours.', 'Avertissement oral'],
+    ['Tenue non conforme', 'Légère', 'Uniforme incomplet (pas de cravate).', 'Avertissement oral'],
+    ['Téléphone', 'Moyenne', 'Téléphone utilisé en classe, confisqué jusqu’à la fin de la journée.', 'Avertissement écrit'],
+    ['Insolence', 'Moyenne', 'A répondu de manière irrespectueuse au professeur.', 'Convocation des parents'],
+    ['Indiscipline', 'Moyenne', 'Refus de travailler et perturbation du cours.', 'Retenue'],
+    ['Absence injustifiée', 'Moyenne', 'Absent sans justificatif toute la journée.', 'Convocation des parents'],
+    ['Fraude', 'Grave', 'Copie pendant le contrôle de mathématiques.', 'Avertissement écrit'],
+    ['Bagarre / violence', 'Grave', 'Bagarre dans la cour pendant la récréation.', 'Exclusion temporaire'],
+    ['Dégradation', 'Moyenne', 'Table de classe abîmée volontairement.', 'Travail d’intérêt général'],
+    ['Félicitations', undefined, 'Aide spontanée à un camarade en difficulté.'],
+    ['Félicitations', undefined, 'Excellente tenue lors de la sortie scolaire.'],
+  ];
+  const incidents: Incident[] = [
+    { id: 'inc1', eleveId: students.find((x) => x.prenom === 'Ricardo')!.id, date: '2025-04-11', type: 'Retard', gravite: 'Légère', description: 'Trois retards consécutifs.', sanction: 'Avertissement oral', statut: 'Clôturé', parentsPrevenus: true, updatedAt: 0 },
+    { id: 'inc2', eleveId: 'e-jean-philippe', date: '2025-03-20', type: 'Félicitations', description: 'Premier prix au concours de lecture.', statut: 'Clôturé', updatedAt: 0 },
+  ];
+  const actifsSec = students.filter((x) => x.statut === 'Actif' && classes.find((c) => c.id === x.classeId)?.niveau !== 'Préscolaire');
+  for (let i = 0; i < 46; i++) {
+    const st = pick(actifsSec);
+    const [type, gravite, description, sanction] = pick(INC);
+    const month = pick([10, 11, 12, 1, 2, 3, 4, 5]);
+    const date = iso(month >= 9 ? 2024 : 2025, month, 1 + Math.floor(rnd() * 27));
+    const ouvert = date >= '2025-05-15' && type !== 'Félicitations' && rnd() < 0.7;
+    incidents.push({
+      id: `inc${i + 3}`, eleveId: st.id, classeId: st.classeId, date, type, gravite, description, sanction,
+      joursExclusion: sanction === 'Exclusion temporaire' ? pick([1, 2, 3]) : undefined,
+      parentsPrevenus: gravite !== 'Légère' && type !== 'Félicitations' ? rnd() < 0.8 : false,
+      statut: ouvert ? 'Ouvert' : 'Clôturé', auteurId: pick(SURV).id, updatedAt: 0,
+    });
+  }
+  incidents.forEach((x) => (x.classeId ??= students.find((s) => s.id === x.eleveId)?.classeId));
+  db.bulkPut('incidents', incidents);
+
+  // ---------- Cahier de textes (trois dernières semaines de cours) ----------
+  const CHAPITRES: Record<string, string[]> = {
+    fr: ['La dissertation : l’introduction', 'Étude d’un poème de Jacques Roumain', 'Le discours rapporté', 'Analyse de « Gouverneurs de la rosée »', 'Le résumé de texte'],
+    cr: ['Pwovèb ak ekspresyon', 'Ekri yon lèt fòmèl', 'Konjigezon vèb yo', 'Lekti : yon kont tradisyonèl'],
+    an: ['Present perfect vs simple past', 'Reading: Haiti’s history', 'Writing a formal email', 'Conditionals (type 2)'],
+    ma: ['Fonctions du second degré', 'Équations et inéquations', 'Suites arithmétiques', 'Trigonométrie : cercle trigonométrique', 'Statistiques : moyenne et écart-type'],
+    svt: ['La cellule et ses organites', 'La photosynthèse', 'Le système immunitaire', 'Les écosystèmes d’Haïti'],
+    pc: ['Les forces et le mouvement', 'Les réactions chimiques', 'L’électricité : loi d’Ohm', 'Les solutions acides et basiques'],
+    hg: ['La révolution haïtienne (1791-1804)', 'L’occupation américaine (1915-1934)', 'Le relief d’Haïti', 'Les départements et leurs ressources'],
+    ec: ['Les droits de l’enfant', 'La Constitution haïtienne', 'Le civisme au quotidien'],
+    inf: ['Tableur : formules de base', 'Traitement de texte : mise en page', 'Internet et sécurité'],
+    art: ['Peinture naïve haïtienne', 'Chant choral', 'Dessin d’observation'],
+    eps: ['Football : passes et contrôles', 'Athlétisme : course de vitesse', 'Volley-ball : service'],
+    opt: ['Projet : jardin scolaire', 'Projet : journal de la classe'],
+    'ps-lang': ['Les sons [a] et [o]', 'Comptine « Lapli tonbe »', 'Reconnaître son prénom'],
+    'ps-math': ['Compter jusqu’à 10', 'Les formes : rond, carré, triangle', 'Grand, moyen, petit'],
+    'ps-monde': ['Les parties du corps', 'Les fruits d’Haïti', 'Le jour et la nuit'],
+    'ps-mot': ['Découper en suivant une ligne', 'Parcours d’équilibre'],
+    'ps-art': ['Peinture avec les doigts', 'Chant : « Ayiti cheri »'],
+    'ps-vivre': ['Attendre son tour', 'Ranger la classe ensemble'],
+  };
+  const lessons: Lesson[] = [];
+  const weekDays: string[] = [];
+  for (let d = new Date('2025-05-19T12:00:00'); d <= new Date('2025-06-06T12:00:00'); d.setDate(d.getDate() + 1)) if (d.getDay() >= 1 && d.getDay() <= 5) weekDays.push(d.toISOString().slice(0, 10));
+  for (const sl of slots) {
+    if (!sl.matiereId) continue;
+    const co = courses.find((c) => c.classeId === sl.classeId && c.matiereId === sl.matiereId);
+    if (!co) continue;
+    const days = weekDays.filter((d) => new Date(d + 'T12:00:00').getDay() === sl.jour);
+    days.forEach((date, wi) => {
+      if (co.professeurId === robert.id && date >= '2025-06-02' && rnd() < 0.6) return; // quelques séances non remplies
+      if (rnd() < 0.12) return;
+      const ch = CHAPITRES[sl.matiereId!] ?? ['Révision'];
+      const titre = ch[(wi + sl.jour) % ch.length];
+      const devoir = rnd() < 0.45;
+      lessons.push({
+        id: `les-${sl.id}-${date}`, coursId: co.id, classeId: co.classeId, matiereId: co.matiereId, professeurId: co.professeurId, date, heure: sl.debut, titre,
+        contenu: pick(['Cours magistral et prise de notes.', 'Exercices d’application en groupe.', 'Correction des exercices et synthèse.', 'Lecture et explication, questions orales.', 'Travaux pratiques.']),
+        devoirs: devoir ? pick(['Exercices 3 à 6 page 42.', 'Apprendre la leçon pour une interrogation.', 'Rédiger un paragraphe de 15 lignes.', 'Préparer l’exposé en groupe.', 'Réviser pour le 5e contrôle.']) : undefined,
+        pourLe: devoir ? weekDays[Math.min(weekDays.length - 1, weekDays.indexOf(date) + 2)] : undefined,
+        updatedAt: 0,
+      });
+    });
+  }
+  db.bulkPut('lessons', lessons);
 
   // ---------- Rôles & utilisateurs ----------
   const roles: Role[] = [
     { id: 'r-dir', nom: 'Directeur', description: 'Accès complet à toute l’application.', systeme: true, espace: 'admin', permissions: perms('write'), updatedAt: 0 },
     { id: 'r-adj', nom: 'Directeur adjoint', description: 'Gestion pédagogique et administrative, sans paramètres ni utilisateurs.', espace: 'admin', permissions: perms('write', { parametres: 'read', utilisateurs: 'none', finance: 'read' }), updatedAt: 0 },
-    { id: 'r-sec', nom: 'Secrétaire', description: 'Inscriptions, élèves, parents, documents.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'write', inscriptions: 'write', parents: 'write', classes: 'read', documents: 'write', communication: 'write', presences: 'read', emploi: 'read', personnel: 'read' }), updatedAt: 0 },
+    { id: 'r-sec', nom: 'Secrétaire', description: 'Inscriptions, élèves, parents, documents.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'write', inscriptions: 'write', parents: 'write', classes: 'read', documents: 'write', communication: 'write', presences: 'read', emploi: 'read', personnel: 'read', discipline: 'read', cahier: 'read' }), updatedAt: 0 },
     { id: 'r-cpt', nom: 'Comptable', description: 'Finance, paiements, salaires et rapports financiers.', espace: 'admin', permissions: perms('none', { dashboard: 'read', finance: 'write', eleves: 'read', parents: 'read', personnel: 'read', rapports: 'read' }), updatedAt: 0 },
-    { id: 'r-cen', nom: 'Censeur', description: 'Présences, discipline et consultation des notes.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'read', presences: 'write', notes: 'read', classes: 'read', emploi: 'read', parents: 'read', communication: 'write' }), updatedAt: 0 },
+    { id: 'r-cen', nom: 'Censeur', description: 'Présences, discipline et consultation des notes.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'read', presences: 'write', discipline: 'write', cahier: 'read', notes: 'read', classes: 'read', emploi: 'read', parents: 'read', communication: 'write' }), updatedAt: 0 },
     { id: 'r-prof', nom: 'Professeur', description: 'Espace professeur : ses classes, saisie des notes, appel, palmarès.', systeme: true, espace: 'professeur', permissions: perms('none'), updatedAt: 0 },
   ];
   db.bulkPut('roles', roles);
