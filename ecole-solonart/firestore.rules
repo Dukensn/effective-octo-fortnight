@@ -1,0 +1,24 @@
+rules_version = '2';
+// Règles Firestore pour École Mixte Solonart.
+// Chaque utilisateur Firebase Auth doit avoir un document ecoles/{ecole}/users/{uid}
+// contenant roleId ; le rôle (ecoles/{ecole}/roles/{roleId}) définit ses permissions.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function userDoc(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/users/$(request.auth.uid)).data; }
+    function role(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/roles/$(userDoc(ecole).roleId)).data; }
+    function signedIn() { return request.auth != null; }
+    function isDirection(ecole) { return signedIn() && userDoc(ecole).roleId == 'r-dir'; }
+    function canWrite(ecole, module) { return signedIn() && (isDirection(ecole) || role(ecole).permissions[module] == 'write'); }
+    function isTeacher(ecole) { return signedIn() && role(ecole).espace == 'professeur'; }
+
+    match /ecoles/{ecole}/{collection}/{id} {
+      allow read: if signedIn() && userDoc(ecole).actif == true;
+      // Notes : le professeur écrit les notes de ses évaluations, la direction tout.
+      allow write: if collection in ['grades', 'evaluations', 'attendance', 'audit'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
+      allow write: if collection in ['students', 'guardians'] && (canWrite(ecole, 'eleves') || canWrite(ecole, 'inscriptions') || canWrite(ecole, 'parents'));
+      allow write: if collection in ['payments', 'expenses', 'salaries', 'projects'] && canWrite(ecole, 'finance');
+      allow write: if collection in ['users', 'roles'] && canWrite(ecole, 'utilisateurs');
+      allow write: if isDirection(ecole);
+    }
+  }
+}

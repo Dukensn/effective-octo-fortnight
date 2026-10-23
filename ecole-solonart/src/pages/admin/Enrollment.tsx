@@ -132,7 +132,6 @@ function Enrollment() {
       if (g.id) { db.patch('guardians', g.id, data); tuteurIds.push(g.id); }
       else tuteurIds.push(db.put('guardians', data).id);
     });
-    const missingReq = DOCS.some((d) => d.req && !f.docs[d.type]);
     const levelPrefix = classe ? ({ 'Secondaire IV': 'SIV', 'Secondaire III': 'SIII', 'Secondaire II': 'SII', 'Secondaire I': 'SI' } as Record<string, string>)[classe.annee] ?? classe.code.replace(/[^A-Z0-9]/gi, '') : 'E';
     const base: Omit<Student, 'id' | 'updatedAt'> = {
       matricule: existing?.matricule ?? `${levelPrefix}${(year?.debut ?? todayISO()).slice(0, 4)}${String(db.list('students').length + 1).padStart(4, '0')}`,
@@ -142,7 +141,7 @@ function Enrollment() {
       adresse: f.adresse, commune: f.commune, telephone: f.telephone || undefined, classeId: f.classeId, anneeId: school!.anneeCourante,
       regime: f.regime, typeInscription: f.typeInscription, redoublant: f.redoublant, boursier: f.boursier, tauxBourse: f.boursier ? f.tauxBourse : undefined,
       ecoleProvenance: f.ecoleProvenance || undefined, dateInscription: existing?.dateInscription ?? todayISO(), dateEntree: f.dateEntree,
-      statut: existing ? (existing.statut === 'En attente' && !asDraft && !missingReq ? 'Actif' : existing.statut) : asDraft || missingReq ? 'En attente' : 'Actif',
+      statut: existing ? (existing.statut === 'En attente' && !asDraft ? 'Actif' : existing.statut) : asDraft ? 'En attente' : 'Actif',
       tuteurIds, contactUrgence: f.urgenceNom ? { nom: f.urgenceNom, telephone: f.urgenceTel, lien: '' } : undefined,
       medical: { groupeSanguin: f.groupeSanguin || undefined, allergies: f.allergies || undefined, problemes: f.problemes || undefined, assurance: f.assurance || undefined },
       documents: DOCS.map((d) => ({ type: d.type, nom: '', fourni: f.docs[d.type] })), langue: 'Français',
@@ -277,7 +276,7 @@ function Enrollment() {
                         </div>
                       ))}
                     </div>
-                    <p className="tiny muted mt-12">Les documents manquants n’empêchent pas l’inscription : le dossier reste « En attente » jusqu’à leur remise.</p>
+                    <p className="tiny muted mt-12">Les documents manquants n’empêchent pas l’inscription : ils restent signalés sur la fiche de l’élève jusqu’à leur remise.</p>
                   </Section>
                 )}
               </div>
@@ -392,7 +391,7 @@ function Success({ student, onNew }: { student: Student; onNew: () => void }) {
     <div style={{ maxWidth: 520, margin: '40px auto' }} className="card card-pad center">
       <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--green)', display: 'grid', placeItems: 'center', margin: '0 auto' }}><Check color="#fff" size={40} strokeWidth={3} /></div>
       <h2 className="mt-16">Inscription enregistrée !</h2>
-      <p className="muted mt-8">{fullName(student)} est inscrit{student.sexe === 'F' ? 'e' : ''} en {classe?.nom}.<br />Matricule : <b style={{ color: 'var(--ink)' }}>{student.matricule}</b>{student.statut === 'En attente' && <><br /><Badge tone="orange">Dossier en attente de documents</Badge></>}</p>
+      <p className="muted mt-8">{fullName(student)} est inscrit{student.sexe === 'F' ? 'e' : ''} en {classe?.nom}.<br />Matricule : <b style={{ color: 'var(--ink)' }}>{student.matricule}</b>{student.documents.some((d) => !d.fourni) && <><br /><Badge tone="orange">{student.documents.filter((d) => !d.fourni).length} document(s) à fournir</Badge></>}</p>
       <div className="row mt-16" style={{ justifyContent: 'center' }}><Avatar src={student.photo} name={fullName(student)} size={64} /></div>
       <div className="stack mt-24" style={{ gap: 10 }}>
         <button className="btn btn-primary btn-lg" onClick={() => nav(`/eleves/${student.id}`)}>Voir la fiche de l’élève</button>

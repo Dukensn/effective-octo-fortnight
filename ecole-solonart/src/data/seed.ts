@@ -70,57 +70,57 @@ export function seedDatabase() {
     const n = staff.length + 1;
     const st: Staff = {
       id: `st${pad(n, 2)}`, matricule: `EMP${pad(n, 3)}`, telephone: phone(), email: `${slug(s.prenom)}.${slug(s.nom)}@solonart.edu`,
-      adresse: `${pick(RUES)}, Léogâne, Haïti`, dateEmbauche: iso(2015 + Math.floor(rnd() * 9), 9, 1), salaire: 40000, modePaiement: pick(['MonCash', 'Virement', 'Espèces']),
+      adresse: `${pick(RUES)}, Léogâne, Haïti`, dateEmbauche: iso(2015 + Math.floor(rnd() * 9), 9, 1), salaire: 24000, modePaiement: pick(['MonCash', 'Virement', 'Espèces']),
       statut: 'Actif', updatedAt: 0, dateNaissance: iso(1972 + Math.floor(rnd() * 25), 1 + Math.floor(rnd() * 12), 1 + Math.floor(rnd() * 27)), ...s,
     } as Staff;
     staff.push(st);
     return st;
   };
-  const dir = addStaff({ nom: 'Cherismé', prenom: 'Léomide S.', sexe: 'M', type: 'Direction', poste: 'Directeur', diplome: "Maîtrise en Sciences de l'éducation", salaire: 120000, photo: 'avatars/dir.jpg', telephone: '+509 36 00 12 45', email: 'direction@solonart.edu', dateNaissance: '1975-06-14' });
-  const adj = addStaff({ nom: 'Pierre', prenom: 'Nadia', sexe: 'F', type: 'Direction', poste: 'Directrice adjointe', diplome: 'Licence en Administration scolaire', salaire: 90000, telephone: '+509 38 22 44 66', adresse: 'Rue du Portail, Léogâne, Haïti', dateNaissance: '1978-09-09' });
-  const robert = addStaff({ nom: 'Robert', prenom: 'Jean', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Mathématiques', diplome: 'Licence en Mathématiques', salaire: 65000, photo: 'avatars/t01.jpg', telephone: '+509 36 12 34 56' });
+  const dir = addStaff({ nom: 'Cherismé', prenom: 'Léomide S.', sexe: 'M', type: 'Direction', poste: 'Directeur', diplome: "Maîtrise en Sciences de l'éducation", salaire: 72000, photo: 'avatars/dir.jpg', telephone: '+509 36 00 12 45', email: 'direction@solonart.edu', dateNaissance: '1975-06-14' });
+  const adj = addStaff({ nom: 'Pierre', prenom: 'Nadia', sexe: 'F', type: 'Direction', poste: 'Directrice adjointe', diplome: 'Licence en Administration scolaire', salaire: 54000, telephone: '+509 38 22 44 66', adresse: 'Rue du Portail, Léogâne, Haïti', dateNaissance: '1978-09-09' });
+  const robert = addStaff({ nom: 'Robert', prenom: 'Jean', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Mathématiques', diplome: 'Licence en Mathématiques', salaire: 39000, photo: 'avatars/t01.jpg', telephone: '+509 36 12 34 56' });
   const P: Record<string, Staff> = {
-    fr: addStaff({ nom: 'Michel', prenom: 'Josée', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Français', diplome: 'Licence en Lettres', salaire: 60000 }),
-    cr: addStaff({ nom: 'Calixte', prenom: 'Jean', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Créole', diplome: 'Licence en Linguistique', salaire: 55000 }),
-    an: addStaff({ nom: 'Pierre', prenom: 'Claudia', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Anglais', diplome: 'Licence en Langues', salaire: 58000 }),
-    ma: addStaff({ nom: 'Augustin', prenom: 'Wilner', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Mathématiques', diplome: 'Licence en Mathématiques', salaire: 62000 }),
-    svt: addStaff({ nom: 'Louis', prenom: 'Sandrine', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'SVT', diplome: 'Licence en Biologie', salaire: 58000 }),
-    pc: addStaff({ nom: 'Charles', prenom: 'Peterson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Physique-Chimie', diplome: 'Licence en Physique', salaire: 60000 }),
-    hg: addStaff({ nom: 'Pierre', prenom: 'Ronald', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Histoire-Géographie', diplome: 'Licence en Histoire', salaire: 56000 }),
-    ec: addStaff({ nom: 'François', prenom: 'Nadine', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Éducation civique', diplome: 'Licence en Sciences sociales', salaire: 58000 }),
-    inf: addStaff({ nom: 'Dorvil', prenom: 'Stevenson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Informatique', diplome: 'Licence en Informatique', salaire: 60000 }),
-    art: addStaff({ nom: 'Mondésir', prenom: 'Carline', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Éducation artistique', diplome: 'Diplôme ENARTS', salaire: 50000 }),
-    eps: addStaff({ nom: 'Étienne', prenom: 'Kervens', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'EPS', diplome: 'Licence en STAPS', salaire: 50000 }),
-    opt: addStaff({ nom: 'Vital', prenom: 'Jameson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Projet / Options', diplome: 'Licence en Gestion', salaire: 52000 }),
+    fr: addStaff({ nom: 'Michel', prenom: 'Josée', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Français', diplome: 'Licence en Lettres', salaire: 36000 }),
+    cr: addStaff({ nom: 'Calixte', prenom: 'Jean', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Créole', diplome: 'Licence en Linguistique', salaire: 33000 }),
+    an: addStaff({ nom: 'Pierre', prenom: 'Claudia', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Anglais', diplome: 'Licence en Langues', salaire: 34500 }),
+    ma: addStaff({ nom: 'Augustin', prenom: 'Wilner', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Mathématiques', diplome: 'Licence en Mathématiques', salaire: 37000 }),
+    svt: addStaff({ nom: 'Louis', prenom: 'Sandrine', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'SVT', diplome: 'Licence en Biologie', salaire: 34500 }),
+    pc: addStaff({ nom: 'Charles', prenom: 'Peterson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Physique-Chimie', diplome: 'Licence en Physique', salaire: 36000 }),
+    hg: addStaff({ nom: 'Pierre', prenom: 'Ronald', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Histoire-Géographie', diplome: 'Licence en Histoire', salaire: 33500 }),
+    ec: addStaff({ nom: 'François', prenom: 'Nadine', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Éducation civique', diplome: 'Licence en Sciences sociales', salaire: 34500 }),
+    inf: addStaff({ nom: 'Dorvil', prenom: 'Stevenson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Informatique', diplome: 'Licence en Informatique', salaire: 36000 }),
+    art: addStaff({ nom: 'Mondésir', prenom: 'Carline', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Éducation artistique', diplome: 'Diplôme ENARTS', salaire: 30000 }),
+    eps: addStaff({ nom: 'Étienne', prenom: 'Kervens', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'EPS', diplome: 'Licence en STAPS', salaire: 30000 }),
+    opt: addStaff({ nom: 'Vital', prenom: 'Jameson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Projet / Options', diplome: 'Licence en Gestion', salaire: 31000 }),
   };
   const P2: Record<string, Staff> = {
-    fr: addStaff({ nom: 'Laurent', prenom: 'Marie', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Français', diplome: 'Licence en Lettres', salaire: 55000, adresse: 'Route de Gressier, Léogâne, Haïti' }),
-    hg: addStaff({ nom: 'Jean', prenom: 'Daniel', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Histoire - Géographie', diplome: 'Licence en Histoire', salaire: 55000, adresse: 'Rue des Écoles, Léogâne, Haïti', dateNaissance: '1982-02-14' }),
-    an: addStaff({ nom: 'Benoit', prenom: 'Guerline', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Anglais', diplome: 'Licence en Langues', salaire: 52000 }),
+    fr: addStaff({ nom: 'Laurent', prenom: 'Marie', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Français', diplome: 'Licence en Lettres', salaire: 33000, adresse: 'Route de Gressier, Léogâne, Haïti' }),
+    hg: addStaff({ nom: 'Jean', prenom: 'Daniel', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Histoire - Géographie', diplome: 'Licence en Histoire', salaire: 33000, adresse: 'Rue des Écoles, Léogâne, Haïti', dateNaissance: '1982-02-14' }),
+    an: addStaff({ nom: 'Benoit', prenom: 'Guerline', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Anglais', diplome: 'Licence en Langues', salaire: 31000 }),
   };
-  addStaff({ nom: 'Joseph', prenom: 'Luc', sexe: 'M', type: 'Administration', poste: 'Secrétaire', salaire: 45000, adresse: 'Route de Petit-Goâve, Léogâne, Haïti' });
-  addStaff({ nom: 'Saintil', prenom: 'Michel', sexe: 'M', type: 'Administration', poste: 'Comptable', diplome: 'Licence en Comptabilité', salaire: 50000 });
-  addStaff({ nom: 'Mondésir', prenom: 'Carline', sexe: 'F', type: 'Soutien', poste: 'Bibliothécaire', salaire: 38000, adresse: 'Rue du Marché, Léogâne, Haïti' });
-  addStaff({ nom: 'Valcourt', prenom: 'Jean R.', sexe: 'M', type: 'Soutien', poste: "Agent d'entretien", salaire: 25000, adresse: 'Cité Solonart, Léogâne, Haïti' });
-  addStaff({ nom: 'Alexandre', prenom: 'Fritz', sexe: 'M', type: 'Administration', poste: 'Conseiller scolaire', diplome: 'Licence en Psychologie', salaire: 55000, adresse: "Rue de l'Avenir, Léogâne, Haïti", dateNaissance: '1984-11-28' });
-  addStaff({ nom: 'Méus', prenom: 'Ricardo', sexe: 'M', type: 'Soutien', poste: "Agent d'entretien", salaire: 35000 });
-  addStaff({ nom: 'Benoit', prenom: 'Carmen', sexe: 'F', type: 'Administration', poste: 'Secrétaire', salaire: 45000 });
-  addStaff({ nom: 'Pierre', prenom: 'Wilson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'EPS', salaire: 45000 });
-  addStaff({ nom: 'Méus', prenom: 'Joël', sexe: 'M', type: 'Administration', poste: 'Censeur (Préfet de discipline)', salaire: 50000 });
+  addStaff({ nom: 'Joseph', prenom: 'Luc', sexe: 'M', type: 'Administration', poste: 'Secrétaire', salaire: 27000, adresse: 'Route de Petit-Goâve, Léogâne, Haïti' });
+  addStaff({ nom: 'Saintil', prenom: 'Michel', sexe: 'M', type: 'Administration', poste: 'Comptable', diplome: 'Licence en Comptabilité', salaire: 30000 });
+  addStaff({ nom: 'Mondésir', prenom: 'Carline', sexe: 'F', type: 'Soutien', poste: 'Bibliothécaire', salaire: 22500, adresse: 'Rue du Marché, Léogâne, Haïti' });
+  addStaff({ nom: 'Valcourt', prenom: 'Jean R.', sexe: 'M', type: 'Soutien', poste: "Agent d'entretien", salaire: 15000, adresse: 'Cité Solonart, Léogâne, Haïti' });
+  addStaff({ nom: 'Alexandre', prenom: 'Fritz', sexe: 'M', type: 'Administration', poste: 'Conseiller scolaire', diplome: 'Licence en Psychologie', salaire: 33000, adresse: "Rue de l'Avenir, Léogâne, Haïti", dateNaissance: '1984-11-28' });
+  addStaff({ nom: 'Méus', prenom: 'Ricardo', sexe: 'M', type: 'Soutien', poste: "Agent d'entretien", salaire: 21000 });
+  addStaff({ nom: 'Benoit', prenom: 'Carmen', sexe: 'F', type: 'Administration', poste: 'Secrétaire', salaire: 27000 });
+  addStaff({ nom: 'Pierre', prenom: 'Wilson', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'EPS', salaire: 27000 });
+  addStaff({ nom: 'Méus', prenom: 'Joël', sexe: 'M', type: 'Administration', poste: 'Censeur (Préfet de discipline)', salaire: 30000 });
   db.bulkPut('staff', staff);
 
   // ---------- Classes ----------
   const classDefs: [string, string, ClassRoom['niveau'], string, number, number, string?][] = [
-    ['7AF', '7e année fondamentale', 'Fondamental', '7e AF', 30, 45000],
-    ['8AF', '8e année fondamentale', 'Fondamental', '8e AF', 28, 45000],
-    ['9AF', '9e année fondamentale', 'Fondamental', '9e AF', 30, 50000],
-    ['S1-B', 'Secondaire I - S1-B', 'Secondaire', 'Secondaire I', 26, 60000, 'B'],
-    ['S2-A', 'Secondaire II - S2-A', 'Secondaire', 'Secondaire II', 28, 65000, 'A'],
-    ['S2-B', 'Secondaire II - S2-B', 'Secondaire', 'Secondaire II', 27, 65000, 'B'],
-    ['S3-A', 'Secondaire III - S3-A', 'Secondaire', 'Secondaire III', 30, 70000, 'A'],
-    ['S3-B', 'Secondaire III - S3-B', 'Secondaire', 'Secondaire III', 28, 70000, 'B'],
-    ['S4-A', 'Secondaire IV - S4-A', 'Secondaire', 'Secondaire IV', 32, 75000, 'A'],
-    ['S4-B', 'Secondaire IV - S4-B', 'Secondaire', 'Secondaire IV', 28, 75000, 'B'],
+    ['7AF', '7e année fondamentale', 'Fondamental', '7e AF', 30, 60000],
+    ['8AF', '8e année fondamentale', 'Fondamental', '8e AF', 28, 60000],
+    ['9AF', '9e année fondamentale', 'Fondamental', '9e AF', 30, 66000],
+    ['S1-B', 'Secondaire I - S1-B', 'Secondaire', 'Secondaire I', 26, 75000, 'B'],
+    ['S2-A', 'Secondaire II - S2-A', 'Secondaire', 'Secondaire II', 28, 81000, 'A'],
+    ['S2-B', 'Secondaire II - S2-B', 'Secondaire', 'Secondaire II', 27, 81000, 'B'],
+    ['S3-A', 'Secondaire III - S3-A', 'Secondaire', 'Secondaire III', 30, 84000, 'A'],
+    ['S3-B', 'Secondaire III - S3-B', 'Secondaire', 'Secondaire III', 28, 84000, 'B'],
+    ['S4-A', 'Secondaire IV - S4-A', 'Secondaire', 'Secondaire IV', 32, 90000, 'A'],
+    ['S4-B', 'Secondaire IV - S4-B', 'Secondaire', 'Secondaire IV', 28, 90000, 'B'],
   ];
   const classes: ClassRoom[] = classDefs.map(([code, nom, niveau, annee, n, frais, section]) => ({
     id: `c-${code.toLowerCase()}`, anneeId: Y, code, nom, niveau, annee, section, filiere: niveau === 'Secondaire' ? 'Sciences' : undefined,
@@ -357,7 +357,7 @@ export function seedDatabase() {
     if (rnd() < 0.3) payments.push({ id: `pay${pad(++rseq, 5)}`, recu: `REC-2024-${pad(rseq)}`, eleveId: s.id, classeId: c.id, date: iso(2024, 9, 5 + Math.floor(rnd() * 20)), montant: 3500, mode: 'Espèces', motif: 'Uniforme', statut: 'Payé', updatedAt: 0 });
   }
   // quelques paiements en attente (MonCash à confirmer)
-  actifs.slice(0, 3).forEach((s, i) => payments.push({ id: `pay${pad(++rseq, 5)}`, recu: `REC-2025-${pad(rseq)}`, eleveId: s.id, classeId: s.classeId, date: iso(2025, 6, 10 + i), montant: 25000, mode: 'MonCash', motif: 'Scolarité', versement: 'Complément', statut: 'En attente', reference: `MC${81000000 + i}`, updatedAt: 0 }));
+  actifs.slice(0, 3).forEach((s, i) => payments.push({ id: `pay${pad(++rseq, 5)}`, recu: `REC-2025-${pad(rseq)}`, eleveId: s.id, classeId: s.classeId, date: iso(2025, 6, 10 + i), montant: 30000, mode: 'MonCash', motif: 'Scolarité', versement: 'Complément', statut: 'En attente', reference: `MC${81000000 + i}`, updatedAt: 0 }));
   db.bulkPut('payments', payments);
 
   const salaries: Salary[] = [];

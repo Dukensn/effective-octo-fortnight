@@ -110,7 +110,7 @@ function Overview({ go, actions, canWrite }: { go: (t: Tab) => void; actions: { 
         <FinStat icon={<BarChart3 />} tint="blue" label="Solde disponible" v={money(t.solde)} trend={pct(t.soldeM[mi], t.soldeM[mi - 1])} />
         <FinStat icon={<PieChart />} tint="orange" label="Créances élèves" v={money(t.creances)} sub="à recouvrer" />
       </div>
-      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))' }}>
+      <div className="fin-row">
         <Card title="Évolution des revenus et dépenses" actions={<div className="chart-legend"><span><i style={{ background: '#22b35e' }} />Revenus</span><span><i style={{ background: '#ef5b6b' }} />Dépenses</span><span><i style={{ background: '#1463f3', height: 3 }} />Solde</span></div>}>
           <BarChart labels={t.months.map((m) => monthShort(Number(m.slice(5))))} series={[{ label: 'Revenus', color: '#22b35e', values: t.revM }, { label: 'Dépenses', color: '#ef5b6b', values: t.depM }]} line={{ label: 'Solde', color: '#1463f3', values: t.revM.map((r, i) => Math.max(0, r - t.depM[i])) }} format={moneyShort} ticks={4} barWidth={13} />
         </Card>

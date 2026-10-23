@@ -11,6 +11,12 @@ import { startSync } from './data/sync';
 
 registerSW({ immediate: true });
 
+// Mémorise l'invite d'installation (bouton « Installer l'application » dans Mon profil)
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  (window as unknown as { __installPrompt?: Event }).__installPrompt = e;
+});
+
 loadDatabase(seedDatabase).then(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
