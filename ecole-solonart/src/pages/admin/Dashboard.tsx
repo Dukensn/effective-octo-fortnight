@@ -69,7 +69,9 @@ export default function Dashboard() {
     return items.filter((i) => i.n > 0 && session.can(i.m));
   }, [attendance, evaluations, payments, actifs, salaries, current, finance.late, sortedClasses, session]); // eslint-disable-line
 
-  const classAvgs = sortedClasses.map((c) => classReport(c.id, current?.id ?? 'annuel'));
+  // Le préscolaire est évalué par compétences : il n'entre pas dans les moyennes.
+  const gradedClasses = sortedClasses.filter((c) => c.niveau !== 'Préscolaire');
+  const classAvgs = gradedClasses.map((c) => classReport(c.id, current?.id ?? 'annuel'));
   const recent = [...payments].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
   const upcoming = [...events].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
   const first = session.user.nom.replace(/^(M\.|Mme)\s+/, '').split(' ')[0];
@@ -121,7 +123,7 @@ export default function Dashboard() {
             </Card>
           )}
           <Card title={`Moyennes par classe — ${current?.libelle ?? ''}`} link="Notes / Examens" onLink={() => nav('/notes')}>
-            <BarChart labels={sortedClasses.map((c) => c.code)} series={[{ label: 'Moyenne', color: '#1463f3', values: classAvgs.map((r) => (r?.classGeneral != null ? Math.round(r.classGeneral * 10) / 10 : null)) }]} max={20} ticks={4} showValues format={(n) => (Number.isInteger(n) ? String(n) : n.toFixed(1))} />
+            <BarChart labels={gradedClasses.map((c) => c.code)} series={[{ label: 'Moyenne', color: '#1463f3', values: classAvgs.map((r) => (r?.classGeneral != null ? Math.round(r.classGeneral * 10) / 10 : null)) }]} max={20} ticks={4} showValues format={(n) => (Number.isInteger(n) ? String(n) : n.toFixed(1))} />
           </Card>
         </div>
         <div className="stack">

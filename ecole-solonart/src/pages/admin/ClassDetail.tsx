@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Pencil, Copy, Trash2, FileText, IdCard, CalendarDays, Printer } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import { PageHead, Tabs, Avatar, StatusBadge, Menu, Empty, Confirm, toast, StatCard, Card } from '../../components/ui';
-import { classReport, classStudents, fmtNote, sortedPeriods, appreciation } from '../../data/compute';
+import { classReport, classStudents, fmtNote, sortedPeriods, appreciation, isPreschool, levelOf } from '../../data/compute';
+import { LevelPill } from '../../components/Level';
 import { civ, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 import { ClassForm } from './Classes';
@@ -31,6 +32,7 @@ export default function ClassDetail() {
   const students = classStudents(classe.id);
   const report = classReport(classe.id, scope);
   const tit = staff.find((s) => s.id === classe.titulaireId);
+  const pre = isPreschool(classe);
   const profs = staff.filter((s) => s.type === 'Professeur');
   const subjectOrder = subjects.map((s) => s.id);
   courses.sort((a, b) => subjectOrder.indexOf(a.matiereId) - subjectOrder.indexOf(b.matiereId));
@@ -61,9 +63,11 @@ export default function ClassDetail() {
       />
       <div className="grid g-stats mb-16">
         <StatCard tint="blue" icon={<Users />} value={`${students.length}/${classe.capacite}`} label="Élèves" sub={`${students.filter((s) => s.sexe === 'F').length} filles · ${students.filter((s) => s.sexe === 'M').length} garçons`} />
-        <StatCard tint="green" icon={<BookOpen />} value={courses.length} label="Matières" sub={`Coef. total ${courses.reduce((a, c) => a + c.coefficient, 0)}`} />
+        <StatCard tint="green" icon={<BookOpen />} value={courses.length} label={pre ? 'Domaines' : 'Matières'} sub={pre ? 'Évalués par compétences' : `Coef. total ${courses.reduce((a, c) => a + c.coefficient, 0)}`} />
         <StatCard tint="violet" icon={<GraduationCap />} value={new Set(courses.map((c) => c.professeurId)).size} label="Professeurs" />
-        <StatCard tint="orange" icon={<Trophy />} value={fmtNote(classReport(classe.id, 'annuel')?.classGeneral)} label="Moyenne annuelle" sub={`${Math.round((classReport(classe.id, 'annuel')?.successRate ?? 0) * 100)}% de réussite`} />
+        {pre
+          ? <StatCard tint="orange" icon={<Trophy />} value={`${Math.round((classReport(classe.id, 'annuel')?.students.filter((r) => levelOf(r.general)?.code === 'A').length ?? 0) / Math.max(1, students.length) * 100)}%`} label="Enfants « Acquis »" sub="Bilan de l’année" />
+          : <StatCard tint="orange" icon={<Trophy />} value={fmtNote(classReport(classe.id, 'annuel')?.classGeneral)} label="Moyenne annuelle" sub={`${Math.round((classReport(classe.id, 'annuel')?.successRate ?? 0) * 100)}% de réussite`} />}
       </div>
       <Tabs tabs={[['eleves', `Élèves (${students.length})`], ['matieres', 'Matières & professeurs'], ['resultats', 'Résultats']]} value={tab} onChange={setTab} />
 
@@ -111,17 +115,17 @@ export default function ClassDetail() {
         <Card pad={false}>
           <div className="card-pad row wrap">
             <select className="select" style={{ width: 200 }} value={scope} onChange={(e) => setScope(e.target.value)}>
-              <option value="annuel">Moyenne annuelle</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.libelle}</option>)}
+              <option value="annuel">{pre ? "Bilan annuel" : "Moyenne annuelle"}</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.libelle}</option>)}
             </select>
-            <span className="small muted">Moyenne de classe : <b style={{ color: 'var(--ink)' }}>{fmtNote(report.classGeneral)}</b> · Plus haute : <b style={{ color: 'var(--green)' }}>{fmtNote(report.best)}</b> · Plus basse : <b style={{ color: 'var(--red)' }}>{fmtNote(report.worst)}</b></span>
+            {pre ? <span className="small muted">Évaluation par compétences : A acquis · EC en cours · NA non acquis</span> : <span className="small muted">Moyenne de classe : <b style={{ color: 'var(--ink)' }}>{fmtNote(report.classGeneral)}</b> · Plus haute : <b style={{ color: 'var(--green)' }}>{fmtNote(report.best)}</b> · Plus basse : <b style={{ color: 'var(--red)' }}>{fmtNote(report.worst)}</b></span>}
           </div>
           <div className="table-wrap"><table className="t">
-            <thead><tr><th>Rang</th><th>Élève</th><th className="c">Moyenne / 20</th><th>Appréciation</th></tr></thead>
-            <tbody>{[...report.students].sort((a, b) => a.rank - b.rank || (b.general ?? 0) - (a.general ?? 0)).map((r) => (
+            <thead><tr>{!pre && <th>Rang</th>}<th>Élève</th><th className="c">{pre ? 'Bilan' : 'Moyenne / 20'}</th><th>Appréciation</th></tr></thead>
+            <tbody>{(pre ? report.students : [...report.students].sort((a, b) => a.rank - b.rank || (b.general ?? 0) - (a.general ?? 0))).map((r) => (
               <tr key={r.student.id} className="clickable" onClick={() => nav(`/eleves/${r.student.id}`)}>
-                <td className="bold">{r.general != null ? r.rank : '-'}</td>
+                {!pre && <td className="bold">{r.general != null ? r.rank : '-'}</td>}
                 <td><div className="person"><Avatar src={r.student.photo} name={fullName(r.student)} size={30} /><b>{fullName(r.student)}</b></div></td>
-                <td className="c bold">{fmtNote(r.general)}</td><td>{appreciation(r.general).label}</td>
+                {pre ? <><td className="c"><LevelPill v={r.general} /></td><td>{levelOf(r.general)?.label ?? '-'}</td></> : <><td className="c bold">{fmtNote(r.general)}</td><td>{appreciation(r.general).label}</td></>}
               </tr>))}</tbody>
           </table></div>
         </Card>

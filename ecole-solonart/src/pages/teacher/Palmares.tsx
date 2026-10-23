@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Pencil, Printer, FileText, FileSpreadsheet, Lock, History, MoreHorizontal, Unlock } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
-import { evaluationStats, fmtNote } from '../../data/compute';
+import { evaluationStats, fmtNote, isPreschool, levelOf, LEVELS } from '../../data/compute';
 import { Empty, Modal, toast, useIsDesktop, Confirm } from '../../components/ui';
 import { fullName, dateShort, downloadCSV, timeAgo } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
@@ -28,12 +28,15 @@ export default function Palmares({ admin }: { admin?: boolean }) {
   const isOwner = course?.professeurId === session.user.staffId;
   const canEdit = (admin && session.can('notes', 'write')) || (isOwner && !period?.verrouillee && ev.statut !== 'Clôturé');
   const st = evaluationStats(ev);
+  const pre = isPreschool(classe);
   const after = st.saisies > 0;
+  const lvl = (note?: number | null) => levelOf(note == null ? null : (note / ev.noteMax) * 20);
   const entryUrl = admin ? `/notes/saisie/${ev.id}` : `/prof/evaluation/${ev.id}/saisie`;
   const sheet = <PalmaresSheet ev={ev} />;
   const printIt = () => printDocument(sheet, 'A4 portrait', `Palmarès ${classe?.code} ${subject?.nom} ${ev.titre}`);
   const excel = () => downloadCSV(`palmares-${classe?.code}-${subject?.court}-${ev.titre}.csv`, [['Rang', 'Élève', 'Matricule', `Note / ${ev.noteMax}`], ...st.ranked.map((r) => [st.rankOf.get(r.student.id), fullName(r.student), r.student.matricule, r.grade?.note]), ...st.rows.filter((r) => r.grade?.note == null).map((r) => ['-', fullName(r.student), r.student.matricule, r.grade?.absent ? 'Absent' : ''])]);
-  const rows = after ? [...st.ranked, ...st.rows.filter((r) => r.grade?.note == null)] : st.rows;
+  // Préscolaire : pas de classement, les enfants restent dans l'ordre de la liste.
+  const rows = after && !pre ? [...st.ranked, ...st.rows.filter((r) => r.grade?.note == null)] : st.rows;
   const history = audits.filter((a) => a.detail.includes(`${subject?.nom} ${classe?.code} ${ev.titre}`)).sort((a, b) => b.date - a.date);
 
   const ActionList = (
@@ -59,18 +62,25 @@ export default function Palmares({ admin }: { admin?: boolean }) {
         </div>
         <div className="card">
           <table className="t">
-            <thead><tr><th style={{ width: 40 }}>#</th><th>Élève</th><th className="c">Note / {ev.noteMax}</th>{after && <th className="c">Rang</th>}</tr></thead>
+            <thead><tr><th style={{ width: 40 }}>#</th><th>Élève</th><th className="c">{pre ? 'Niveau' : `Note / ${ev.noteMax}`}</th>{after && !pre && <th className="c">Rang</th>}</tr></thead>
             <tbody>{rows.map((r, i) => (
               <tr key={r.student.id}>
                 <td className="muted">{i + 1}</td>
                 <td style={{ color: 'var(--ink)' }}>{fullName(r.student)}</td>
-                <td className="c bold">{r.grade?.absent ? <span className="badge b-red">Abs.</span> : r.grade?.note != null ? fmtNote(r.grade.note) : '-'}</td>
-                {after && <td className="c">{st.rankOf.get(r.student.id) ?? '-'}</td>}
+                <td className="c bold">{r.grade?.absent ? <span className="badge b-red">Abs.</span> : r.grade?.note == null ? '-' : pre ? (() => { const l = lvl(r.grade.note)!; return <span className="lvl" title={l.label} style={{ background: l.bg, color: l.color }}>{l.code}</span>; })() : fmtNote(r.grade.note)}</td>
+                {after && !pre && <td className="c">{st.rankOf.get(r.student.id) ?? '-'}</td>}
               </tr>
             ))}</tbody>
           </table>
         </div>
-        {after && (
+        {after && pre && (
+          <div className="grid mt-16" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {LEVELS.map((l) => (
+              <div key={l.code} className="card center" style={{ padding: 12, background: l.bg, border: 0 }}><div className="tiny" style={{ color: l.color }}>{l.label}</div><div style={{ fontSize: 20, fontWeight: 800, color: l.color }}>{st.rows.filter((r) => !r.grade?.absent && lvl(r.grade?.note)?.code === l.code).length}</div></div>
+            ))}
+          </div>
+        )}
+        {after && !pre && (
           <div className="grid mt-16" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             <div className="card center" style={{ padding: 12, background: 'var(--primary-50)', border: 0 }}><div className="tiny muted">Moyenne</div><div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ink)' }}>{fmtNote(st.moyenne)} <span className="tiny muted">/ {ev.noteMax}</span></div></div>
             <div className="card center" style={{ padding: 12, background: 'var(--green-50)', border: 0 }}><div className="tiny" style={{ color: 'var(--green)' }}>Plus haute</div><div style={{ fontSize: 20, fontWeight: 800, color: 'var(--green)' }}>{fmtNote(st.max)}</div></div>

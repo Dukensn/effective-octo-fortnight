@@ -60,9 +60,16 @@ export function seedDatabase() {
     { id: 'art', nom: 'Éducation artistique', court: 'ART', couleur: 'violet', updatedAt: 0 },
     { id: 'eps', nom: 'Éducation physique et sportive (EPS)', court: 'EPS', couleur: 'blue', updatedAt: 0 },
     { id: 'opt', nom: 'Options / Projet', court: 'OPT', couleur: 'amber', updatedAt: 0 },
+    // Préscolaire : domaines d'apprentissage évalués par compétences (Acquis / En cours / Non acquis)
+    { id: 'ps-lang', nom: 'Langage oral et écrit', court: 'LANG', couleur: 'blue', groupe: 'prescolaire', updatedAt: 0 },
+    { id: 'ps-math', nom: 'Pré-mathématiques', court: 'MATH', couleur: 'green', groupe: 'prescolaire', updatedAt: 0 },
+    { id: 'ps-monde', nom: 'Découverte du monde', court: 'MONDE', couleur: 'violet', groupe: 'prescolaire', updatedAt: 0 },
+    { id: 'ps-mot', nom: 'Motricité', court: 'MOT', couleur: 'cyan', groupe: 'prescolaire', updatedAt: 0 },
+    { id: 'ps-art', nom: 'Arts, chants et comptines', court: 'ART', couleur: 'pink', groupe: 'prescolaire', updatedAt: 0 },
+    { id: 'ps-vivre', nom: 'Vivre ensemble', court: 'VIVRE', couleur: 'amber', groupe: 'prescolaire', updatedAt: 0 },
   ];
   db.bulkPut('subjects', subjects);
-  const COEF: Record<string, number> = { fr: 3, cr: 2, an: 3, ma: 4, svt: 3, pc: 3, hg: 2, ec: 1, inf: 2, art: 1, eps: 1, opt: 2 };
+  const COEF: Record<string, number> = { fr: 3, cr: 2, an: 3, ma: 4, svt: 3, pc: 3, hg: 2, ec: 1, inf: 2, art: 1, eps: 1, opt: 2, 'ps-lang': 1, 'ps-math': 1, 'ps-monde': 1, 'ps-mot': 1, 'ps-art': 1, 'ps-vivre': 1 };
 
   // ---------- Personnel ----------
   const staff: Staff[] = [];
@@ -98,6 +105,11 @@ export function seedDatabase() {
     hg: addStaff({ nom: 'Jean', prenom: 'Daniel', sexe: 'M', type: 'Professeur', poste: 'Professeur', specialite: 'Histoire - Géographie', diplome: 'Licence en Histoire', salaire: 33000, adresse: 'Rue des Écoles, Léogâne, Haïti', dateNaissance: '1982-02-14' }),
     an: addStaff({ nom: 'Benoit', prenom: 'Guerline', sexe: 'F', type: 'Professeur', poste: 'Professeure', specialite: 'Anglais', diplome: 'Licence en Langues', salaire: 31000 }),
   };
+  const maitresses: Record<string, Staff> = {
+    PS: addStaff({ nom: 'Jean-Baptiste', prenom: 'Roseline', sexe: 'F', type: 'Professeur', poste: 'Maîtresse', specialite: 'Préscolaire', diplome: 'Brevet de jardinière d’enfants', salaire: 26000 }),
+    MS: addStaff({ nom: 'Desrosiers', prenom: 'Mirlande', sexe: 'F', type: 'Professeur', poste: 'Maîtresse', specialite: 'Préscolaire', diplome: 'Brevet de jardinière d’enfants', salaire: 26000 }),
+    GS: addStaff({ nom: 'Toussaint', prenom: 'Guerda', sexe: 'F', type: 'Professeur', poste: 'Maîtresse', specialite: 'Préscolaire', diplome: 'Diplôme ENI (préscolaire)', salaire: 27000 }),
+  };
   addStaff({ nom: 'Joseph', prenom: 'Luc', sexe: 'M', type: 'Administration', poste: 'Secrétaire', salaire: 27000, adresse: 'Route de Petit-Goâve, Léogâne, Haïti' });
   addStaff({ nom: 'Saintil', prenom: 'Michel', sexe: 'M', type: 'Administration', poste: 'Comptable', diplome: 'Licence en Comptabilité', salaire: 30000 });
   addStaff({ nom: 'Mondésir', prenom: 'Carline', sexe: 'F', type: 'Soutien', poste: 'Bibliothécaire', salaire: 22500, adresse: 'Rue du Marché, Léogâne, Haïti' });
@@ -111,6 +123,9 @@ export function seedDatabase() {
 
   // ---------- Classes ----------
   const classDefs: [string, string, ClassRoom['niveau'], string, number, number, string?][] = [
+    ['PS', 'Petite section (Préscolaire I)', 'Préscolaire', 'Préscolaire I', 18, 35000],
+    ['MS', 'Moyenne section (Préscolaire II)', 'Préscolaire', 'Préscolaire II', 20, 35000],
+    ['GS', 'Grande section (Préscolaire III)', 'Préscolaire', 'Préscolaire III', 22, 38000],
     ['7AF', '7e année fondamentale', 'Fondamental', '7e AF', 30, 60000],
     ['8AF', '8e année fondamentale', 'Fondamental', '8e AF', 28, 60000],
     ['9AF', '9e année fondamentale', 'Fondamental', '9e AF', 30, 66000],
@@ -124,16 +139,19 @@ export function seedDatabase() {
   ];
   const classes: ClassRoom[] = classDefs.map(([code, nom, niveau, annee, n, frais, section]) => ({
     id: `c-${code.toLowerCase()}`, anneeId: Y, code, nom, niveau, annee, section, filiere: niveau === 'Secondaire' ? 'Sciences' : undefined,
-    salle: `Salle ${code}`, capacite: 35, fraisScolarite: frais, fraisInscription: 5000, updatedAt: 0, titulaireId: undefined,
+    salle: `Salle ${code}`, capacite: 35, fraisScolarite: frais, fraisInscription: niveau === 'Préscolaire' ? 3000 : 5000, updatedAt: 0, titulaireId: undefined,
     _n: n,
   } as ClassRoom & { _n: number }));
-  const titulaires: Record<string, string> = { 'S4-A': P.ec.id, 'S4-B': P.fr.id, 'S3-A': robert.id, 'S3-B': P.svt.id, 'S2-A': P.an.id, 'S2-B': P.hg.id, 'S1-B': P2.fr.id, '9AF': P.cr.id, '8AF': P2.hg.id, '7AF': P2.an.id };
+  const titulaires: Record<string, string> = { 'S4-A': P.ec.id, 'S4-B': P.fr.id, 'S3-A': robert.id, 'S3-B': P.svt.id, 'S2-A': P.an.id, 'S2-B': P.hg.id, 'S1-B': P2.fr.id, '9AF': P.cr.id, '8AF': P2.hg.id, '7AF': P2.an.id, PS: maitresses.PS.id, MS: maitresses.MS.id, GS: maitresses.GS.id };
   classes.forEach((c) => (c.titulaireId = titulaires[c.code]));
 
   // ---------- Cours (matières x classes) ----------
   const courses: Course[] = [];
   for (const c of classes) {
+    const pre = c.niveau === 'Préscolaire';
     for (const s of subjects) {
+      if (pre !== (s.groupe === 'prescolaire')) continue;
+      if (pre) { courses.push({ id: `${c.id}-${s.id}`, classeId: c.id, matiereId: s.id, professeurId: maitresses[c.code].id, coefficient: 1, heuresSemaine: 4, updatedAt: 0 }); continue; }
       if (c.niveau === 'Fondamental' && (s.id === 'pc' || s.id === 'opt')) continue;
       let prof = P[s.id];
       if (s.id === 'ma' && ['S4-A', 'S4-B', 'S3-A'].includes(c.code)) prof = robert;
@@ -174,12 +192,12 @@ export function seedDatabase() {
     ['Charles', 'Daniela', 'F', 'avatars/s07.jpg'], ['Méus', 'Ricardo', 'M', 'avatars/s08.jpg'], ['Benoit', 'Ashley', 'F', 'avatars/s09.jpg'],
     ['Pierre', 'Lucas', 'M', 'avatars/s10.jpg'], ['Bonheur', 'Sarah', 'F'], ['Hermogène', 'Lucas', 'M'],
   ];
-  const LEVEL_PREFIX: Record<string, string> = { '7e AF': 'F7', '8e AF': 'F8', '9e AF': 'F9', 'Secondaire I': 'SI', 'Secondaire II': 'SII', 'Secondaire III': 'SIII', 'Secondaire IV': 'SIV' };
+  const LEVEL_PREFIX: Record<string, string> = { 'Préscolaire I': 'PI', 'Préscolaire II': 'PII', 'Préscolaire III': 'PIII', '7e AF': 'F7', '8e AF': 'F8', '9e AF': 'F9', 'Secondaire I': 'SI', 'Secondaire II': 'SII', 'Secondaire III': 'SIII', 'Secondaire IV': 'SIV' };
   let mseq = 0;
   const groupes = ['O+', 'O+', 'O+', 'A+', 'B+', 'AB+', 'O-', 'A-'];
   for (const c of classes as (ClassRoom & { _n: number })[]) {
     const n = c._n;
-    const age = { '7e AF': 12, '8e AF': 13, '9e AF': 14, 'Secondaire I': 15, 'Secondaire II': 15, 'Secondaire III': 16, 'Secondaire IV': 16 }[c.annee] ?? 14;
+    const age = { 'Préscolaire I': 3, 'Préscolaire II': 4, 'Préscolaire III': 5, '7e AF': 12, '8e AF': 13, '9e AF': 14, 'Secondaire I': 15, 'Secondaire II': 15, 'Secondaire III': 16, 'Secondaire IV': 16 }[c.annee] ?? 14;
     for (let i = 0; i < n; i++) {
       mseq++;
       let nom: string, prenom: string, sexe: Sexe, photo: string | undefined;
@@ -243,7 +261,7 @@ export function seedDatabase() {
     students.push({
       id: `e${pad(++mseq)}`, matricule: `ATT2025${pad(mseq)}`, nom, prenom: sexe === 'M' ? pick(PRENOMS_M) : pick(PRENOMS_F), sexe,
       dateNaissance: iso(2010, 3 + i, 10 + i), lieuNaissance: 'Léogâne', nationalite: 'Haïtienne', adresse: pick(RUES), commune: 'Léogâne',
-      classeId: classes[i + 3].id, anneeId: Y, regime: 'Externe', typeInscription: 'Nouvelle inscription', redoublant: false, boursier: false,
+      classeId: classes[i + 6].id, anneeId: Y, regime: 'Externe', typeInscription: 'Nouvelle inscription', redoublant: false, boursier: false,
       dateInscription: iso(2025, 6, 2 + i), dateEntree: '2025-09-01', statut: 'En attente', tuteurIds: [pere.id],
       medical: {}, documents: [{ type: 'Acte de naissance', nom: 'acte.pdf', fourni: true }, { type: 'Dernier bulletin', nom: '', fourni: i % 2 === 0 }, { type: "Photo d'identité", nom: '', fourni: false }],
       langue: 'Français', updatedAt: 0,
@@ -278,6 +296,8 @@ export function seedDatabase() {
         if (co.matiereId === 'eps' || co.matiereId === 'art') n += 1.6;
         if (co.matiereId === 'ma') n -= 1.2;
         n = Math.max(3, Math.min(19.5, Math.round(n * 2) / 2));
+        // Préscolaire : la note n'est que le support du niveau (A = 18, EC = 12, NA = 6).
+        if (cls.niveau === 'Préscolaire') n = n >= 13 ? 18 : n >= 9 ? 12 : 6;
         const absent = rnd() < 0.006;
         grades.push({ id: `gr-${ev.id}-${s.id}`, evaluationId: ev.id, eleveId: s.id, note: absent ? null : n, absent, updatedAt: 0 });
       }

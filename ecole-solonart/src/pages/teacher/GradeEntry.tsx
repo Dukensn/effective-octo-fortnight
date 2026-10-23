@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Lock } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
-import { classStudents, gradesForEvaluation } from '../../data/compute';
+import { classStudents, gradesForEvaluation, isPreschool, levelOf, LEVELS } from '../../data/compute';
 import { Avatar, Empty, Modal, toast } from '../../components/ui';
 import { fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
@@ -35,6 +35,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
   const [done, setDone] = useState(false);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const max = ev?.noteMax ?? 20;
+  const pre = isPreschool(classe);
 
   const parsed = useMemo(() => Object.fromEntries(Object.entries(values).map(([k, v]) => {
     const t = v.trim().toLowerCase();
@@ -83,7 +84,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
       {locked && <div className="card card-pad mb-16 row" style={{ background: 'var(--orange-50)', border: 0 }}><Lock size={18} color="var(--orange)" /><span className="small">Notes verrouillées par la direction. Contactez l’administration pour toute correction.</span></div>}
       <div className="card">
         <table className="t">
-          <thead><tr><th style={{ width: 40 }}>#</th><th>Élève</th><th className="right" style={{ width: 110 }}>Note / {max}</th></tr></thead>
+          <thead><tr><th style={{ width: 40 }}>#</th><th>Élève</th><th className="right" style={{ width: pre ? 200 : 110 }}>{pre ? 'Niveau' : `Note / ${max}`}</th></tr></thead>
           <tbody>{students.map((s, i) => {
             const p = parsed[s.id];
             return (
@@ -91,6 +92,16 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
                 <td className="muted">{i + 1}</td>
                 <td><div className="person"><Avatar src={s.photo} name={fullName(s)} size={28} /><span style={{ color: 'var(--ink)' }}>{fullName(s)}</span></div></td>
                 <td className="right">
+                  {pre ? (
+                    <span className="level-picker" role="group" aria-label={`Niveau de ${fullName(s)}`}>
+                      {LEVELS.map((l) => {
+                        const on = !p?.empty && !p?.absent && levelOf(((p?.note ?? 0) / max) * 20)?.code === l.code;
+                        const v = String(Math.round((l.note * max) / 20 * 100) / 100).replace('.', ',');
+                        return <button key={l.code} type="button" title={l.label} disabled={locked} className={on ? 'on' : ''} style={on ? { background: l.bg, color: l.color, borderColor: l.color } : undefined} onClick={() => setValues({ ...values, [s.id]: on ? '' : v })}>{l.code}</button>;
+                      })}
+                      <button type="button" title="Absent" disabled={locked} className={p?.absent ? 'on' : ''} onClick={() => setValues({ ...values, [s.id]: p?.absent ? '' : 'abs' })}>abs</button>
+                    </span>
+                  ) : (
                   <input
                     ref={(el) => { refs.current[i] = el; }}
                     className={`note-input ${p && !p.ok ? 'bad' : ''}`}
@@ -99,13 +110,14 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
                     onChange={(e) => setValues({ ...values, [s.id]: e.target.value })}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === 'ArrowDown') { e.preventDefault(); refs.current[i + 1]?.focus(); } if (e.key === 'ArrowUp') { e.preventDefault(); refs.current[i - 1]?.focus(); } }}
                   />
+                  )}
                 </td>
               </tr>
             );
           })}</tbody>
         </table>
       </div>
-      <p className="tiny muted mt-8">Astuce : tapez « abs » pour un élève absent. Entrée passe à l’élève suivant. Les notes sont enregistrées sur l’appareil et synchronisées avec l’administration.</p>
+      {pre ? <p className="tiny muted mt-8">Préscolaire : touchez A (acquis), EC (en cours d’acquisition) ou NA (non acquis). Touchez à nouveau pour effacer.</p> : <p className="tiny muted mt-8">Astuce : tapez « abs » pour un élève absent. Entrée passe à l’élève suivant. Les notes sont enregistrées sur l’appareil et synchronisées avec l’administration.</p>}
       {!locked && (
         <div className="sticky-foot">
           <button className="btn btn-soft btn-lg grow" onClick={() => { try { localStorage.removeItem(draftKey); } catch { /* ignore */ } back(); }}>Annuler</button>

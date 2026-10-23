@@ -11,7 +11,7 @@ import { useSession } from '../../lib/session';
 
 export default function Reports() {
   const session = useSession()!;
-  const classes = useCollection('classes').slice().sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
+  const classes = useCollection('classes').filter((c) => c.niveau !== 'Préscolaire').sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
   const subjects = useCollection('subjects');
   useCollection('grades');
   useCollection('students');

@@ -270,6 +270,7 @@ export function scaleNote(note20: number | null, bareme: 20 | 100) {
  */
 export function autoCouncil(r: StudentReport, scope: ID | 'annuel', seuil20 = 10) {
   const st = r.student;
+  if (isPreschool(db.get('classes', st.classeId))) return autoCouncilPreschool(r, scope);
   const p = scope === 'annuel' ? undefined : db.get('periods', scope);
   const inPeriod = (d: string) => !p || (d >= p.debut && d <= p.fin);
   const att = db.list('attendance').filter((a) => a.eleveId === st.id && inPeriod(a.date));
@@ -292,5 +293,41 @@ export function autoCouncil(r: StudentReport, scope: ID | 'annuel', seuil20 = 10
       respect: incidents === 0 ? 'Très bon' : 'À améliorer',
       participation: g != null && g >= 12 ? 'Active' : g != null && g >= 10 ? 'Moyenne' : 'Faible',
     },
+  };
+}
+
+// ---------- Préscolaire : évaluation par compétences ----------
+export type Level = 'A' | 'EC' | 'NA';
+export const LEVELS: { code: Level; label: string; note: number; color: string; bg: string }[] = [
+  { code: 'A', label: 'Acquis', note: 18, color: '#15803d', bg: '#dcfce7' },
+  { code: 'EC', label: 'En cours d’acquisition', note: 12, color: '#b45309', bg: '#fef3c7' },
+  { code: 'NA', label: 'Non acquis', note: 6, color: '#b91c1c', bg: '#fee2e2' },
+];
+/** Une moyenne /20 ramenée à un niveau de compétence. */
+export function levelOf(note20: number | null | undefined) {
+  if (note20 === null || note20 === undefined) return null;
+  return LEVELS[note20 >= 15 ? 0 : note20 >= 9 ? 1 : 2];
+}
+export function isPreschool(classe?: Pick<ClassRoom, 'niveau'> | null) {
+  return classe?.niveau === 'Préscolaire';
+}
+
+/** Conseil automatique adapté aux tout-petits : pas de rang, des mots simples. */
+export function autoCouncilPreschool(r: StudentReport, scope: ID | 'annuel') {
+  const st = r.student;
+  const il = st.sexe === 'F' ? 'Elle' : 'Il';
+  const lv = levelOf(r.general);
+  const todo = r.lines.filter((l) => levelOf(l.value)?.code === 'NA' || levelOf(l.value)?.code === 'EC').map((l) => l.subject.nom.toLowerCase()).slice(0, 2);
+  const appreciation = !lv ? `${st.prenom} n’a pas encore été évalué${st.sexe === 'F' ? 'e' : ''}.`
+    : lv.code === 'A' ? `${st.prenom} est un${st.sexe === 'F' ? 'e' : ''} enfant épanoui${st.sexe === 'F' ? 'e' : ''} et curieux${st.sexe === 'F' ? 'se' : ''}. ${il} progresse très bien. Bravo !`
+    : lv.code === 'EC' ? `${st.prenom} fait de beaux progrès. ${il} doit continuer à s’exercer avec l’aide de la maison.`
+    : `${st.prenom} a besoin d’un accompagnement attentif à l’école et à la maison.`;
+  const observations = todo.length ? `À travailler : ${todo.join(' et ')}.` : 'Toutes les compétences sont en bonne voie.';
+  const classe = db.get('classes', st.classeId);
+  const next = classe?.annee === 'Préscolaire I' ? 'Préscolaire II' : classe?.annee === 'Préscolaire II' ? 'Préscolaire III' : '1re année fondamentale';
+  const decisionTxt = scope === 'annuel' ? (lv && lv.code !== 'NA' ? `Passe en ${next}` : 'À revoir avec la famille') : lv?.label ?? 'En attente';
+  return {
+    appreciation, observations, decision: decisionTxt,
+    comportement: { conduite: 'Bonne', collaboration: lv?.code === 'A' ? 'Excellent' : 'Bon', respect: 'Très bon', participation: lv?.code === 'NA' ? 'Moyenne' : 'Active' },
   };
 }

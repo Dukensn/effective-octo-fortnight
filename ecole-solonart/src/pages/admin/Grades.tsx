@@ -4,7 +4,8 @@ import { Lock, Unlock, Pencil, Trophy, Plus, Wand2, Save, FileText } from 'lucid
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Evaluation, ReportCardEntry } from '../../data/types';
 import { PageHead, Tabs, Field, StatusBadge, Badge, Menu, Modal, toast, Card, Avatar, Toggle, Empty } from '../../components/ui';
-import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, autoCouncil } from '../../data/compute';
+import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, autoCouncil, isPreschool } from '../../data/compute';
+import { LevelPill } from '../../components/Level';
 import { civ, dateShort, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 
@@ -173,6 +174,7 @@ function Council() {
   const [classe, setClasse] = useState('c-s4-a');
   const [scope, setScope] = useState<string>('annuel');
   const report = classReport(classe, scope);
+  const pre = isPreschool(report?.classe);
   const seuil = school?.bareme === 100 ? (school.seuilReussite ?? 50) / 5 : school?.seuilReussite ?? 10;
   const entryFor = (eleveId: string) => entries.find((e) => e.eleveId === eleveId && e.periodeId === scope);
   const upsert = (eleveId: string, patch: Partial<ReportCardEntry>) => {
@@ -201,19 +203,19 @@ function Council() {
       </div>
       {report && (
         <Card pad={false}>
-          <div className="card-pad small muted">Moyenne de la classe : <b style={{ color: 'var(--ink)' }}>{fmtNote(report.classGeneral)}</b> · Réussite : <b style={{ color: 'var(--ink)' }}>{Math.round(report.successRate * 100)}%</b> · Effectif : {report.effectif}</div>
+          {pre ? <div className="card-pad small muted">Préscolaire : bilan par compétences, sans moyenne ni rang · Effectif : {report.effectif}</div> : <div className="card-pad small muted">Moyenne de la classe : <b style={{ color: 'var(--ink)' }}>{fmtNote(report.classGeneral)}</b> · Réussite : <b style={{ color: 'var(--ink)' }}>{Math.round(report.successRate * 100)}%</b> · Effectif : {report.effectif}</div>}
           <div className="table-wrap"><table className="t t-compact">
-            <thead><tr><th>Rang</th><th>Élève</th><th className="c">Moy.</th><th>Mention</th><th style={{ minWidth: 260 }}>Appréciation générale</th><th>Conduite</th><th>{scope === 'annuel' ? 'Décision' : 'Avis du conseil'}</th></tr></thead>
-            <tbody>{[...report.students].sort((a, b) => a.rank - b.rank).map((r) => {
+            <thead><tr>{!pre && <th>Rang</th>}<th>Élève</th><th className="c">{pre ? 'Bilan' : 'Moy.'}</th>{!pre && <th>Mention</th>}<th style={{ minWidth: 260 }}>Appréciation générale</th><th>Conduite</th><th>{scope === 'annuel' ? 'Décision' : 'Avis du conseil'}</th></tr></thead>
+            <tbody>{(pre ? report.students : [...report.students].sort((a, b) => a.rank - b.rank)).map((r) => {
               const saved = entryFor(r.student.id);
               const auto = autoCouncil(r, scope, seuil);
               const e = { appreciation: saved?.appreciation || auto.appreciation, decision: saved?.decision || auto.decision, comportement: { ...auto.comportement, ...(saved?.comportement ?? {}) }, updatedAt: saved?.updatedAt };
               return (
                 <tr key={r.student.id}>
-                  <td className="bold">{r.rank || '-'}</td>
+                  {!pre && <td className="bold">{r.rank || '-'}</td>}
                   <td><div className="person"><Avatar src={r.student.photo} name={fullName(r.student)} size={28} /><b>{fullName(r.student)}</b></div></td>
-                  <td className="c bold">{fmtNote(r.general)}</td>
-                  <td>{appreciation(r.general).label}</td>
+                  {pre ? <td className="c"><LevelPill v={r.general} /></td> : <><td className="c bold">{fmtNote(r.general)}</td>
+                  <td>{appreciation(r.general).label}</td></>}
                   <td><textarea className="textarea" style={{ minHeight: 44, fontSize: 12.5 }} disabled={!canWrite} defaultValue={e.appreciation} key={`${r.student.id}-${e.updatedAt}`} onBlur={(ev) => ev.target.value !== e.appreciation && upsert(r.student.id, { appreciation: ev.target.value })} placeholder="Appréciation..." /></td>
                   <td><select className="select" disabled={!canWrite} value={e.comportement.conduite} onChange={(ev) => upsert(r.student.id, { comportement: { ...e.comportement, conduite: ev.target.value } as ReportCardEntry['comportement'] })}>{[...new Set([e.comportement.conduite, ...CONDUITE])].map((c) => <option key={c}>{c}</option>)}</select></td>
                   <td><select className="select" disabled={!canWrite} value={e.decision} onChange={(ev) => upsert(r.student.id, { decision: ev.target.value })}>{[...new Set([e.decision, ...DECISIONS])].map((d) => <option key={d}>{d}</option>)}</select></td>

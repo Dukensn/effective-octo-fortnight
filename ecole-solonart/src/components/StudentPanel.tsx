@@ -4,7 +4,8 @@ import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarChe
 import { db, useCollection, useDoc } from '../data/store';
 import type { Student } from '../data/types';
 import { Avatar, Badge, Menu, StatusBadge, Confirm, toast, Modal, Field } from './ui';
-import { appreciation, classReport, fmtNote, sortedPeriods } from '../data/compute';
+import { appreciation, classReport, fmtNote, isPreschool, levelOf, sortedPeriods } from '../data/compute';
+import { LevelPill } from './Level';
 import { money, dateLong, dateShort, age, fullName } from '../lib/format';
 import { balances } from '../lib/finance';
 import { useSession, audit } from '../lib/session';
@@ -34,6 +35,8 @@ export function StudentPanel({ student }: { student: Student }) {
 
   const reports = useMemo(() => periods.map((p) => ({ p, r: classReport(student.classeId, p.id)?.students.find((x) => x.student.id === student.id) })), [student.id, student.classeId, periods]);
   const annual = classReport(student.classeId, 'annuel');
+  const pre = isPreschool(annual?.classe);
+  const N = (v: number | null | undefined) => (pre ? <LevelPill v={v} /> : fmtNote(v));
   const me = annual?.students.find((x) => x.student.id === student.id);
   const filled = reports.filter((x) => x.r?.general != null);
   const last = filled[filled.length - 1];
@@ -94,8 +97,9 @@ export function StudentPanel({ student }: { student: Student }) {
       {tab === 'Aperçu' && (
         <>
           <div className="kpis">
-            <div className="card kpi"><div className="t">Moyenne générale</div><div className="v">{fmtNote(last?.r?.general)} <small>/ 20</small></div><div className="s">{delta !== 0 && <span className={delta > 0 ? 'trend-up' : 'trend-down'}>{delta > 0 ? <ArrowUp size={12} /> : <ArrowDown size={12} />} {delta > 0 ? '+' : ''}{fmtNote(delta)}</span>}<br />{last?.p.libelle}</div></div>
-            <div className="card kpi"><div className="t">Rang de la classe</div><div className="v">{last?.r?.rank ?? '-'} <small>/ {annual?.effectif}</small></div></div>
+            {pre ? <div className="card kpi"><div className="t">Bilan de compétences</div><div className="v" style={{ fontSize: 18 }}>{levelOf(last?.r?.general)?.label ?? '-'}</div><div className="s">{last?.p.libelle}</div></div>
+            : <div className="card kpi"><div className="t">Moyenne générale</div><div className="v">{fmtNote(last?.r?.general)} <small>/ 20</small></div><div className="s">{delta !== 0 && <span className={delta > 0 ? 'trend-up' : 'trend-down'}>{delta > 0 ? <ArrowUp size={12} /> : <ArrowDown size={12} />} {delta > 0 ? '+' : ''}{fmtNote(delta)}</span>}<br />{last?.p.libelle}</div></div>}
+            {!pre && <div className="card kpi"><div className="t">Rang de la classe</div><div className="v">{last?.r?.rank ?? '-'} <small>/ {annual?.effectif}</small></div></div>}
             <div className="card kpi"><div className="t">Présence</div><div className="v">{Math.round(att.rate * 100)}%</div><div className="s">{att.present} / {att.total} jours</div></div>
             <div className="card kpi"><div className="t">Situation financière</div><div style={{ margin: '10px 0 6px' }}>{bal && bal.rest === 0 ? <Badge tone="green"><ArrowUp />À jour</Badge> : <Badge tone="orange">Reste {money(bal?.rest ?? 0)}</Badge>}</div><div className="s">Année {useDoc('years', student.anneeId)?.libelle}</div></div>
           </div>
@@ -103,10 +107,11 @@ export function StudentPanel({ student }: { student: Student }) {
             <div className="card-head"><h3>Derniers résultats</h3><button className="link" style={{ border: 0, background: 'none', color: 'var(--primary)' }} onClick={() => setTab('Notes')}>Voir tous</button></div>
             <div className="table-wrap" style={{ padding: '0 16px 16px' }}>
               <table className="t" style={{ border: '1px solid var(--line)', borderRadius: 10 }}>
-                <thead><tr><th>Contrôle</th><th>Moyenne</th><th>Rang</th><th>Appréciation</th></tr></thead>
+                <thead><tr><th>Contrôle</th><th>{pre ? 'Bilan' : 'Moyenne'}</th>{!pre && <th>Rang</th>}<th>Appréciation</th></tr></thead>
                 <tbody>
                   {reports.map(({ p, r }) => {
                     const a = appreciation(r?.general);
+                    if (pre) return <tr key={p.id}><td>{p.libelle}</td><td><LevelPill v={r?.general} /></td><td>{levelOf(r?.general)?.label ?? '-'}</td></tr>;
                     return <tr key={p.id}><td>{p.libelle}</td><td>{fmtNote(r?.general)}</td><td>{r?.general != null ? `${r.rank}/${annual?.effectif}` : '-'}</td><td style={{ color: a.tone === 'insuffisant' ? 'var(--red)' : 'var(--green)', fontWeight: 500 }}>{r?.general != null ? a.label : '-'}</td></tr>;
                   })}
                 </tbody>
@@ -145,16 +150,16 @@ export function StudentPanel({ student }: { student: Student }) {
         <div className="card">
           <div className="table-wrap">
             <table className="t t-compact">
-              <thead><tr><th>Matière</th><th className="c">Coef.</th>{periods.map((p) => <th key={p.id} className="c">{p.court}</th>)}<th className="c">Moy.</th><th className="c">Classe</th></tr></thead>
+              <thead><tr><th>{pre ? 'Domaine' : 'Matière'}</th>{!pre && <th className="c">Coef.</th>}{periods.map((p) => <th key={p.id} className="c">{p.court}</th>)}<th className="c">{pre ? 'Bilan' : 'Moy.'}</th>{!pre && <th className="c">Classe</th>}</tr></thead>
               <tbody>
                 {me.lines.map((l) => (
                   <tr key={l.course.id}>
-                    <td>{l.subject.nom}</td><td className="c">{l.course.coefficient}</td>
-                    {periods.map((p) => <td key={p.id} className="c">{fmtNote(l.byPeriod[p.id])}</td>)}
-                    <td className="c bold">{fmtNote(l.value)}</td><td className="c muted">{fmtNote(l.classAvg)}</td>
+                    <td>{l.subject.nom}</td>{!pre && <td className="c">{l.course.coefficient}</td>}
+                    {periods.map((p) => <td key={p.id} className="c">{N(l.byPeriod[p.id])}</td>)}
+                    <td className="c bold">{N(l.value)}</td>{!pre && <td className="c muted">{fmtNote(l.classAvg)}</td>}
                   </tr>
                 ))}
-                <tr style={{ background: 'var(--primary-50)' }}><td className="bold">Moyenne générale</td><td />{periods.map((p) => <td key={p.id} className="c bold">{fmtNote(me.byPeriod[p.id])}</td>)}<td className="c bold">{fmtNote(me.general)}</td><td className="c">{fmtNote(annual.classGeneral)}</td></tr>
+                {!pre && <tr style={{ background: 'var(--primary-50)' }}><td className="bold">Moyenne générale</td><td />{periods.map((p) => <td key={p.id} className="c bold">{fmtNote(me.byPeriod[p.id])}</td>)}<td className="c bold">{fmtNote(me.general)}</td><td className="c">{fmtNote(annual.classGeneral)}</td></tr>}
               </tbody>
             </table>
           </div>

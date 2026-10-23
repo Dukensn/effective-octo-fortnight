@@ -6,7 +6,7 @@ import { PageHead } from '../../components/ui';
 import { Scaled, A4L } from '../../components/Scaled';
 import { BulletinPages, BULLETIN_MODELS, TRI_THEMES, type BulletinModel } from '../../docs/Bulletins';
 import { buildBulletin } from '../../docs/common';
-import { classStudents, sortedPeriods } from '../../data/compute';
+import { classStudents, isPreschool, sortedPeriods } from '../../data/compute';
 import { fullName } from '../../lib/format';
 import { printDocument } from '../../lib/print';
 import { audit } from '../../lib/session';
@@ -32,12 +32,14 @@ export default function ReportCards() {
   const [idx, setIdx] = useState(startIdx);
   const current = students[Math.min(idx, students.length - 1)];
   const t = TRI_THEMES.find((x) => x.key === theme)!;
-  const models = BULLETIN_MODELS.filter((m) => scope === 'annuel' || !m.annualOnly);
-  const activeModel = models.some((m) => m.key === model) ? model : 'tripliable';
-  const data = useMemo(() => (current ? buildBulletin(current.id, scope) : null), [current, scope]); // eslint-disable-line
-  const twoSided = activeModel === 'livret' || activeModel === 'tripliable';
-  const sides = twoSided && !duplex ? 'recto' : 'both';
   const c = classes.find((x) => x.id === classe);
+  const pre = isPreschool(c);
+  // Le préscolaire n'a qu'un modèle (compétences, sans notes) ; les autres classes ne l'utilisent pas.
+  const models = BULLETIN_MODELS.filter((m) => !!m.prescolaire === pre && (scope === 'annuel' || !m.annualOnly));
+  const activeModel = models.some((m) => m.key === model) ? model : models[0].key;
+  const data = useMemo(() => (current ? buildBulletin(current.id, scope) : null), [current, scope]); // eslint-disable-line
+  const twoSided = activeModel === 'livret' || activeModel === 'tripliable' || activeModel === 'prescolaire';
+  const sides = twoSided && !duplex ? 'recto' : 'both';
 
   const printAll = (only?: string) => {
     const list = only ? students.filter((s) => s.id === only) : students;
@@ -81,7 +83,7 @@ export default function ReportCards() {
         </div>
         <div className="row small" style={{ gap: 8, color: 'var(--muted)' }}>
           <Sparkles size={15} color="var(--primary)" style={{ flex: 'none' }} />
-          <span>Moyennes, rangs, appréciations, conduite, observations et décision sont remplis automatiquement. <a style={{ cursor: 'pointer' }} onClick={() => nav('/notes?tab=conseil')}>Modifier un élève</a></span>
+          <span>{pre ? 'Niveaux de compétence, mot de la maîtresse et décision sont remplis automatiquement.' : 'Moyennes, rangs, appréciations, conduite, observations et décision sont remplis automatiquement.'} <a style={{ cursor: 'pointer' }} onClick={() => nav('/notes?tab=conseil')}>Modifier un élève</a></span>
         </div>
       </div>
 

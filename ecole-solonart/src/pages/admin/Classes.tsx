@@ -30,7 +30,7 @@ export default function Classes() {
         actions={session.can('classes', 'write') && <button className="btn btn-primary" onClick={() => setEdit({})}><Plus />Créer une classe</button>} />
       <div className="row wrap mb-16" style={{ gap: 12 }}>
         <div style={{ flex: '1 1 260px', maxWidth: 380 }}><SearchInput value={q} onChange={setQ} placeholder="Rechercher une classe..." /></div>
-        <Pills items={['Tous', 'Fondamental', 'Secondaire']} value={niveau} onChange={setNiveau} />
+        <Pills items={['Tous', 'Préscolaire', 'Fondamental', 'Secondaire']} value={niveau} onChange={setNiveau} />
       </div>
       <div className="grid g-3">
         {list.map((c) => {
@@ -50,7 +50,7 @@ export default function Classes() {
               </div>
               <div className="row between small" style={{ borderTop: '1px solid var(--line-2)', paddingTop: 10 }}>
                 <span className="row" style={{ gap: 8 }}>{tit && <Avatar src={tit.photo} name={civ(tit)} size={26} />}<span className="ellipsis" style={{ maxWidth: 160 }}>{tit ? civ(tit) : 'Aucun titulaire'}</span></span>
-                <span>Moy. {last?.court} : <b>{fmtNote(r?.classGeneral)}</b></span>
+                {c.niveau === 'Préscolaire' ? <span>Compétences</span> : <span>Moy. {last?.court} : <b>{fmtNote(r?.classGeneral)}</b></span>}
               </div>
             </button>
           );
@@ -70,9 +70,10 @@ export function ClassForm({ value, onClose, onSaved }: { value: Partial<ClassRoo
     if (!f.code?.trim() || !f.nom?.trim()) return toast('Code et nom requis', true);
     const saved = db.put('classes', { anneeId: school.anneeCourante, salle: f.salle || `Salle ${f.code}`, annee: f.annee || f.nom!, ...f } as ClassRoom);
     if (!value.id) {
-      // Affecte automatiquement toutes les matières à la nouvelle classe
-      const subjects = db.list('subjects');
-      db.bulkPut('courses', subjects.map((s) => ({ id: `${saved.id}-${s.id}`, classeId: saved.id, matiereId: s.id, coefficient: 2, heuresSemaine: 3 })));
+      // Affecte automatiquement les matières du niveau (domaines de compétences pour le préscolaire)
+      const pre = saved.niveau === 'Préscolaire';
+      const subjects = db.list('subjects').filter((s) => (s.groupe === 'prescolaire') === pre);
+      db.bulkPut('courses', subjects.map((s) => ({ id: `${saved.id}-${s.id}`, classeId: saved.id, matiereId: s.id, professeurId: pre ? saved.titulaireId : undefined, coefficient: pre ? 1 : 2, heuresSemaine: pre ? 4 : 3 })));
     }
     audit(value.id ? 'Modification classe' : 'Création classe', f.code!);
     toast('Classe enregistrée');

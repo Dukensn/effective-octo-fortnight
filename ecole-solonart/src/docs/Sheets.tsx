@@ -2,7 +2,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { db } from '../data/store';
 import type { Evaluation, Guardian, Payment, Student, TimetableSlot } from '../data/types';
-import { classReport, evaluationStats, fmtNote, sortedPeriods } from '../data/compute';
+import { classReport, evaluationStats, fmtNote, isPreschool, levelOf, LEVELS, sortedPeriods } from '../data/compute';
 import { money, dateLong, dateShort, fullName, civ, monthLabel, age } from '../lib/format';
 import { balances } from '../lib/finance';
 import { DocLogo, QR, Signature, PhotoOrSilhouette } from './common';
@@ -145,6 +145,20 @@ export function PalmaresSheet({ ev }: { ev: Evaluation }) {
   const c = db.get('classes', ev.classeId);
   const s = db.get('subjects', ev.matiereId);
   const prof = db.get('staff', db.get('courses', ev.coursId)?.professeurId);
+  const pre = isPreschool(c);
+  const lv = (n?: number | null) => levelOf(n == null ? null : (n / ev.noteMax) * 20);
+  if (pre) return page(
+    <A4 title={`Bilan de compétences — ${c?.code} · ${s?.nom}`} sub={`${ev.titre} du ${dateLong(ev.date)} · Maîtresse : ${civ(prof)}`}>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+        {LEVELS.map((l) => <div key={l.code} style={{ flex: 1, background: l.bg, borderRadius: 8, padding: 8, textAlign: 'center', color: l.color }}><div style={{ fontSize: 10 }}>{l.label}</div><b style={{ fontSize: 16 }}>{st.rows.filter((r) => !r.grade?.absent && lv(r.grade?.note)?.code === l.code).length}</b></div>)}
+      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead><tr><th style={th}>#</th><th style={th}>Enfant</th><th style={th}>Matricule</th><th style={{ ...th, textAlign: 'center' }}>Niveau</th></tr></thead>
+        <tbody>{st.rows.map((r, i) => <tr key={r.student.id}><td style={td}>{i + 1}</td><td style={td}>{fullName(r.student)}</td><td style={td}>{r.student.matricule}</td><td style={{ ...td, textAlign: 'center', fontWeight: 700, color: lv(r.grade?.note)?.color }}>{r.grade?.absent ? 'Absent' : lv(r.grade?.note)?.label ?? '-'}</td></tr>)}</tbody>
+      </table>
+      <Signatures left="La Maîtresse" right="La Direction" />
+    </A4>,
+  );
   const rows = [...st.ranked, ...st.rows.filter((r) => r.grade?.note == null)];
   return page(
     <A4 title={`Palmarès — ${c?.code} · ${s?.nom}`} sub={`${ev.titre} du ${dateLong(ev.date)} · Professeur : ${civ(prof)} · Noté sur ${ev.noteMax}`}>

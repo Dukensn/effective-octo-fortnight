@@ -523,3 +523,11 @@ table.t { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   .mobile-search-bar { display: block !important; position: sticky; top: var(--topbar); z-index: 29; background: #fff; padding: 10px 14px; border-bottom: 1px solid var(--line); }
   .mobile-search-bar .search { display: block; }
 }
+
+/* Préscolaire : choix du niveau de compétence */
+.level-picker { display: inline-flex; gap: 4px; }
+.level-picker button { min-width: 38px; height: 34px; padding: 0 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--muted); font-weight: 700; font-size: 13px; cursor: pointer; }
+.level-picker button.on { background: var(--primary-50); color: var(--ink); border-color: var(--muted); }
+.level-picker button:disabled { opacity: .5; cursor: default; }
+.lvl { display: inline-block; min-width: 34px; text-align: center; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+@media (max-width: 480px) { .level-picker { gap: 3px; } .level-picker button { min-width: 32px; padding: 0 4px; font-size: 12px; } }

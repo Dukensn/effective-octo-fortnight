@@ -37,6 +37,13 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Préscolaire (version 3)
+- 3 classes : **Petite section (PS)**, **Moyenne section (MS)**, **Grande section (GS)**, avec leurs maîtresses (comptes professeur, code 1234).
+- 6 **domaines d’apprentissage** : langage, pré-mathématiques, découverte du monde, motricité, arts et chants, vivre ensemble.
+- **Pas de notes ni de rang** : la maîtresse touche **A** (acquis), **EC** (en cours d’acquisition) ou **NA** (non acquis) pour chaque enfant.
+- **Livret préscolaire** recto + verso (photo, domaines × contrôles, mot de la maîtresse, décision « Passe en … », mot aux parents, signatures).
+- Les classes du préscolaire sont exclues des moyennes de l’école (tableau de bord, rapports).
+
 ## Ce que contient l’application
 
 **Espace direction / administration** (menu de gauche sur ordinateur, barre du bas + menu ☰ sur téléphone)

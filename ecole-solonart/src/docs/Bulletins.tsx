@@ -9,6 +9,7 @@ import {
 import { BarChart } from '../components/charts';
 import { APPRECIATION_LEGEND, appreciation } from '../data/compute';
 import { dateLong } from '../lib/format';
+import { PrescolaireRecto, PrescolaireVerso } from './Prescolaire';
 import { DocLogo, QR, Signature, Seal, PhotoOrSilhouette, n1, n0, shortSubject, shortProf, type BulletinData } from './common';
 
 const NAVY = '#0d2a63';
@@ -531,12 +532,13 @@ export function TrifoldVerso({ d, t }: { d: BulletinData; t: TriTheme }) {
   );
 }
 
-export type BulletinModel = 'annuel' | 'annuel100' | 'livret' | 'tripliable';
-export const BULLETIN_MODELS: { key: BulletinModel; nom: string; desc: string; pages: string; annualOnly?: boolean }[] = [
+export type BulletinModel = 'annuel' | 'annuel100' | 'livret' | 'tripliable' | 'prescolaire';
+export const BULLETIN_MODELS: { key: BulletinModel; nom: string; desc: string; pages: string; annualOnly?: boolean; prescolaire?: boolean }[] = [
   { key: 'tripliable', nom: 'Tripliable (6 thèmes)', desc: 'Bulletin de période ou annuel, recto + verso, à plier en 3.', pages: 'Recto + verso' },
   { key: 'annuel', nom: 'Bulletin annuel /20', desc: 'Tableau complet C1 à C5, évolution, résultat global.', pages: '1 page', annualOnly: true },
   { key: 'annuel100', nom: 'Bulletin annuel /100', desc: 'Notes sur 100 avec coefficients et examen final.', pages: '1 page', annualOnly: true },
   { key: 'livret', nom: 'Livret 3 volets + dos', desc: 'Résultats annuels, suivi, comportement et décision.', pages: 'Recto + verso', annualOnly: true },
+  { key: 'prescolaire', nom: 'Livret préscolaire', desc: 'Compétences Acquis / En cours / Non acquis, sans note ni rang.', pages: 'Recto + verso', prescolaire: true },
 ];
 
 /** Rend toutes les pages d'un bulletin pour un élève. */
@@ -545,6 +547,7 @@ export function BulletinPages({ d, model, theme, sides = 'both' }: { d: Bulletin
   if (model === 'annuel') pages.push(<BulletinAnnuel key="a" d={d} />);
   if (model === 'annuel100') pages.push(<BulletinAnnuel100 key="a" d={d} />);
   if (model === 'livret') { if (sides !== 'verso') pages.push(<LivretRecto key="r" d={d} />); if (sides !== 'recto') pages.push(<LivretVerso key="v" d={d} />); }
+  if (model === 'prescolaire') { if (sides !== 'verso') pages.push(<PrescolaireRecto key="r" d={d} />); if (sides !== 'recto') pages.push(<PrescolaireVerso key="v" d={d} />); }
   if (model === 'tripliable') { if (sides !== 'verso') pages.push(<TrifoldRecto key="r" d={d} t={theme} />); if (sides !== 'recto') pages.push(<TrifoldVerso key="v" d={d} t={theme} />); }
   return <>{pages.map((p, i) => <div className="print-page" key={i}>{p}</div>)}</>;
 }
