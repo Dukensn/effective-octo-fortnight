@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useCollection, useDoc } from '../../data/store';
-import { Empty, StatusBadge } from '../../components/ui';
+import { Empty, ScreenHead, StatusBadge } from '../../components/ui';
 import { dateShort } from '../../lib/format';
 import { useSession } from '../../lib/session';
 
@@ -22,11 +22,7 @@ export default function TeacherEvaluations() {
   const list = evaluations.filter((e) => typeOf(e.periodeId) === tab || (tab === 'examen' && /examen/i.test(e.titre))).sort((a, b) => ordre(a.periodeId) - ordre(b.periodeId) || a.date.localeCompare(b.date));
   return (
     <div style={{ maxWidth: 760, margin: '0 auto' }}>
-      <div className="row mb-16">
-        <button className="icon-btn" onClick={() => nav('/prof/classes')} aria-label="Retour"><ArrowLeft /></button>
-        <h2 className="grow center" style={{ fontSize: 18 }}>{classe?.code} - {subject?.nom.split(' (')[0]}</h2>
-        <span style={{ width: 40 }} />
-      </div>
+      <ScreenHead center title={`${classe?.code} - ${subject?.nom.split(' (')[0]}`} onBack={() => nav('/prof/classes')} />
       <div className="seg mb-16"><button className={tab === 'controle' ? 'active' : ''} onClick={() => setTab('controle')}>Contrôles</button><button className={tab === 'examen' ? 'active' : ''} onClick={() => setTab('examen')}>Examens</button></div>
       {list.length === 0 && <Empty title="Aucune évaluation">La direction planifie les contrôles et examens.</Empty>}
       <div className="stack" style={{ gap: 10 }}>

@@ -37,6 +37,19 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Application mobile et rapport mensuel (version 4)
+- **Sur téléphone et tablette, l’interface devient une vraie application** :
+  - barre du haut avec le nom de l’écran, un bouton retour et un menu ⋮ qui regroupe les actions de la page ;
+  - barre du bas : **Accueil · Élèves · ＋ · Finance · Menu** (adaptée aux droits de chaque rôle) ;
+  - le **＋** ouvre les actions rapides : inscrire, encaisser, dépense, appel, notes, bulletins, badges, rapport du mois, message ;
+  - **Menu** donne tous les modules, le profil et la déconnexion ;
+  - onglets en pastilles collés en haut, chiffres clés compacts, feuilles qui montent du bas, transitions entre écrans.
+- **Professeur** : Accueil · Notes · Appel · Horaire · Menu.
+- **Rapport financier mensuel** (Finance → Rapport mensuel, ou ＋ → Rapport du mois) :
+  - recettes par motif et par mode de paiement, salaires, dépenses par catégorie, résultat et comparaison avec le mois précédent ;
+  - impression ou PDF A4, envoi du résumé par WhatsApp, export Excel.
+- L’ordinateur garde la mise en page habituelle (menu de gauche).
+
 ## Préscolaire (version 3)
 - 3 classes : **Petite section (PS)**, **Moyenne section (MS)**, **Grande section (GS)**, avec leurs maîtresses (comptes professeur, code 1234).
 - 6 **domaines d’apprentissage** : langage, pré-mathématiques, découverte du monde, motricité, arts et chants, vivre ensemble.

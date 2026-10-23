@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronDown, LogOut, Menu as MenuIcon, Search, UserCircle2, WifiOff, Cloud, CloudOff, RefreshCw, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Bell, ChevronDown, ChevronRight, HelpCircle, LayoutGrid, LogOut, Plus, Search, UserCircle2, WifiOff, Cloud, CloudOff, RefreshCw, type LucideIcon } from 'lucide-react';
 import { SchoolLogo } from './Logo';
-import { Avatar } from './ui';
+import { AppBarCtx, Avatar, Sheet, useIsDesktop } from './ui';
 import { useCollection, useDoc } from '../data/store';
 import { logout, useSession } from '../lib/session';
 import { useSyncState } from '../data/sync';
@@ -98,57 +98,116 @@ function SyncPill() {
   return <span className="sync-pill only-desktop"><Ic size={14} />{label}</span>;
 }
 
-export function Shell({ items, bottom, children }: { items: NavItem[]; bottom: NavItem[]; children: ReactNode }) {
-  const [drawer, setDrawer] = useState(false);
+export interface QuickAction { label: string; sub?: string; icon: LucideIcon; to: string; tint: string }
+
+// Titres des écrans secondaires (les écrans principaux prennent le libellé du menu).
+const SUB_TITLES: [RegExp, string][] = [
+  [/^\/inscriptions\/rapide/, 'Inscription rapide'], [/^\/inscriptions\/nouvelle/, 'Nouvelle inscription'], [/^\/eleves\/import/, 'Importer des élèves'],
+  [/^\/eleves\/photos/, 'Séance photo'], [/^\/eleves\//, 'Fiche élève'], [/^\/classes\//, 'Classe'], [/^\/notes\/saisie/, 'Saisie des notes'],
+  [/^\/notes\/palmares/, 'Palmarès'], [/^\/documents\/bulletins/, 'Bulletins'], [/^\/documents\/badges/, 'Badges'], [/^\/prof\/evaluation\/.+\/saisie/, 'Saisie des notes'],
+  [/^\/prof\/evaluation/, 'Palmarès'], [/^\/prof\/classes\//, 'Contrôles'], [/^\/profil/, 'Mon profil'], [/^\/aide/, 'Aide'], [/^\/evenements/, 'Événements'], [/^\/gestion/, 'Gestion'],
+];
+
+export function Shell({ items, tabs, quick = [], children }: { items: NavItem[]; tabs: NavItem[]; quick?: QuickAction[]; children: ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [plus, setPlus] = useState(false);
+  const [more, setMore] = useState(false);
+  const [slots, setSlots] = useState<{ title: HTMLElement | null; actions: HTMLElement | null }>({ title: null, actions: null });
+  const titleRef = useCallback((el: HTMLElement | null) => setSlots((x) => (x.title === el ? x : { ...x, title: el })), []);
+  const actionsRef = useCallback((el: HTMLElement | null) => setSlots((x) => (x.actions === el ? x : { ...x, actions: el })), []);
   const session = useSession();
   const school = useDoc('school', 'main');
   const year = useDoc('years', school?.anneeCourante);
   const online = useOnline();
   const navigate = useNavigate();
   const location = useLocation();
+  const desktop = useIsDesktop();
   const pendingStudents = useCollection('students').filter((s) => s.statut === 'En attente').length;
   const pendingPayments = useCollection('payments').filter((p) => p.statut === 'En attente').length;
   const notifCount = session?.isTeacher ? 0 : pendingStudents + pendingPayments;
-  useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+  useEffect(() => { window.scrollTo(0, 0); setSearchOpen(false); setPlus(false); setMore(false); }, [location.pathname, location.search]);
   if (!session) return null;
   const roleLabel = session.isTeacher ? 'Professeur' : session.role.nom;
+  const path = location.pathname;
+  const isTab = tabs.some((t) => (t.end ? path === t.to : path === t.to));
+  const fallbackTitle = SUB_TITLES.find(([re]) => re.test(path))?.[1] ?? items.find((t) => t.to !== '/' && path.startsWith(t.to))?.label ?? (path === '/' ? 'Accueil' : '');
+  const goBack = () => {
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate('/' + (path.split('/')[1] ?? ''));
+  };
+  const others = items.filter((it) => !tabs.some((t) => t.to === it.to));
+  const half = Math.ceil(tabs.length / 2);
   return (
+    <AppBarCtx.Provider value={slots}>
     <div className="shell">
       <aside className="sidebar"><SideNav items={items} /></aside>
-      {drawer && (
-        <>
-          <div className="drawer-backdrop" onClick={() => setDrawer(false)} />
-          <aside className="drawer"><SideNav items={items} onNavigate={() => setDrawer(false)} /></aside>
-        </>
-      )}
       <div className="main">
-        {!online && <div className="offline-banner"><WifiOff size={13} style={{ verticalAlign: -2 }} /> Mode hors ligne — vos modifications sont enregistrées sur cet appareil et seront synchronisées.</div>}
-        <header className="topbar">
-          <button className="icon-btn only-mobile" style={{ display: undefined }} onClick={() => setDrawer(true)} aria-label="Menu"><MenuIcon /></button>
-          <div className="mobile-brand only-mobile"><SchoolLogo size={26} /><span className="ellipsis" style={{ maxWidth: 150 }}>{school?.nom.replace('École Mixte ', '')}</span></div>
-          <GlobalSearch />
-          <span className="spacer" />
-          {!session.isTeacher && <button className="icon-btn only-phone" aria-label="Rechercher" onClick={() => setSearchOpen(!searchOpen)}><Search /></button>}
-          <SyncPill />
-          <button className="icon-btn" aria-label="Notifications" onClick={() => navigate(session.isTeacher ? '/evenements' : '/evenements')}>
-            <Bell />
-            {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
-          </button>
-          {!session.isTeacher && (
-            <button className="btn year-select" style={{ color: 'var(--ink)', fontWeight: 500 }} onClick={() => navigate('/parametres?tab=annee')} title="Changer d’année scolaire">Année {year?.libelle}</button>
-          )}
-          <UserMenu name={session.user.nom} photo={session.user.photo} role={roleLabel} />
-        </header>
-        {searchOpen && <div className="mobile-search-bar only-phone"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>}
-        <main className="content">{children}</main>
+        {!online && <div className="offline-banner"><WifiOff size={13} style={{ verticalAlign: -2 }} /> Hors ligne — tout est enregistré sur l’appareil et sera synchronisé.</div>}
+        {desktop ? (
+          <header className="topbar">
+            <GlobalSearch />
+            <span className="spacer" />
+            <SyncPill />
+            <button className="icon-btn" aria-label="Notifications" onClick={() => navigate('/evenements')}>
+              <Bell />
+              {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
+            </button>
+            {!session.isTeacher && (
+              <button className="btn year-select" style={{ color: 'var(--ink)', fontWeight: 500 }} onClick={() => navigate('/parametres?tab=annee')} title="Changer d’année scolaire">Année {year?.libelle}</button>
+            )}
+            <UserMenu name={session.user.nom} photo={session.user.photo} role={roleLabel} />
+          </header>
+        ) : (
+          <header className="appbar">
+            {isTab ? <SchoolLogo size={28} className="appbar-logo" /> : <button className="icon-btn" aria-label="Retour" onClick={goBack}><ArrowLeft /></button>}
+            <h1 className="appbar-title"><span ref={titleRef} className="ab-slot" /><span className="ab-default">{fallbackTitle}</span></h1>
+            {!session.isTeacher && <button className="icon-btn" aria-label="Rechercher" onClick={() => setSearchOpen(!searchOpen)}><Search /></button>}
+            <button className="icon-btn" aria-label="Notifications" onClick={() => navigate('/evenements')}>
+              <Bell />
+              {notifCount > 0 && <span className="dot-count">{Math.min(notifCount, 9)}</span>}
+            </button>
+            <span ref={actionsRef} className="ab-actions" />
+          </header>
+        )}
+        {searchOpen && !desktop && <div className="mobile-search-bar"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>}
+        <main className="content" key={desktop ? 'd' : path}>{children}</main>
         <nav className="bottom-nav">
-          {bottom.map((it) => (
-            <NavLink key={it.to} to={it.to} end={it.end}><it.icon />{it.label}</NavLink>
-          ))}
+          {tabs.slice(0, half).map((it) => <NavLink key={it.to} to={it.to} end={it.end}><it.icon />{it.label}</NavLink>)}
+          {quick.length > 0 && <button className="tab-plus" aria-label="Nouveau" onClick={() => setPlus(true)}><span><Plus /></span></button>}
+          {tabs.slice(half).map((it) => <NavLink key={it.to} to={it.to} end={it.end}><it.icon />{it.label}</NavLink>)}
+          <button className={more ? 'active' : ''} onClick={() => setMore(true)}><LayoutGrid />Menu</button>
         </nav>
       </div>
+      <Sheet open={plus} onClose={() => setPlus(false)} title="Que voulez-vous faire ?">
+        <div className="quick-grid">
+          {quick.map((q) => (
+            <button key={q.label} onClick={() => { setPlus(false); navigate(q.to); }}>
+              <span className={`qi tint-${q.tint}`}><q.icon /></span>
+              <b>{q.label}</b>
+              {q.sub && <small>{q.sub}</small>}
+            </button>
+          ))}
+        </div>
+      </Sheet>
+      <Sheet open={more} onClose={() => setMore(false)}>
+        <button className="me-row" onClick={() => { setMore(false); navigate('/profil'); }}>
+          <Avatar src={session.user.photo} name={session.user.nom} size={46} />
+          <span className="grow"><b>{session.user.nom}</b><small>{roleLabel}{!session.isTeacher && year ? ` · Année ${year.libelle}` : ''}</small></span>
+          <ChevronRight size={18} className="chev" />
+        </button>
+        <div className="app-grid">
+          {others.map((it) => (
+            <button key={it.to} onClick={() => { setMore(false); navigate(it.to); }}>
+              <span><it.icon /></span>{it.label.replace('Tableau de bord', 'Accueil').replace('Notes / Examens', 'Notes')}
+            </button>
+          ))}
+          <button onClick={() => { setMore(false); navigate('/aide'); }}><span><HelpCircle /></span>Aide</button>
+        </div>
+        <button className="sheet-row danger" onClick={() => { setMore(false); logout(); navigate('/'); }}><LogOut />Se déconnecter</button>
+      </Sheet>
     </div>
+    </AppBarCtx.Provider>
   );
 }
 

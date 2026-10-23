@@ -99,11 +99,11 @@ export default function Dashboard() {
         <div className="hero-logo"><SchoolLogo size={110} /></div>
       </section>
 
-      <div className="grid g-stats mb-16">
+      <div className="grid g-stats mini mb-16">
         <StatCard tint="blue" icon={<Users />} value={actifs.length} label="Élèves" sub={`${actifs.filter((s) => s.sexe === 'F').length} filles · ${actifs.filter((s) => s.sexe === 'M').length} garçons`} />
         <StatCard tint="green" icon={<GraduationCap />} value={profs.length} label="Professeurs" sub={`${staff.filter((s) => s.statut === 'Actif').length} membres du personnel`} />
         <StatCard tint="violet" icon={<ClipboardCheck />} value={`${Math.round(presence * 100)}%`} label="Présence" sub="20 derniers jours" />
-        <StatCard tint="orange" icon={<Wallet />} value={`${Math.round(finance.rate * 100)}%`} label="Scolarité encaissée" sub={money(finance.paid)} />
+        <StatCard tint="orange" icon={<Wallet />} value={`${Math.round(finance.rate * 100)}%`} label="Scolarité" sub={money(finance.paid)} />
       </div>
 
       <div className="split split-side">

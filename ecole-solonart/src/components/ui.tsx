@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { Children, cloneElement, createContext, Fragment, isValidElement, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { CheckCircle2, ChevronLeft, ChevronRight, Inbox, MoreHorizontal, X, AlertCircle, Search } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Inbox, MoreHorizontal, MoreVertical, X, AlertCircle, Search } from 'lucide-react';
 import { initials } from '../lib/format';
 
 // ---------------- Avatar ----------------
@@ -80,12 +80,18 @@ export function Toasts() {
 }
 
 // ---------------- Tabs ----------------
+/** Fait défiler une rangée horizontale pour que l'élément actif soit visible. */
+export const scrollIntoRow = (el: HTMLElement | null) => {
+  const row = el?.parentElement;
+  if (!el || !row || row.scrollWidth <= row.clientWidth) return;
+  row.scrollLeft = Math.max(0, el.offsetLeft - row.offsetLeft - 14);
+};
 export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: (T | [T, string])[]; value: T; onChange: (v: T) => void }) {
   return (
     <div className="tabs" role="tablist">
       {tabs.map((t) => {
         const [k, label] = Array.isArray(t) ? t : [t, t];
-        return <button key={k} role="tab" className={value === k ? 'active' : ''} onClick={() => onChange(k)}>{label}</button>;
+        return <button key={k} role="tab" className={value === k ? 'active' : ''} ref={value === k ? scrollIntoRow : undefined} onClick={() => onChange(k)}>{label}</button>;
       })}
     </div>
   );
@@ -186,7 +192,102 @@ export function Empty({ title, children, icon }: { title: string; children?: Rea
   );
 }
 
+// ---------------- Feuille du bas (mobile) ----------------
+export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title?: ReactNode; children: ReactNode }) {
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', h);
+    document.body.style.overflow = 'hidden';
+    return () => { window.removeEventListener('keydown', h); document.body.style.overflow = ''; };
+  }, [open, onClose]);
+  if (!open) return null;
+  return createPortal(
+    <div className="sheet-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="sheet" role="dialog" aria-modal="true">
+        <div className="sheet-handle" />
+        {title && <div className="sheet-title">{title}</div>}
+        {children}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/** Emplacements de la barre d'application mobile, remplis par PageHead. */
+export const AppBarCtx = createContext<{ title: HTMLElement | null; actions: HTMLElement | null }>({ title: null, actions: null });
+
+/** Transforme les actions d'en-tête (boutons, menus) en lignes de feuille d'actions. */
+function sheetRows(node: ReactNode, close: () => void): ReactNode[] {
+  const out: ReactNode[] = [];
+  Children.toArray(node).forEach((ch, i) => {
+    if (!isValidElement(ch)) return;
+    const el = ch as ReactElement<{ children?: ReactNode; items?: Parameters<typeof Menu>[0]['items']; className?: string; onClick?: () => void }>;
+    if (el.type === Fragment) { out.push(...sheetRows(el.props.children, close)); return; }
+    if (el.type === Menu) {
+      el.props.items!.forEach((it, j) => out.push(it === 'sep' ? <hr key={`${i}-${j}`} /> : (
+        <button key={`${i}-${j}`} className={`sheet-row ${it.danger ? 'danger' : ''}`} onClick={() => { close(); it.onClick(); }}>{it.icon}{it.label}</button>
+      )));
+      return;
+    }
+    if (el.type === 'button') {
+      const primary = el.props.className?.includes('btn-primary');
+      out.push(cloneElement(el, { key: i, className: `sheet-row ${primary ? 'primary' : ''}`, onClick: () => { close(); el.props.onClick?.(); } }));
+      return;
+    }
+    out.push(<div key={i} className="sheet-other">{el}</div>);
+  });
+  // l'action principale en premier
+  return out.sort((x, y) => Number(isValidElement(y) && String((y.props as { className?: string }).className).includes('primary')) - Number(isValidElement(x) && String((x.props as { className?: string }).className).includes('primary')));
+}
+
+function AppBarActions({ actions, title }: { actions: ReactNode; title: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button className="icon-btn" aria-label="Actions" onClick={() => setOpen(true)}><MoreVertical /></button>
+      <Sheet open={open} onClose={() => setOpen(false)} title={title}>
+        <div className="sheet-list">{sheetRows(actions, () => setOpen(false))}</div>
+      </Sheet>
+    </>
+  );
+}
+
+/** En-tête d'écran secondaire (retour + titre). Sur téléphone, le titre monte dans la barre d'application. */
+export function ScreenHead({ title, sub, right, menu, onBack, center }: { title: ReactNode; sub?: ReactNode; right?: ReactNode; menu?: ReactNode; onBack: () => void; center?: boolean }) {
+  const bar = useContext(AppBarCtx);
+  const desktop = useIsDesktop();
+  if (!desktop && bar.title) {
+    return (
+      <>
+        {createPortal(title, bar.title)}
+        {menu && bar.actions && createPortal(menu, bar.actions)}
+        {(sub || right) && <div className="row mb-12 screen-sub">{sub && <div className="grow muted small">{sub}</div>}{right}</div>}
+      </>
+    );
+  }
+  return (
+    <div className="row mb-16" style={{ alignItems: sub ? 'flex-start' : 'center' }}>
+      <button className="icon-btn" onClick={onBack} aria-label="Retour"><ArrowLeft /></button>
+      {center ? <h2 className="grow center" style={{ fontSize: 18 }}>{title}</h2> : <div className="grow"><h2 style={{ fontSize: 19 }}>{title}</h2>{sub && <div className="muted">{sub}</div>}</div>}
+      {right ?? (center && <span style={{ width: 40 }} />)}
+      {menu}
+    </div>
+  );
+}
+
 export function PageHead({ title, sub, actions, back }: { title: ReactNode; sub?: ReactNode; actions?: ReactNode; back?: ReactNode }) {
+  const bar = useContext(AppBarCtx);
+  const desktop = useIsDesktop();
+  // Sur téléphone et tablette : le titre va dans la barre d'application, les actions dans une feuille.
+  if (!desktop && bar.title) {
+    return (
+      <>
+        {createPortal(title, bar.title)}
+        {actions && bar.actions && createPortal(<AppBarActions actions={actions} title={title} />, bar.actions)}
+      </>
+    );
+  }
   return (
     <div className="page-head">
       <div className="titles">

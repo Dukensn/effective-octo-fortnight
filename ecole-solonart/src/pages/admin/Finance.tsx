@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign } from 'lucide-react';
+import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Expense, Payment, PaymentMode, Project, Salary } from '../../data/types';
-import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, Empty } from '../../components/ui';
+import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, Empty, scrollIntoRow } from '../../components/ui';
 import { BarChart, Donut } from '../../components/charts';
 import { money, moneyShort, dateShort, fullName, monthLabel, monthShort, todayISO, downloadCSV, norm, civ } from '../../lib/format';
-import { balances, nextReceipt } from '../../lib/finance';
+import { activeMonths, balances, monthlyReport, nextReceipt } from '../../lib/finance';
 import { useSession, audit } from '../../lib/session';
 import { printDocument } from '../../lib/print';
-import { ReceiptSheet, FinanceReportSheet } from '../../docs/Sheets';
+import { ReceiptSheet, FinanceReportSheet, MonthlyReportSheet } from '../../docs/Sheets';
 
 type Tab = 'apercu' | 'paiements' | 'salaires' | 'depenses' | 'comptabilite' | 'projets' | 'rapports';
 const MODES: PaymentMode[] = ['MonCash', 'NatCash', 'Espèces', 'Virement', 'Chèque'];
@@ -52,7 +52,12 @@ export default function Finance() {
   const [projForm, setProjForm] = useState<Partial<Project> | null>(null);
   const session = useSession()!;
   const canWrite = session.can('finance', 'write');
-  useEffect(() => { if (params.get('new')) { setPayForm(params.get('eleve') ?? ''); setParams({ tab: 'paiements' }, { replace: true }); } }, [params]); // eslint-disable-line
+  useEffect(() => {
+    if (params.get('new')) { setPayForm(params.get('eleve') ?? ''); setTab('paiements'); setParams({ tab: 'paiements' }, { replace: true }); return; }
+    if (params.get('depense')) { setExpForm({}); setTab('depenses'); setParams({ tab: 'depenses' }, { replace: true }); return; }
+    const t = params.get('tab') as Tab | null;
+    if (t && t !== tab) setTab(t);
+  }, [params]); // eslint-disable-line
   const actions = { pay: () => setPayForm(''), exp: () => setExpForm({}), proj: () => setProjForm({}) };
   return (
     <>
@@ -62,7 +67,7 @@ export default function Finance() {
             { label: 'Ajouter un paiement (élève)', icon: <Receipt />, onClick: actions.pay },
             { label: 'Enregistrer une dépense', icon: <TrendingDown />, onClick: actions.exp },
             { label: 'Créer un projet', icon: <FolderKanban />, onClick: actions.proj },
-            { label: 'Générer un état financier', icon: <FileText />, onClick: () => setTab('rapports') },
+            { label: 'Rapport financier du mois', icon: <FileText />, onClick: () => setTab('rapports') },
           ]} />
           <Menu trigger={<button className="btn btn-primary"><Plus />Nouveau<ChevronDown /></button>} items={[
             { label: 'Paiement élève', icon: <Receipt />, onClick: actions.pay },
@@ -70,7 +75,7 @@ export default function Finance() {
             { label: 'Projet', icon: <FolderKanban />, onClick: actions.proj },
           ]} />
         </>} />
-      <Tabs tabs={[['apercu', 'Vue d’ensemble'], ['paiements', 'Paiements élèves'], ['salaires', 'Salaires et personnels'], ['depenses', 'Dépenses'], ['comptabilite', 'Comptabilité'], ['projets', 'Projets'], ['rapports', 'Rapports']]} value={tab} onChange={(t) => { setTab(t); setParams({ tab: t }, { replace: true }); }} />
+      <Tabs tabs={[['apercu', 'Vue d’ensemble'], ['paiements', 'Paiements élèves'], ['salaires', 'Salaires et personnels'], ['depenses', 'Dépenses'], ['comptabilite', 'Comptabilité'], ['projets', 'Projets'], ['rapports', 'Rapport mensuel']]} value={tab} onChange={(t) => { setTab(t); setParams({ tab: t }, { replace: true }); }} />
       {tab === 'apercu' && <Overview go={setTab} actions={actions} canWrite={canWrite} />}
       {tab === 'paiements' && <Payments onNew={actions.pay} canWrite={canWrite} />}
       {tab === 'salaires' && <Salaries canWrite={canWrite} />}
@@ -451,10 +456,65 @@ function ReportList() {
   );
 }
 function Reports() {
+  useCollection('payments'); useCollection('expenses'); useCollection('salaries');
+  const months = activeMonths();
+  // Par défaut : le dernier mois où l'école a encaissé quelque chose.
+  const [ym, setYm] = useState(() => months.find((m) => monthlyReport(m).recettes > 0) ?? months[0] ?? todayISO().slice(0, 7));
+  const r = monthlyReport(ym);
+  const pct = (cur: number, prev?: number) => (prev ? Math.round(((cur - prev) / Math.abs(prev)) * 100) : null);
+  const print = () => printDocument(<MonthlyReportSheet ym={ym} />, 'A4 portrait', `Rapport financier ${monthLabel(ym)}`);
+  const share = () => {
+    const school = db.get('school', 'main');
+    const txt = [`${school?.nom} — Rapport financier ${monthLabel(ym)}`, `Recettes : ${money(r.recettes)} (${r.nbPaiements} paiements)`, `Sorties : ${money(r.totalSorties)} (salaires ${money(r.salaires)}, dépenses ${money(r.depenses)})`, `Résultat : ${money(r.resultat)}`].join('\n');
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+  };
+  const excel = () => downloadCSV(`rapport-${ym}.csv`, [['Rubrique', 'Détail', 'Montant'], ...r.parMotif.map(([k, v]) => ['Recette', k, v]), ...(r.salaires ? [['Sortie', 'Salaires', r.salaires]] : []), ...r.parCategorie.map(([k, v]) => ['Sortie', k, v]), ['Résultat', '', r.resultat]]);
+  const Bars = ({ rows, total, color }: { rows: [string, number][]; total: number; color: string }) => (
+    <div className="stack" style={{ gap: 10 }}>
+      {rows.length === 0 && <p className="small muted">Aucun mouvement ce mois-ci.</p>}
+      {rows.map(([k, v]) => (
+        <div key={k}>
+          <div className="row between small"><span>{k}</span><b style={{ color: 'var(--ink)' }}>{money(v)}</b></div>
+          <div className="bar mt-4"><i style={{ width: `${total ? (v / total) * 100 : 0}%`, background: color }} /></div>
+        </div>
+      ))}
+    </div>
+  );
+  const kpi = (label: string, v: number, tone: string, d: number | null, invert?: boolean) => (
+    <div className="card kpi">
+      <div className="t">{label}</div>
+      <div className="v" style={{ color: tone }}>{money(v)}</div>
+      {d !== null && <div className="s"><span className={(invert ? d <= 0 : d >= 0) ? 'trend-up' : 'trend-down'}>{d > 0 ? '+' : ''}{d}%</span> vs mois précédent</div>}
+    </div>
+  );
   return (
-    <div className="grid g-2">
-      <Card title="États financiers à imprimer (PDF)"><ReportList /></Card>
-      <Card title="Conseil"><p className="small muted">Chaque état est généré à partir des données en temps réel. Choisissez « Enregistrer au format PDF » dans la fenêtre d’impression pour l’envoyer par email ou WhatsApp.</p></Card>
+    <div className="stack">
+      <div className="chips-scroll" role="tablist" aria-label="Mois">
+        {months.map((m) => <button key={m} ref={m === ym ? scrollIntoRow : undefined} className={`chip ${m === ym ? 'active' : ''}`} onClick={() => setYm(m)}>{monthLabel(m)}</button>)}
+      </div>
+      <div className="kpis kpis-3">
+        {kpi('Recettes', r.recettes, 'var(--green)', pct(r.recettes, r.precedent?.recettes))}
+        {kpi('Sorties', r.totalSorties, 'var(--red)', pct(r.totalSorties, r.precedent?.totalSorties), true)}
+        {kpi('Résultat', r.resultat, r.resultat < 0 ? 'var(--red)' : 'var(--ink)', null)}
+      </div>
+      <div className="row wrap" style={{ gap: 8 }}>
+        <button className="btn btn-primary grow" onClick={print}><Printer />Imprimer / PDF</button>
+        <button className="btn grow" onClick={share}><MessageCircle />WhatsApp</button>
+        <button className="btn grow" onClick={excel}><FileSpreadsheet />Excel</button>
+      </div>
+      <div className="grid g-2">
+        <Card title="Recettes par motif"><Bars rows={r.parMotif} total={r.recettes} color="var(--green)" /></Card>
+        <Card title="Sorties"><Bars rows={[...(r.salaires ? [['Salaires', r.salaires] as [string, number]] : []), ...r.parCategorie]} total={r.totalSorties} color="var(--red)" /></Card>
+        <Card title="Modes de paiement"><Bars rows={r.parMode} total={r.recettes} color="var(--primary)" /></Card>
+        <Card title="À surveiller">
+          <div className="info">
+            <div>Salaires en attente</div><div>{r.salairesEnAttente}</div>
+            <div>Paiements à confirmer</div><div>{r.enAttente}</div>
+            <div>Nouvelles inscriptions</div><div>{r.inscriptions}</div>
+          </div>
+        </Card>
+      </div>
+      <Card title="Autres états financiers (PDF)"><ReportList /></Card>
     </div>
   );
 }

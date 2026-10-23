@@ -4,7 +4,7 @@ import { db } from '../data/store';
 import type { Evaluation, Guardian, Payment, Student, TimetableSlot } from '../data/types';
 import { classReport, evaluationStats, fmtNote, isPreschool, levelOf, LEVELS, sortedPeriods } from '../data/compute';
 import { money, dateLong, dateShort, fullName, civ, monthLabel, age } from '../lib/format';
-import { balances } from '../lib/finance';
+import { balances, monthlyReport } from '../lib/finance';
 import { DocLogo, QR, Signature, PhotoOrSilhouette } from './common';
 
 const NAVY = '#0d2a63';
@@ -255,6 +255,67 @@ export function ClassResultsSheet({ classeId, scope }: { classeId: string; scope
     <A4 title={`Résultats — ${r.classe.nom}`} sub={`${p?.libelle ?? 'Moyennes annuelles'} · Moyenne de classe ${fmtNote(r.classGeneral)} · Réussite ${Math.round(r.successRate * 100)}%`}>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr><th style={th}>Rang</th><th style={th}>Élève</th>{r.students[0]?.lines.map((l) => <th key={l.course.id} style={{ ...th, fontSize: 8.5, padding: 3, textAlign: 'center' }}>{l.subject.court}</th>)}<th style={{ ...th, textAlign: 'center' }}>Moy.</th></tr></thead>
         <tbody>{[...r.students].sort((a, b) => a.rank - b.rank).map((s) => <tr key={s.student.id}><td style={td}>{s.rank}</td><td style={{ ...td, whiteSpace: 'nowrap' }}>{fullName(s.student)}</td>{s.lines.map((l) => <td key={l.course.id} style={{ ...td, textAlign: 'center', padding: 3 }}>{fmtNote(l.value)}</td>)}<td style={{ ...td, textAlign: 'center', fontWeight: 800 }}>{fmtNote(s.general)}</td></tr>)}</tbody></table>
+    </A4>,
+  );
+}
+
+/** Rapport financier mensuel (A4 portrait). */
+export function MonthlyReportSheet({ ym }: { ym: string }) {
+  const r = monthlyReport(ym);
+  const right = { ...td, textAlign: 'right' as const };
+  const delta = (cur: number, prev?: number) => {
+    if (!prev) return '';
+    const d = Math.round(((cur - prev) / Math.abs(prev)) * 100);
+    return `${d > 0 ? '+' : ''}${d}% vs mois précédent`;
+  };
+  const box = (label: string, value: number, color: string, sub: string) => (
+    <div style={{ flex: 1, background: '#f3f7fd', borderRadius: 8, padding: '10px 12px', borderTop: `3px solid ${color}` }}>
+      <div style={{ fontSize: 10.5, color: '#46557a' }}>{label}</div>
+      <div style={{ fontSize: 17, fontWeight: 800, color }}>{money(value)}</div>
+      <div style={{ fontSize: 9.5, color: '#46557a' }}>{sub}</div>
+    </div>
+  );
+  const section = (t: string) => <div style={{ fontSize: 12.5, fontWeight: 800, color: NAVY, margin: '14px 0 6px' }}>{t}</div>;
+  const table = (head: string, rows: [string, number][], total: number) => (
+    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <thead><tr><th style={th}>{head}</th><th style={{ ...th, textAlign: 'right' }}>Montant</th><th style={{ ...th, textAlign: 'right', width: 60 }}>Part</th></tr></thead>
+      <tbody>
+        {rows.length === 0 && <tr><td style={td} colSpan={3}>Aucun mouvement</td></tr>}
+        {rows.map(([k, v]) => <tr key={k}><td style={td}>{k}</td><td style={right}>{money(v)}</td><td style={right}>{total ? Math.round((v / total) * 100) : 0}%</td></tr>)}
+        <tr><td style={{ ...td, fontWeight: 800 }}>Total</td><td style={{ ...right, fontWeight: 800 }}>{money(total)}</td><td style={right} /></tr>
+      </tbody>
+    </table>
+  );
+  let cr = 0;
+  balances().forEach((b) => (cr += b.rest));
+  return page(
+    <A4 title={`Rapport financier — ${monthLabel(ym)}`} sub={`${r.nbPaiements} paiements encaissés · ${r.salairesPayes} salaires payés · ${r.inscriptions} nouvelles inscriptions`}>
+      <div style={{ display: 'flex', gap: 10 }}>
+        {box('Recettes', r.recettes, '#137a3d', delta(r.recettes, r.precedent?.recettes))}
+        {box('Sorties (salaires + dépenses)', r.totalSorties, '#c0392b', delta(r.totalSorties, r.precedent?.totalSorties))}
+        {box('Résultat du mois', r.resultat, r.resultat < 0 ? '#c0392b' : NAVY, r.resultat < 0 ? 'Déficit' : 'Excédent')}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div>{section('Recettes par motif')}{table('Motif', r.parMotif, r.recettes)}</div>
+        <div>{section('Recettes par mode de paiement')}{table('Mode', r.parMode, r.recettes)}</div>
+      </div>
+      {section('Sorties')}
+      {table('Poste', [...(r.salaires ? [['Salaires du personnel', r.salaires] as [string, number]] : []), ...r.parCategorie], r.totalSorties)}
+      {r.detailDepenses.length > 0 && <>
+        {section('Détail des dépenses')}
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead><tr><th style={th}>Date</th><th style={th}>Libellé</th><th style={th}>Catégorie</th><th style={{ ...th, textAlign: 'right' }}>Montant</th></tr></thead>
+          <tbody>{r.detailDepenses.slice(0, 14).map((d, i) => <tr key={i}><td style={td}>{dateShort(d.date)}</td><td style={td}>{d.libelle}</td><td style={td}>{d.categorie}</td><td style={right}>{money(d.montant)}</td></tr>)}</tbody>
+        </table>
+      </>}
+      {section('Points d’attention')}
+      <KV cols={2} rows={[
+        ['Salaires en attente', `${r.salairesEnAttente}`],
+        ['Paiements à confirmer', `${r.enAttente}`],
+        ['Créances élèves (à ce jour)', money(cr)],
+        ['Résultat mois précédent', r.precedent ? money(r.precedent.resultat) : '-'],
+      ]} />
+      <Signatures left="Le Comptable" right="La Direction" />
     </A4>,
   );
 }

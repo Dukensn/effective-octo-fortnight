@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Pencil, Printer, FileText, FileSpreadsheet, Lock, History, MoreHorizontal, Unlock } from 'lucide-react';
+import { Pencil, Printer, FileText, FileSpreadsheet, Lock, History, MoreVertical, Unlock } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import { evaluationStats, fmtNote, isPreschool, levelOf, LEVELS } from '../../data/compute';
-import { Empty, Modal, toast, useIsDesktop, Confirm } from '../../components/ui';
+import { Empty, Modal, toast, useIsDesktop, Confirm, ScreenHead } from '../../components/ui';
 import { fullName, dateShort, downloadCSV, timeAgo } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 import { printDocument } from '../../lib/print';
@@ -54,12 +54,9 @@ export default function Palmares({ admin }: { admin?: boolean }) {
   return (
     <div className="split split-side" style={{ maxWidth: 1100, margin: '0 auto' }}>
       <div>
-        <div className="row mb-16" style={{ alignItems: 'flex-start' }}>
-          <button className="icon-btn" onClick={() => nav(-1)} aria-label="Retour"><ArrowLeft /></button>
-          <div className="grow"><h2 style={{ fontSize: 19 }}>{classe?.code} - {ev.titre}</h2><div className="muted">{subject?.nom} · {dateShort(ev.date)}</div></div>
-          <span className="badge b-blue" style={{ alignSelf: 'center' }}>{st.total} élèves</span>
-          {!desktop && <button className="icon-btn" onClick={() => setActions(true)} aria-label="Actions"><MoreHorizontal /></button>}
-        </div>
+        <ScreenHead title={`${classe?.code} - ${ev.titre}`} sub={`${subject?.nom} · ${dateShort(ev.date)}`} onBack={() => nav(-1)}
+          right={<span className="badge b-blue" style={{ alignSelf: 'center' }}>{st.total} élèves</span>}
+          menu={!desktop && <button className="icon-btn" onClick={() => setActions(true)} aria-label="Actions"><MoreVertical /></button>} />
         <div className="card">
           <table className="t">
             <thead><tr><th style={{ width: 40 }}>#</th><th>Élève</th><th className="c">{pre ? 'Niveau' : `Note / ${ev.noteMax}`}</th>{after && !pre && <th className="c">Rang</th>}</tr></thead>

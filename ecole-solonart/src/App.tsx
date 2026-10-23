@@ -1,9 +1,9 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
-  Mail, BarChart3, Settings, Clock, LayoutGrid, CalendarHeart, BookOpenCheck, Trophy, CalendarClock,
+  Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard,
 } from 'lucide-react';
-import { Shell, type NavItem } from './components/Layout';
+import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
 import { PrintRoot } from './lib/print';
 import { useSession } from './lib/session';
@@ -79,17 +79,29 @@ function Guard({ m, children }: { m: ModuleKey; children: React.ReactNode }) {
 function AdminApp() {
   const session = useSession()!;
   const items = ADMIN_NAV.filter((n) => session.can(n.m));
-  const bottomAll: (NavItem & { m: ModuleKey })[] = [
+  // Barre du bas : les 3 écrans les plus utilisés auxquels ce rôle a accès, le bouton « ＋ » et le menu.
+  const tabs = ([
     { to: '/', label: 'Accueil', icon: Home, end: true, m: 'dashboard' },
-    { to: '/presences', label: 'Ponctualité', icon: Clock, m: 'presences' },
-    { to: '/gestion', label: 'Gestion', icon: LayoutGrid, m: 'eleves' },
+    { to: '/eleves', label: 'Élèves', icon: Users, m: 'eleves' },
     { to: '/finance', label: 'Finance', icon: BadgeDollarSign, m: 'finance' },
-    { to: '/evenements', label: 'Événements', icon: CalendarHeart, m: 'dashboard' },
-  ];
-  const bottom = bottomAll.filter((b) => session.can(b.m));
+    { to: '/notes', label: 'Notes', icon: FileText, m: 'notes' },
+    { to: '/presences', label: 'Présences', icon: ClipboardCheck, m: 'presences' },
+    { to: '/documents', label: 'Documents', icon: FolderOpen, m: 'documents' },
+  ] as (NavItem & { m: ModuleKey })[]).filter((t) => session.can(t.m)).slice(0, 3);
+  const quick = ([
+    { label: 'Inscrire un élève', sub: 'En 1 minute', icon: UserPlus, to: '/inscriptions/rapide', tint: 'blue', m: 'inscriptions', w: true },
+    { label: 'Encaisser', sub: 'Paiement + reçu', icon: Receipt, to: '/finance?new=1', tint: 'green', m: 'finance', w: true },
+    { label: 'Dépense', sub: 'Enregistrer une sortie', icon: TrendingDown, to: '/finance?tab=depenses&depense=1', tint: 'red', m: 'finance', w: true },
+    { label: 'Faire l’appel', sub: 'Présences du jour', icon: ClipboardCheck, to: '/presences', tint: 'violet', m: 'presences', w: true },
+    { label: 'Notes', sub: 'Saisie et conseil', icon: FileText, to: '/notes', tint: 'orange', m: 'notes', w: false },
+    { label: 'Bulletins', sub: 'Classe ou élève', icon: BookOpenCheck, to: '/documents/bulletins', tint: 'navy', m: 'documents', w: false },
+    { label: 'Badges', sub: 'Portrait ou paysage', icon: IdCard, to: '/documents/badges', tint: 'blue', m: 'documents', w: false },
+    { label: 'Rapport du mois', sub: 'Finances en PDF', icon: BarChart3, to: '/finance?tab=rapports', tint: 'green', m: 'finance', w: false },
+    { label: 'Message', sub: 'SMS, WhatsApp', icon: Mail, to: '/communication', tint: 'orange', m: 'communication', w: true },
+  ] as (QuickAction & { m: ModuleKey; w: boolean })[]).filter((q) => session.can(q.m, q.w ? 'write' : 'read'));
   const G = (m: ModuleKey, el: React.ReactNode) => <Guard m={m}>{el}</Guard>;
   return (
-    <Shell items={items} bottom={bottom.length >= 3 ? bottom : bottomAll.slice(0, 1).concat(bottom.slice(1))}>
+    <Shell items={items} tabs={tabs} quick={quick}>
       <Routes>
         <Route path="/" element={G('dashboard', <Dashboard />)} />
         <Route path="/gestion" element={<Gestion />} />
@@ -127,15 +139,14 @@ function AdminApp() {
 }
 
 function TeacherApp() {
-  const bottom: NavItem[] = [
+  const tabs: NavItem[] = [
     { to: '/', label: 'Accueil', icon: Home, end: true },
-    { to: '/prof/classes', label: 'Classes', icon: Users },
     { to: '/prof/notes', label: 'Notes', icon: BookOpenCheck },
     { to: '/prof/appel', label: 'Appel', icon: ClipboardCheck },
-    { to: '/prof/palmares', label: 'Palmarès', icon: Trophy },
+    { to: '/prof/emploi', label: 'Horaire', icon: CalendarClock },
   ];
   return (
-    <Shell items={TEACHER_NAV} bottom={bottom}>
+    <Shell items={TEACHER_NAV} tabs={tabs}>
       <Routes>
         <Route path="/" element={<TeacherHome />} />
         <Route path="/prof/classes" element={<TeacherClasses />} />

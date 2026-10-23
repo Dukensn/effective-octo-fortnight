@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, Lock } from 'lucide-react';
+import { Check, Lock } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import { classStudents, gradesForEvaluation, isPreschool, levelOf, LEVELS } from '../../data/compute';
-import { Avatar, Empty, Modal, toast } from '../../components/ui';
+import { Avatar, Empty, Modal, ScreenHead, toast } from '../../components/ui';
 import { fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 
@@ -72,14 +72,7 @@ export default function GradeEntry({ admin }: { admin?: boolean }) {
 
   return (
     <div style={{ maxWidth: 760, margin: '0 auto' }}>
-      <div className="row mb-16" style={{ alignItems: 'flex-start' }}>
-        <button className="icon-btn" onClick={back} aria-label="Retour"><ArrowLeft /></button>
-        <div className="grow">
-          <h2 style={{ fontSize: 19 }}>{classe?.code} - {ev.titre}</h2>
-          <div className="muted">{subject?.nom}</div>
-        </div>
-        <span className="badge b-blue" style={{ alignSelf: 'center' }}>{filled}/{students.length}</span>
-      </div>
+      <ScreenHead title={`${classe?.code} - ${ev.titre}`} sub={subject?.nom} onBack={back} right={<span className="badge b-blue" style={{ alignSelf: 'center' }}>{filled}/{students.length}</span>} />
       {restored && !locked && <div className="card card-pad mb-16 small" style={{ background: 'var(--primary-50)', border: 0 }}>Brouillon récupéré : vos notes non enregistrées ont été remises. Pensez à enregistrer.</div>}
       {locked && <div className="card card-pad mb-16 row" style={{ background: 'var(--orange-50)', border: 0 }}><Lock size={18} color="var(--orange)" /><span className="small">Notes verrouillées par la direction. Contactez l’administration pour toute correction.</span></div>}
       <div className="card">

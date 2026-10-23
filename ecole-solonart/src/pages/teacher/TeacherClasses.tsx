@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, ChevronRight } from 'lucide-react';
+import { FileText, ChevronRight } from 'lucide-react';
 import { useCollection } from '../../data/store';
-import { Empty } from '../../components/ui';
+import { Empty, ScreenHead } from '../../components/ui';
 import { classStudents } from '../../data/compute';
 import { useMyCourses } from './TeacherHome';
 
@@ -16,11 +16,7 @@ export default function TeacherClasses({ mode }: { mode?: 'notes' | 'palmares' }
   const title = mode === 'notes' ? 'Saisir des notes' : mode === 'palmares' ? 'Palmarès' : 'Mes classes';
   return (
     <div style={{ maxWidth: 760, margin: '0 auto' }}>
-      <div className="row mb-16">
-        <button className="icon-btn" onClick={() => nav('/')} aria-label="Retour"><ArrowLeft /></button>
-        <h2 className="grow center" style={{ fontSize: 18 }}>{title}</h2>
-        <span style={{ width: 40 }} />
-      </div>
+      <ScreenHead center title={title} onBack={() => nav('/')} />
       {mode && <p className="small muted mb-12 center">Choisissez une classe</p>}
       {sorted.length === 0 && <Empty title="Aucune classe assignée">Demandez à la direction de vous affecter des matières.</Empty>}
       <div className="stack" style={{ gap: 10 }}>
