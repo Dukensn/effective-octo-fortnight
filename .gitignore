@@ -18,3 +18,8 @@ studio/fomasyon-fb-ads/snapshots/
 studio/fomasyon-fb-ads/assets/audio/
 studio/fomasyon-fb-ads/assets/music/*.wav
 studio/fomasyon-fb-ads/__pycache__/
+
+# Clés « compte de service » Firebase / Google : ne jamais committer
+*firebase-adminsdk*.json
+*service-account*.json
+serviceAccount*.json
