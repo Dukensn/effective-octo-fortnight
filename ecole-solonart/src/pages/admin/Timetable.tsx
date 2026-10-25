@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { defaultClassId } from '../../data/compute';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, User, MapPin, UtensilsCrossed, Printer, AlertTriangle, CalendarPlus, Copy, School, Users, BookOpen, CalendarRange, Pencil, Trash2 } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
@@ -105,7 +106,7 @@ export default function Timetable() {
   const subjects = useCollection('subjects');
   const courses = useCollection('courses');
   const [tab, setTab] = useState<'classe' | 'prof'>(params.get('prof') ? 'prof' : 'classe');
-  const [classe, setClasse] = useState(params.get('classe') ?? 'c-s4-a');
+  const [classe, setClasse] = useState(params.get('classe') ?? defaultClassId());
   const [prof, setProf] = useState(params.get('prof') ?? staff.find((s) => s.type === 'Professeur')?.id ?? '');
   const [edit, setEdit] = useState<Partial<TimetableSlot> | null>(null);
   const [showConflicts, setShowConflicts] = useState(false);

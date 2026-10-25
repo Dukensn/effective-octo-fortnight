@@ -2,8 +2,9 @@
 import { useSyncExternalStore } from 'react';
 import { db, useDoc } from '../data/store';
 import type { Access, AuditLog, ModuleKey, User } from '../data/types';
+import { NS } from '../data/mode';
 
-const KEY = 'solonart:session';
+const KEY = `${NS}:session`;
 let current: string | null = (() => { try { return localStorage.getItem(KEY); } catch { return null; } })();
 const ls = new Set<() => void>();
 

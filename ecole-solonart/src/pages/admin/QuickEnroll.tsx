@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Camera, Check, Link2, ListPlus, FileSpreadsheet, MessageCircle } from 'lucide-react';
-import { findByEmail } from '../../lib/auth';
+import { findByEmail, putAccount } from '../../lib/auth';
 import { phoneDigits } from '../../lib/relance';
 import { db, useCollection, uid } from '../../data/store';
 import type { PaymentMode, Student } from '../../data/types';
@@ -62,7 +62,7 @@ export default function QuickEnroll() {
       let account = db.list('users').find((u) => u.guardianId === gid);
       const email = f.email.trim().toLowerCase();
       if (!account && role && /^\S+@\S+\.\S+$/.test(email) && !findByEmail(email)) {
-        account = db.put('users', { id: `u-par-${gid}`, nom: civ(g), email, telephone: g.telephone, roleId: role.id, guardianId: gid, pin: '', actif: true });
+        account = putAccount({ id: `u-par-${gid}`, nom: civ(g), email, telephone: g.telephone, roleId: role.id, guardianId: gid, pin: '', actif: true });
         if (!g.email) db.patch('guardians', gid, { email });
       }
       const url = `${location.origin}${location.pathname}`;

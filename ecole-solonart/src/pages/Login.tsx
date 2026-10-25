@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useCollection, useDoc } from '../data/store';
-import { DEMO_PASSWORD, googleAvailable, loginWithGoogle, loginWithPassword, resetPassword, signUp } from '../lib/auth';
+import { DEMO_PASSWORD, googleAvailable, type AuthResult, loginWithGoogle, loginWithPassword, resetPassword, signUp } from '../lib/auth';
 import { SchoolLogo } from '../components/Logo';
+import { enterDemo, isDemo, leaveDemo, onlineConfigured, SCHOOL_NAME } from '../data/mode';
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
@@ -27,11 +28,12 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [demo, setDemo] = useState(false);
 
-  const run = async (f: () => Promise<string | null>) => {
+  const run = async (f: () => Promise<AuthResult>) => {
     setBusy(true); setError(''); setInfo('');
-    const err = await f();
+    const r = await f();
     setBusy(false);
-    if (err) setError(err);
+    if (typeof r === 'string') setError(r);
+    else if (r) { setInfo(r.info); setMode('login'); setPw(''); }
   };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,14 +49,20 @@ export default function Login() {
       <div className="auth-box">
         <div className="auth-brand">
           <SchoolLogo size={56} />
-          <b>{school?.nom ?? 'École'}</b>
+          <b>{school?.nom ?? (SCHOOL_NAME || 'École')}</b>
           <span>{school?.devise}</span>
         </div>
 
+        {isDemo && onlineConfigured && (
+          <div className="auth-demo-banner"><span><b>Démonstration</b><small>Une école fictive, seulement sur ce téléphone.</small></span><button type="button" onClick={leaveDemo}>Quitter</button></div>
+        )}
+
         <h1 className="auth-title">{mode === 'login' ? 'Connexion' : 'Créer un compte'}</h1>
 
-        <button type="button" className="auth-google" disabled={busy} onClick={() => run(loginWithGoogle)}><GoogleIcon />Continuer avec Google</button>
-        <div className="auth-or"><span>ou</span></div>
+        {!(isDemo && onlineConfigured) && (<>
+          <button type="button" className="auth-google" disabled={busy} onClick={() => run(loginWithGoogle)}><GoogleIcon />Continuer avec Google</button>
+          <div className="auth-or"><span>ou</span></div>
+        </>)}
 
         <form onSubmit={submit} className="auth-form">
           {mode === 'signup' && <input className="input" placeholder="Nom complet" autoComplete="name" value={nom} onChange={(e) => setNom(e.target.value)} />}
@@ -73,6 +81,10 @@ export default function Login() {
           {mode === 'login' ? <>Pas encore de compte ? <button onClick={() => { setMode('signup'); setError(''); }}>Créer un compte</button></>
             : <>Déjà un compte ? <button onClick={() => { setMode('login'); setError(''); }}>Se connecter</button></>}
         </p>
+
+        {onlineConfigured && !isDemo && (
+          <button type="button" className="auth-try" onClick={enterDemo}>Découvrir l’application avec une école de démonstration</button>
+        )}
 
         {demoAccounts.length > 0 && (
           <div className="auth-demo">

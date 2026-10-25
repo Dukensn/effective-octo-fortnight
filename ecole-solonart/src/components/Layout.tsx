@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { RouteTip, SetupReminder, WelcomeTour } from './Guide';
+import { isDemo, leaveDemo, onlineConfigured } from '../data/mode';
 import { logoutEverywhere } from '../lib/auth';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell, ChevronDown, ChevronRight, HelpCircle, LayoutGrid, LogOut, Plus, Search, UserCircle2, WifiOff, Cloud, CloudOff, RefreshCw, type LucideIcon } from 'lucide-react';
@@ -180,7 +181,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
           </header>
         )}
         {searchOpen && !desktop && <div className="mobile-search-bar"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>}
-        <main className="content" key={desktop ? 'd' : path} ref={setContentEl}><RouteTip path={path} />{children}</main>
+        <main className="content" key={desktop ? 'd' : path} ref={setContentEl}>{isDemo && onlineConfigured && <div className="demo-strip"><span><b>Démonstration</b> · école fictive, sur ce téléphone seulement</span><button onClick={leaveDemo}>Quitter</button></div>}<RouteTip path={path} />{children}</main>
         <WelcomeTour />
         <SetupReminder />
         <nav className="bottom-nav">

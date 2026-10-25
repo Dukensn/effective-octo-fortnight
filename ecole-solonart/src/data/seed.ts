@@ -4,8 +4,9 @@ import { dayItems } from '../lib/prof';
 import type {
   ChatMessage, CourseCheck, ExternalSlot,
   ClassRoom, Course, Evaluation, Grade, Guardian, Period, Role, Staff, Student, Subject, TimetableSlot,
-  Payment, Expense, Salary, Attendance, ModuleKey, Access, User, Sexe, Incident, Lesson,
+  Payment, Expense, Salary, Attendance, User, Sexe, Incident, Lesson,
 } from './types';
+import { DEFAULT_SUBJECTS, defaultRoles } from './skeleton';
 
 let seedState = 20240905;
 function rnd() {
@@ -25,8 +26,7 @@ const PROFESSIONS = ['Commerçant(e)', 'Enseignant(e)', 'Agriculteur(trice)', 'I
 const phone = () => `+509 ${pick(['31', '32', '33', '34', '36', '37', '38', '39', '41', '42', '43', '44', '46', '48'])} ${pad(Math.floor(rnd() * 100), 2)} ${pad(Math.floor(rnd() * 100), 2)} ${pad(Math.floor(rnd() * 100), 2)}`;
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]+/g, '.').replace(/^\.|\.$/g, '');
 
-export const ALL_MODULES: ModuleKey[] = ['dashboard', 'eleves', 'inscriptions', 'classes', 'parents', 'personnel', 'emploi', 'notes', 'presences', 'discipline', 'cahier', 'finance', 'documents', 'communication', 'rapports', 'parametres', 'utilisateurs'];
-const perms = (a: Access, over: Partial<Record<ModuleKey, Access>> = {}) => ({ ...Object.fromEntries(ALL_MODULES.map((m) => [m, a])), ...over });
+export { ALL_MODULES } from './skeleton';
 
 export function seedDatabase() {
   seedState = 20240905;
@@ -49,27 +49,7 @@ export function seedDatabase() {
   ];
   db.bulkPut('periods', periods);
 
-  const subjects: Subject[] = [
-    { id: 'fr', nom: 'Français', court: 'FR', couleur: 'blue', updatedAt: 0 },
-    { id: 'cr', nom: 'Créole', court: 'CR', couleur: 'teal', updatedAt: 0 },
-    { id: 'an', nom: 'Anglais', court: 'AN', couleur: 'pink', updatedAt: 0 },
-    { id: 'ma', nom: 'Mathématiques', court: 'MA', couleur: 'green', updatedAt: 0 },
-    { id: 'svt', nom: 'Sciences de la vie et de la terre (SVT)', court: 'SVT', couleur: 'violet', updatedAt: 0 },
-    { id: 'pc', nom: 'Physique-Chimie', court: 'PC', couleur: 'violet', updatedAt: 0 },
-    { id: 'hg', nom: 'Histoire-Géographie', court: 'HG', couleur: 'amber', updatedAt: 0 },
-    { id: 'ec', nom: 'Éducation civique et morale', court: 'ECM', couleur: 'cyan', updatedAt: 0 },
-    { id: 'inf', nom: 'Informatique', court: 'INF', couleur: 'slate', updatedAt: 0 },
-    { id: 'art', nom: 'Éducation artistique', court: 'ART', couleur: 'violet', updatedAt: 0 },
-    { id: 'eps', nom: 'Éducation physique et sportive (EPS)', court: 'EPS', couleur: 'blue', updatedAt: 0 },
-    { id: 'opt', nom: 'Options / Projet', court: 'OPT', couleur: 'amber', updatedAt: 0 },
-    // Préscolaire : domaines d'apprentissage évalués par compétences (Acquis / En cours / Non acquis)
-    { id: 'ps-lang', nom: 'Langage oral et écrit', court: 'LANG', couleur: 'blue', groupe: 'prescolaire', updatedAt: 0 },
-    { id: 'ps-math', nom: 'Pré-mathématiques', court: 'MATH', couleur: 'green', groupe: 'prescolaire', updatedAt: 0 },
-    { id: 'ps-monde', nom: 'Découverte du monde', court: 'MONDE', couleur: 'violet', groupe: 'prescolaire', updatedAt: 0 },
-    { id: 'ps-mot', nom: 'Motricité', court: 'MOT', couleur: 'cyan', groupe: 'prescolaire', updatedAt: 0 },
-    { id: 'ps-art', nom: 'Arts, chants et comptines', court: 'ART', couleur: 'pink', groupe: 'prescolaire', updatedAt: 0 },
-    { id: 'ps-vivre', nom: 'Vivre ensemble', court: 'VIVRE', couleur: 'amber', groupe: 'prescolaire', updatedAt: 0 },
-  ];
+  const subjects: Subject[] = DEFAULT_SUBJECTS.map((x) => ({ ...x }));
   db.bulkPut('subjects', subjects);
   const COEF: Record<string, number> = { fr: 3, cr: 2, an: 3, ma: 4, svt: 3, pc: 3, hg: 2, ec: 1, inf: 2, art: 1, eps: 1, opt: 2, 'ps-lang': 1, 'ps-math': 1, 'ps-monde': 1, 'ps-mot': 1, 'ps-art': 1, 'ps-vivre': 1 };
 
@@ -557,15 +537,7 @@ export function seedDatabase() {
   ['ps', 'ms', 'gs'].forEach((code, i) => db.patch('classes', `c-${code}`, { cotitulaireIds: [cotit[i].id] }));
 
   // ---------- Rôles & utilisateurs ----------
-  const roles: Role[] = [
-    { id: 'r-dir', nom: 'Directeur', description: 'Accès complet à toute l’application.', systeme: true, espace: 'admin', permissions: perms('write'), updatedAt: 0 },
-    { id: 'r-adj', nom: 'Directeur adjoint', description: 'Gestion pédagogique et administrative, sans paramètres ni utilisateurs.', espace: 'admin', permissions: perms('write', { parametres: 'read', utilisateurs: 'none', finance: 'read' }), updatedAt: 0 },
-    { id: 'r-sec', nom: 'Secrétaire', description: 'Inscriptions, élèves, parents, documents.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'write', inscriptions: 'write', parents: 'write', classes: 'read', documents: 'write', communication: 'write', presences: 'read', emploi: 'read', personnel: 'read', discipline: 'read', cahier: 'read' }), updatedAt: 0 },
-    { id: 'r-cpt', nom: 'Comptable', description: 'Finance, paiements, salaires et rapports financiers.', espace: 'admin', permissions: perms('none', { dashboard: 'read', finance: 'write', eleves: 'read', parents: 'read', personnel: 'read', rapports: 'read' }), updatedAt: 0 },
-    { id: 'r-cen', nom: 'Censeur', description: 'Présences, discipline et consultation des notes.', espace: 'admin', permissions: perms('none', { dashboard: 'read', eleves: 'read', presences: 'write', discipline: 'write', cahier: 'read', notes: 'read', classes: 'read', emploi: 'read', parents: 'read', communication: 'write' }), updatedAt: 0 },
-    { id: 'r-prof', nom: 'Professeur', description: 'Espace professeur : ses classes, saisie des notes, appel, palmarès.', systeme: true, espace: 'professeur', permissions: perms('none'), updatedAt: 0 },
-    { id: 'r-par', nom: 'Parent', description: 'Espace parent : notes validées, absences, discipline, devoirs et paiements de ses enfants uniquement.', systeme: true, espace: 'parent', permissions: perms('none'), updatedAt: 0 },
-  ];
+  const roles: Role[] = defaultRoles();
   db.bulkPut('roles', roles);
   const byPoste = (p: string) => staff.find((s) => s.poste === p)!;
   const users: Omit<User, 'updatedAt'>[] = [

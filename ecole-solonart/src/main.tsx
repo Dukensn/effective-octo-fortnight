@@ -9,6 +9,7 @@ import App from './App';
 import { loadDatabase } from './data/store';
 import { seedDatabase } from './data/seed';
 import { startSync } from './data/sync';
+import { isDemo } from './data/mode';
 import { reconcileTimetable } from './lib/regles';
 import { autoSnapshot } from './lib/backup';
 
@@ -20,7 +21,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   (window as unknown as { __installPrompt?: Event }).__installPrompt = e;
 });
 
-loadDatabase(seedDatabase).then(() => {
+loadDatabase(isDemo ? seedDatabase : undefined).then(() => {
   reconcileTimetable();
   createRoot(document.getElementById('root')!).render(
     <StrictMode>

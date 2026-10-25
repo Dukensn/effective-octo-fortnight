@@ -6,7 +6,7 @@ import { PageHead } from '../../components/ui';
 import { Scaled, A4L } from '../../components/Scaled';
 import { BulletinPages, BULLETIN_MODELS, TRI_THEMES, type BulletinModel } from '../../docs/Bulletins';
 import { buildBulletin } from '../../docs/common';
-import { classStudents, isPreschool, sortedPeriods } from '../../data/compute';
+import { classStudents, isPreschool, sortedPeriods, defaultClassId } from '../../data/compute';
 import { fullName } from '../../lib/format';
 import { printDocument } from '../../lib/print';
 import { audit } from '../../lib/session';
@@ -22,7 +22,7 @@ export default function ReportCards() {
   useCollection('reportEntries');
   useDoc('school', 'main');
   const periods = sortedPeriods();
-  const [classe, setClasse] = useState(params.get('classe') ?? 'c-s4-a');
+  const [classe, setClasse] = useState(params.get('classe') ?? defaultClassId());
   const [scope, setScope] = useState<string>(params.get('scope') ?? 'annuel');
   const [model, setModel] = useState<BulletinModel>(params.get('scope') && params.get('scope') !== 'annuel' ? 'tripliable' : 'annuel');
   const [theme, setTheme] = useState('bleu');

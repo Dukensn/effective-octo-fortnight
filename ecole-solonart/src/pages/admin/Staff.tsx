@@ -7,6 +7,7 @@ import { PageHead, Tabs, Field, SearchInput, Avatar, StatusBadge, Empty, Modal, 
 import { civ, fullName, norm, money, dateLong, downloadCSV, readFileAsDataURL } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
 import { remunerationOf } from '../../lib/paie';
+import { putAccount } from '../../lib/auth';
 
 export default function StaffPage() {
   const session = useSession()!;
@@ -80,9 +81,9 @@ function StaffPanel({ s, onEdit }: { s: Staff; onEdit: () => void }) {
   const titulaire = classes.filter((c) => c.titulaireId === s.id);
   const createAccount = () => {
     const role = s.type === 'Professeur' ? 'r-prof' : s.poste === 'Comptable' ? 'r-cpt' : s.poste.startsWith('Secrétaire') ? 'r-sec' : 'r-adj';
-    db.put('users', { nom: civ(s), email: s.email, telephone: s.telephone, roleId: role, staffId: s.id, pin: '', actif: true, photo: s.photo });
+    putAccount({ nom: civ(s), email: s.email, telephone: s.telephone, roleId: role, staffId: s.id, pin: '', actif: true, photo: s.photo });
     audit('Création compte', civ(s));
-    toast('Compte créé — code initial : 1234');
+    toast('Compte créé : la personne se connecte avec son adresse e-mail');
   };
   return (
     <div className="stack">

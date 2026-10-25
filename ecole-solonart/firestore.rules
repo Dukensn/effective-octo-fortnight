@@ -1,12 +1,15 @@
 rules_version = '2';
 // Règles Firestore pour École Mixte Solonart.
-// Chaque utilisateur Firebase Auth doit avoir un document ecoles/{ecole}/users/{uid}
-// contenant roleId ; le rôle (ecoles/{ecole}/roles/{roleId}) définit ses permissions.
+// Chaque compte a un document ecoles/{ecole}/users/{e-mail en minuscules} contenant roleId ;
+// le rôle (ecoles/{ecole}/roles/{roleId}) définit ses permissions.
+// L'adresse doit être confirmée (Google l'est toujours ; e-mail + mot de passe : lien de confirmation),
+// sinon quelqu'un pourrait créer un compte avec l'adresse d'un autre et prendre ses droits.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function userDoc(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/users/$(request.auth.uid)).data; }
+    function me() { return request.auth.token.email.lower(); }
+    function userDoc(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/users/$(me())).data; }
     function role(ecole) { return get(/databases/$(database)/documents/ecoles/$(ecole)/roles/$(userDoc(ecole).roleId)).data; }
-    function signedIn() { return request.auth != null; }
+    function signedIn() { return request.auth != null && request.auth.token.email != null && request.auth.token.email_verified == true; }
     function active(ecole) { return signedIn() && userDoc(ecole).actif == true; }
     function isParent(ecole) { return active(ecole) && role(ecole).espace == 'parent'; }
     function isStaff(ecole) { return active(ecole) && role(ecole).espace != 'parent'; }
@@ -39,7 +42,7 @@ service cloud.firestore {
       // Le personnel lit toute l'école. Un parent ne lit que sa propre fiche utilisateur :
       // les données de ses enfants lui seront servies par une synchronisation filtrée (à mettre en place).
       allow read: if !(collection in ['audit', 'chat']) && isStaff(ecole);
-      allow read: if collection == 'users' && isParent(ecole) && id == request.auth.uid;
+      allow read: if collection == 'users' && isParent(ecole) && id == me();
 
       allow write: if collection != 'audit' && collection in ['grades', 'evaluations', 'attendance'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
       allow write: if collection in ['students', 'guardians'] && (canWrite(ecole, 'eleves') || canWrite(ecole, 'inscriptions') || canWrite(ecole, 'parents'));
@@ -55,17 +58,17 @@ service cloud.firestore {
       allow create, update: if collection == 'pointages' && (canWrite(ecole, 'presences') || canWrite(ecole, 'finance'));
       allow write: if collection in ['users', 'roles'] && canWrite(ecole, 'utilisateurs');
       // Nouveau compte (Google ou e-mail) : la personne crée sa propre fiche, sans rôle, puis envoie sa demande avec le code.
-      allow create: if collection == 'users' && signedIn() && id == request.auth.uid && request.resource.data.roleId == ''
-        && request.resource.data.email == request.auth.token.email;
-      allow update: if collection == 'users' && signedIn() && id == request.auth.uid && resource.data.roleId == ''
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['demande', 'nom', 'photo', 'dernierAcces', 'updatedAt']);
-      allow read: if collection == 'users' && signedIn() && id == request.auth.uid;
-      allow read: if collection == 'school' && signedIn();
+      allow create: if collection == 'users' && signedIn() && id == me() && request.resource.data.roleId == ''
+        && request.resource.data.email == me();
+      allow update: if collection == 'users' && signedIn() && id == me() && resource.data.roleId == ''
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['demande', 'nom', 'photo', 'dernierAcces', 'vus', 'dernierRappel', 'updatedAt']);
+      allow read: if collection == 'users' && signedIn() && id == me();
+      allow read: if collection in ['school', 'roles'] && signedIn();
+      // Chacun met à jour sa propre fiche (photo, tutoriel vu, dernière visite) ; jamais son rôle ni son état.
+      allow update: if collection == 'users' && active(ecole) && id == me()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'nom', 'telephone', 'dernierAcces', 'vus', 'dernierRappel', 'pin', 'updatedAt']);
       // Le secrétariat (module Parents) crée les accès parent, uniquement avec le rôle « Parent ».
       allow write: if collection == 'users' && canWrite(ecole, 'parents') && request.resource.data.roleId == 'r-par';
-      // Un parent ne modifie que son code et sa date de visite.
-      allow update: if collection == 'users' && isParent(ecole) && id == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pin', 'dernierAcces', 'photo', 'updatedAt']);
       allow write: if !(collection in ['audit', 'chat']) && isDirection(ecole) && !(collection == 'pointages' && request.method == 'delete');
     }
   }

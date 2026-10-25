@@ -250,6 +250,11 @@ html, body { background: #fff; }
 .auth-demo { margin-top: 8px; border-top: 1px solid var(--hair); padding-top: 12px; display: flex; flex-direction: column; gap: 4px; }
 .auth-demo > button { border: 0; background: none; color: var(--muted); font-size: 12px; font-weight: 500; }
 .auth-demo p { font-size: 12px; color: var(--muted); text-align: center; }
+.auth-try { border: 0; background: var(--primary-soft, #eef4ff); color: var(--primary); font-weight: 600; font-size: 14px; padding: 12px 14px; border-radius: 14px; margin-top: 4px; }
+.auth-demo-banner { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: linear-gradient(135deg, #fff4e5, #ffe9cc); color: #8a4b00; }
+.auth-demo-banner span { flex: 1; display: flex; flex-direction: column; }
+.auth-demo-banner small { font-size: 12px; opacity: .85; }
+.auth-demo-banner button { border: 0; background: #fff; color: #8a4b00; font-weight: 600; border-radius: 999px; padding: 8px 14px; }
 .auth-demo-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; border: 0; background: none; padding: 8px 0; font-size: 14px; color: var(--ink); text-align: left; }
 .auth-demo-row + .auth-demo-row { box-shadow: inset 0 1px 0 var(--hair); }
 .auth-demo-row small { font-size: 12px; color: var(--muted); }
@@ -423,3 +428,7 @@ button.row-item:active { opacity: .7; }
 .dossier-banner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: 16px; background: var(--orange-50); }
 .dossier-banner.soumis { background: var(--green-50); }
 .auto-relance .row-ic { flex: none; }
+/* Démonstration : bandeau discret en haut de l'écran */
+.demo-strip { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 8px 8px 8px 14px; border-radius: 14px; background: linear-gradient(135deg, #fff4e5, #ffe9cc); color: #8a4b00; font-size: 13px; }
+.demo-strip span { flex: 1; min-width: 0; }
+.demo-strip button { border: 0; background: #fff; color: #8a4b00; font-weight: 600; border-radius: 999px; padding: 6px 12px; font-size: 13px; }

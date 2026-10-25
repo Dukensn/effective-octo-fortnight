@@ -6,7 +6,8 @@
 // Un compte créé par la personne elle-même n'a pas encore d'école : elle entre le code d'établissement,
 // puis la direction valide et choisit son rôle.
 import { db } from '../data/store';
-import { firebaseConfig, firebaseEnabled } from '../data/sync';
+import { fetchAccount, firebaseApp, firebaseEnabled } from '../data/sync';
+import { userKey } from '../data/skeleton';
 import type { User } from '../data/types';
 import { audit, signIn } from './session';
 
@@ -14,8 +15,21 @@ import { audit, signIn } from './session';
 export const DEMO_PASSWORD = 'solonart';
 export const googleAvailable = firebaseEnabled;
 
+/** Réponse d'une connexion : null = c'est fait, texte = erreur, { info } = message à lire (ex. vérifier son e-mail). */
+export type AuthResult = string | null | { info: string };
+
 const clean = (e: string) => e.trim().toLowerCase();
 export const findByEmail = (email: string) => db.list('users').find((u) => u.email && clean(u.email) === clean(email));
+
+/** Enregistre un compte. En ligne, son identifiant EST son adresse e-mail (les règles de sécurité lisent users/{e-mail}) :
+ *  changer l'adresse déplace donc la fiche. En démonstration, l'identifiant ne change pas. */
+export function putAccount(doc: Omit<User, 'id' | 'updatedAt'> & { id?: string }): User {
+  const email = clean(doc.email);
+  const id = firebaseEnabled ? email : doc.id;
+  const prev = doc.id ? db.get('users', doc.id) : undefined;
+  if (firebaseEnabled && prev && prev.id !== id) db.remove('users', prev.id);
+  return db.put('users', { ...prev, ...doc, email, id } as User);
+}
 
 async function fingerprint(email: string, pw: string) {
   const data = new TextEncoder().encode(`solonart|${clean(email)}|${pw}`);
@@ -24,9 +38,7 @@ async function fingerprint(email: string, pw: string) {
 }
 
 async function firebaseAuth() {
-  const { initializeApp, getApps } = await import('firebase/app');
-  const m = await import('firebase/auth');
-  const app = getApps()[0] ?? initializeApp(firebaseConfig);
+  const [app, m] = await Promise.all([firebaseApp(), import('firebase/auth')]);
   return { m, auth: m.getAuth(app) };
 }
 
@@ -37,14 +49,31 @@ function fbMessage(e: unknown) {
   if (code.includes('weak-password')) return 'Mot de passe trop faible (8 caractères au moins)';
   if (code.includes('popup-closed')) return 'Connexion Google annulée';
   if (code.includes('network')) return 'Pas de connexion Internet';
+  if (code.includes('configuration-not-found') || code.includes('operation-not-allowed')) return 'Ce mode de connexion n’est pas encore activé pour l’école. Prévenez la direction.';
+  if (code.includes('unauthorized-domain')) return 'Ce site n’est pas encore autorisé pour la connexion Google. Prévenez la direction.';
+  if (code.includes('too-many-requests')) return 'Trop d’essais. Patientez quelques minutes.';
+  if (code.includes('popup-blocked')) return 'Le navigateur a bloqué la fenêtre Google. Autorisez-la puis réessayez.';
   return 'La connexion a échoué. Réessayez.';
 }
 
-/** Ouvre la session sur la fiche de cette adresse (la crée si c'est un nouveau compte). */
-function enter(email: string, nom: string, photo?: string, uid?: string) {
-  // Avec Firebase, un nouveau compte prend l'identifiant Firebase (les règles de sécurité lisent users/{uid}).
-  const u = findByEmail(email) ?? db.put('users', { id: uid, nom, email: clean(email), roleId: '', pin: '', actif: true, photo } as Omit<User, 'updatedAt'> as User);
+/** En ligne : ouvre la session sur la fiche de cette adresse, lue sur le serveur.
+ *  Pas de fiche = nouveau compte sans école (il entrera le code d'établissement). */
+async function enter(email: string, nom: string, photo?: string): Promise<AuthResult> {
+  let u: User | undefined;
+  try { u = await fetchAccount(email); }
+  catch (e) { return fbMessage(e); }
+  u ??= db.put('users', { id: userKey(email), nom, email: clean(email), roleId: '', pin: '', actif: true, photo } as Omit<User, 'updatedAt'> as User);
+  // Compte préparé par l'école (« Direction », pas de photo) : on reprend le nom et la photo du compte Google.
+  if (u.nom === 'Direction' && nom !== email) db.patch('users', u.id, { nom });
+  if (!u.photo && photo) db.patch('users', u.id, { photo });
   return signIn(u.id);
+}
+
+/** Compte e-mail + mot de passe : l'adresse doit être confirmée (sinon n'importe qui pourrait prendre l'adresse d'un autre). */
+async function askVerification(m: typeof import('firebase/auth'), auth: import('firebase/auth').Auth, user: import('firebase/auth').User): Promise<AuthResult> {
+  try { await m.sendEmailVerification(user); } catch { /* déjà envoyé il y a peu */ }
+  await m.signOut(auth);
+  return { info: `Confirmez votre adresse : ouvrez le lien envoyé à ${user.email} (regardez aussi dans « Spam »), puis connectez-vous.` };
 }
 
 const check = (email: string, pw: string) => {
@@ -53,12 +82,16 @@ const check = (email: string, pw: string) => {
   return null;
 };
 
-export async function loginWithPassword(email: string, pw: string): Promise<string | null> {
+export async function loginWithPassword(email: string, pw: string): Promise<AuthResult> {
   const bad = check(email, pw);
   if (bad) return bad;
   if (firebaseEnabled) {
-    try { const { m, auth } = await firebaseAuth(); const r = await m.signInWithEmailAndPassword(auth, email.trim(), pw); return enter(r.user.email ?? email, r.user.displayName ?? email, undefined, r.user.uid); }
-    catch (e) { return fbMessage(e); }
+    try {
+      const { m, auth } = await firebaseAuth();
+      const r = await m.signInWithEmailAndPassword(auth, email.trim(), pw);
+      if (!r.user.emailVerified) return askVerification(m, auth, r.user);
+      return enter(r.user.email ?? email, r.user.displayName ?? email);
+    } catch (e) { return fbMessage(e); }
   }
   const u = findByEmail(email);
   if (!u) return 'Aucun compte avec cette adresse. Créez un compte.';
@@ -67,13 +100,17 @@ export async function loginWithPassword(email: string, pw: string): Promise<stri
   return signIn(u.id);
 }
 
-export async function signUp(nom: string, email: string, pw: string): Promise<string | null> {
+export async function signUp(nom: string, email: string, pw: string): Promise<AuthResult> {
   if (nom.trim().length < 3) return 'Entrez votre nom complet';
   const bad = check(email, pw);
   if (bad) return bad;
   if (firebaseEnabled) {
-    try { const { m, auth } = await firebaseAuth(); const r = await m.createUserWithEmailAndPassword(auth, email.trim(), pw); return enter(email, nom.trim(), undefined, r.user.uid); }
-    catch (e) { return fbMessage(e); }
+    try {
+      const { m, auth } = await firebaseAuth();
+      const r = await m.createUserWithEmailAndPassword(auth, email.trim(), pw);
+      await m.updateProfile(r.user, { displayName: nom.trim() }).catch(() => undefined);
+      return askVerification(m, auth, r.user);
+    } catch (e) { return fbMessage(e); }
   }
   const existing = findByEmail(email);
   // Invitation : la direction a enregistré cette adresse ; la personne choisit son mot de passe à la première connexion.
@@ -83,13 +120,13 @@ export async function signUp(nom: string, email: string, pw: string): Promise<st
   return signIn(u.id);
 }
 
-export async function loginWithGoogle(): Promise<string | null> {
+export async function loginWithGoogle(): Promise<AuthResult> {
   if (!firebaseEnabled) return 'La connexion Google s’activera quand la base de données en ligne sera branchée. En attendant, utilisez votre e-mail et votre mot de passe.';
   try {
     const { m, auth } = await firebaseAuth();
     const r = await m.signInWithPopup(auth, new m.GoogleAuthProvider());
     if (!r.user.email) return 'Ce compte Google n’a pas d’adresse e-mail';
-    return enter(r.user.email, r.user.displayName ?? r.user.email, r.user.photoURL ?? undefined, r.user.uid);
+    return enter(r.user.email, r.user.displayName ?? r.user.email, r.user.photoURL ?? undefined);
   } catch (e) { return fbMessage(e); }
 }
 
@@ -115,7 +152,10 @@ export async function changePassword(u: User, old: string, next: string): Promis
 export function resetLocalPassword(userId: string) { db.patch('users', userId, { mdp: undefined }); }
 
 export async function logoutEverywhere() {
-  if (firebaseEnabled) { try { const { m, auth } = await firebaseAuth(); await m.signOut(auth); } catch { /* hors ligne */ } }
+  if (!firebaseEnabled) return;
+  try { const { m, auth } = await firebaseAuth(); await m.signOut(auth); } catch { /* hors ligne */ }
+  // Téléphone partagé : on n'y laisse pas les données de l'école (sauf s'il reste des modifications à envoyer).
+  if (db.pendingCount() === 0) await db.reset();
 }
 
 /** Code d'établissement : « SOLONART-4821 ». */

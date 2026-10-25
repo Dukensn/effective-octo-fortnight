@@ -37,7 +37,7 @@ export default function Dashboard() {
     const days = new Set(attendance.filter((a) => !a.eleveId).map((a) => a.date));
     const abs = attendance.filter((a) => a.eleveId && (a.statut === 'Absent' || a.statut === 'Excusé')).length;
     const total = days.size * actifs.length;
-    return total ? 1 - abs / total : 1;
+    return total ? 1 - abs / total : null;
   }, [attendance, actifs.length]);
 
   const finance = useMemo(() => {
@@ -109,7 +109,7 @@ export default function Dashboard() {
       <div className="grid g-stats mini mb-16">
         <StatCard tint="blue" icon={<Users />} value={actifs.length} label="Élèves" sub={`${actifs.filter((s) => s.sexe === 'F').length} filles · ${actifs.filter((s) => s.sexe === 'M').length} garçons`} />
         <StatCard tint="green" icon={<GraduationCap />} value={profs.length} label="Professeurs" sub={`${staff.filter((s) => s.statut === 'Actif').length} membres du personnel`} />
-        <StatCard tint="violet" icon={<ClipboardCheck />} value={`${Math.round(presence * 100)}%`} label="Présence" sub="20 derniers jours" />
+        <StatCard tint="violet" icon={<ClipboardCheck />} value={presence === null ? "—" : `${Math.round(presence * 100)}%`} label="Présence" sub="20 derniers jours" />
         <StatCard tint="orange" icon={<Wallet />} value={`${Math.round(finance.rate * 100)}%`} label="Scolarité" sub={money(finance.paid)} />
       </div>
 

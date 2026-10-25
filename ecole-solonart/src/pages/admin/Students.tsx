@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { defaultClassId } from '../../data/compute';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, ChevronDown, FileSpreadsheet, Printer, Eye, Pencil, IdCard, FileText, ChevronRight, Upload, Camera } from 'lucide-react';
 import { useCollection } from '../../data/store';
@@ -74,7 +75,7 @@ function StudentsDesktop() {
   const students = useCollection('students');
   const classes = useCollection('classes').slice().sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
   const [tab, setTab] = useState<Tab>('liste');
-  const [classe, setClasse] = useState(params.get('classe') ?? 'c-s4-a');
+  const [classe, setClasse] = useState(params.get('classe') ?? defaultClassId());
   const [statut, setStatut] = useState('Actif');
   const [q, setQ] = useState('');
   const [perPage, setPerPage] = useState(10);

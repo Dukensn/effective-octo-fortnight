@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { defaultClassId } from '../../data/compute';
 import { FiltersFold } from '../../components/Mobile';
 import { Plus, Printer, BookText, NotebookPen, AlertCircle } from 'lucide-react';
 import { useCollection } from '../../data/store';
@@ -57,7 +58,7 @@ export default function Cahier() {
   const staff = useCollection('staff');
   const classes = useCollection('classes').slice().sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
   const [tab, setTab] = useState<'seances' | 'devoirs' | 'suivi'>('seances');
-  const [classe, setClasse] = useState('c-s4-a');
+  const [classe, setClasse] = useState(defaultClassId());
   const [matiere, setMatiere] = useState('all');
   const [form, setForm] = useState<Partial<Lesson> | null>(null);
   const ref = referenceDate();

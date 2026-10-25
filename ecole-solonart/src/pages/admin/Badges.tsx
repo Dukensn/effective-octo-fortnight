@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { defaultClassId } from '../../data/compute';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Printer, CheckSquare, Square, RectangleVertical, RectangleHorizontal, Users2, Palette, ScanLine, Pencil } from 'lucide-react';
 import { useCollection, useDoc } from '../../data/store';
@@ -43,7 +44,7 @@ export default function Badges() {
   const templates = [...BADGE_TEMPLATES, ...customs].filter((t) => t.kinds.includes(kind));
   const [tplKey, setTplKey] = useState<Record<BadgeKind, string>>({ professeur: 'classique', direction: 'bordeaux', personnel: 'ciel', eleve: 'eleve-bleu' });
   const tpl = templates.find((t) => t.key === tplKey[kind]) ?? templates[0];
-  const [classe, setClasse] = useState(params.get('classe') ?? students.find((s) => s.id === params.get('eleve'))?.classeId ?? 'c-s4-a');
+  const [classe, setClasse] = useState(params.get('classe') ?? students.find((s) => s.id === params.get('eleve'))?.classeId ?? defaultClassId());
   const preset = params.get('eleve') ?? params.get('staff');
   const [selected, setSelected] = useState<Record<string, boolean>>(preset ? { [preset]: true } : {});
   const [mode, setMode] = useState<'tous' | 'selection'>(preset ? 'selection' : 'tous');

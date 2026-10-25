@@ -38,6 +38,7 @@ import Finance from './pages/admin/Finance';
 import Documents from './pages/admin/Documents';
 import ReportCards from './pages/admin/ReportCards';
 import Badges from './pages/admin/Badges';
+import { NS } from './data/mode';
 import Communication from './pages/admin/Communication';
 import Events from './pages/admin/Events';
 import Reports from './pages/admin/Reports';
@@ -110,7 +111,7 @@ function Guard({ m, children }: { m: ModuleKey; children: React.ReactNode }) {
 function useDailyAutoRelances(on: boolean, userId: string) {
   useEffect(() => {
     if (!on) return;
-    const key = `solonart:relance-auto:${new Date().toISOString().slice(0, 10)}`;
+    const key = `${NS}:relance-auto:${new Date().toISOString().slice(0, 10)}`;
     try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch { return; }
     const t = setTimeout(() => { const n = runAutoRelances(userId); if (n) toast(`${n} parent${n > 1 ? 's' : ''} en retard relancé${n > 1 ? 's' : ''} automatiquement`); }, 4000);
     return () => clearTimeout(t);

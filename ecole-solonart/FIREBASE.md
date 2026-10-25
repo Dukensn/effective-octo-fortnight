@@ -1,41 +1,52 @@
-# Connecter l’application à Firebase
+# L’école en ligne (Firebase) et la démonstration
 
-L’application fonctionne **hors ligne** dès maintenant : toutes les données sont dans le navigateur (IndexedDB).
-Firebase sert à **synchroniser** plusieurs appareils (professeurs ↔ direction) et à sauvegarder en ligne.
+Le même site sert deux choses :
 
-## 1. Créer le projet
-1. https://console.firebase.google.com → « Ajouter un projet » (ex. `solonart`).
-2. **Firestore Database** → Créer (mode production, région `us-east1` ou la plus proche).
-3. **Authentication** → activer « E-mail/Mot de passe » (étape 4).
-4. Paramètres du projet → « Vos applications » → icône Web `</>` → copier la configuration.
+| | École en ligne | Démonstration |
+|---|---|---|
+| Données | Firestore : `ecoles/{SCHOOL_ID}/…`, partagées par tous les téléphones | une école fictive, **seulement sur ce téléphone** |
+| Au départ | vide (école, année, rôles, matières, directeur) | remplie (élèves, notes, paiements…) |
+| Connexion | Google ou e-mail + mot de passe (Firebase Auth) | comptes de démonstration, mot de passe `solonart` |
+| Entrée / sortie | par défaut | « Découvrir l’application avec une école de démonstration » sur l’écran de connexion ; « Quitter » ou Paramètres → Données → « Effacer la démonstration » |
 
-## 2. Configurer l’application
-```bash
-cp .env.example .env.local
-# remplir VITE_FIREBASE_API_KEY, VITE_FIREBASE_PROJECT_ID, etc.
-npm install
-npm run build
-```
-Au démarrage, `src/data/sync.ts` :
-- envoie toutes les modifications locales (file d’attente) vers `ecoles/{SCHOOL_ID}/{collection}/{id}` par lots de 400 ;
-- écoute chaque collection en temps réel (`onSnapshot`) et fusionne les changements reçus
-  (règle « la modification la plus récente gagne », champ `updatedAt`) ;
-- garde aussi le cache hors ligne de Firestore (`persistentLocalCache`).
+Rien de la démonstration n’est jamais envoyé en ligne (`src/data/mode.ts` sépare les données de l’appareil).
+Sans configuration Firebase (`.env`), l’application n’a que la démonstration.
 
-La première ouverture avec Firebase envoie les données de démonstration. Pour démarrer à vide :
-Paramètres → Données → « Réinitialiser », puis supprimer les données fictives, ou importer votre sauvegarde JSON.
+## Projet actuel
+- Projet Firebase `solonarterp`, Firestore `(default)` en `us-east1`, école `solonart`.
+- La configuration Web (publique) est dans `.env.production`.
+- Directeur : le compte dont l’adresse a été donnée à `scripts/ecole.ts creer`.
 
-## 3. Règles de sécurité
-Copier `firestore.rules` dans Firestore → Règles. Elles lisent le rôle de l’utilisateur dans
-`ecoles/{ecole}/users/{uid}` et les permissions dans `ecoles/{ecole}/roles/{roleId}`.
+## Une nouvelle école (ou un nouveau projet)
+1. Console Firebase : créer le projet, puis **Authentication → Commencer** ; activer **Google** et **E-mail/Mot de passe**.
+2. Paramètres du projet → Comptes de service → « Générer une nouvelle clé privée ».
+   **Ce fichier est la clé maîtresse du projet : jamais dans le dépôt, jamais dans l’application.**
+3. Depuis un ordinateur :
+   ```bash
+   node --experimental-strip-types scripts/ecole.ts regles  --cle /chemin/cle.json
+   node --experimental-strip-types scripts/ecole.ts creer   --cle /chemin/cle.json --ecole monecole \
+        --nom "École …" --commune … --directeur direction@exemple.com
+   node --experimental-strip-types scripts/ecole.ts domaine --cle /chemin/cle.json --domaine monecole.vercel.app
+   ```
+   `creer` ne remplace jamais une école existante et affiche le **code d’établissement**.
+4. Mettre la configuration Web du projet dans `.env.production` (avec `VITE_FIREBASE_SCHOOL_ID=monecole`), puis déployer.
 
-## 4. Authentification
-Dans Firebase → Authentication → Méthodes de connexion, activer **Google** et **E-mail/Mot de passe**,
-puis ajouter le domaine de l’application (ex. `effective-octo-fortnight.vercel.app`) dans « Domaines autorisés ».
-`src/lib/auth.ts` utilise alors Firebase Auth ; la fiche `users/{uid}` d’un nouveau compte porte l’identifiant Firebase,
-et les règles (`firestore.rules`) permettent à la personne de créer sa fiche sans rôle puis d’envoyer sa demande avec le code.
+## Comptes et sécurité
+- La fiche d’un compte est `ecoles/{ecole}/users/{adresse e-mail en minuscules}` ; son `roleId` désigne `roles/{roleId}`.
+- L’adresse doit être **confirmée** (Google : toujours ; e-mail + mot de passe : lien envoyé à la création).
+  Sans cela, n’importe qui pourrait créer un compte avec l’adresse d’un autre et prendre ses droits.
+- Un compte créé par la personne elle-même n’a pas de rôle : elle entre le code d’établissement, la direction valide.
+- Un compte préparé par l’école (professeur, parent) est retrouvé par son adresse à la première connexion.
+- `firestore.rules` : le personnel lit toute l’école ; chacun ne modifie que ce que son rôle permet.
 
-## Structure des collections
-`school, years, periods, classes, subjects, courses, guardians, students, staff, evaluations, grades,
-reportEntries, attendance, staffAttendance, timetable, payments, expenses, salaries, projects, messages,
-events, incidents, roles, users, audit` — types complets dans `src/data/types.ts`.
+## Synchronisation (`src/data/sync.ts`)
+- L’application travaille toujours sur la base de l’appareil (hors ligne), puis envoie la file d’attente par lots de 400.
+- Les changements des autres appareils arrivent en temps réel (`onSnapshot`) ; la modification la plus récente gagne (`updatedAt`).
+- Compte sans rôle ou parent : on n’écoute que sa fiche, l’école et les rôles ; personnel : toute l’école.
+- Une écriture refusée par le serveur (droits, document de plus de 1 Mo) est écartée et signalée dans Paramètres → Données.
+- À la déconnexion, les données de l’école sont effacées du téléphone (s’il ne reste rien à envoyer).
+
+## Limites actuelles
+- **Espace parent en ligne** : le parent se connecte, mais la lecture filtrée de ses enfants n’est pas encore en place.
+- Photos et documents sont gardés dans les fiches : un dossier très lourd (plus de 1 Mo) est refusé. Prochaine étape : Firebase Storage.
+- Les relances automatiques partent quand la direction ouvre l’application (pas encore de serveur).

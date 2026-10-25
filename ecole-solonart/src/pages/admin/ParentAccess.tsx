@@ -8,7 +8,7 @@ import { toast } from '../../components/ui';
 import { civ, timeAgo } from '../../lib/format';
 import { audit } from '../../lib/session';
 import { phoneDigits } from '../../lib/relance';
-import { findByEmail, googleAvailable, resetLocalPassword } from '../../lib/auth';
+import { findByEmail, googleAvailable, putAccount, resetLocalPassword } from '../../lib/auth';
 
 export function ParentAccess({ g, canWrite }: { g: Guardian; canWrite: boolean }) {
   const users = useCollection('users');
@@ -25,8 +25,8 @@ export function ParentAccess({ g, canWrite }: { g: Guardian; canWrite: boolean }
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return toast('Entrez l’adresse e-mail du parent', true);
     const other = findByEmail(email);
     if (other && other.id !== account?.id) return toast(`Cette adresse est déjà utilisée par ${other.nom}`, true);
-    if (account) db.patch('users', account.id, { email: email.trim().toLowerCase(), actif: true });
-    else db.put('users', { id: `u-par-${g.id}`, nom: civ(g), email: email.trim().toLowerCase(), telephone: g.telephone, roleId: role.id, guardianId: g.id, pin: '', actif: true, photo: g.photo });
+    if (account) putAccount({ ...account, email, actif: true });
+    else putAccount({ id: `u-par-${g.id}`, nom: civ(g), email: email.trim().toLowerCase(), telephone: g.telephone, roleId: role.id, guardianId: g.id, pin: '', actif: true, photo: g.photo });
     if (!g.email) db.patch('guardians', g.id, { email: email.trim() });
     audit(account ? 'Accès parent modifié' : 'Création accès parent', `${civ(g)} · ${email.trim()}`, { domaine: 'acces' });
     toast('Accès prêt : envoyez l’invitation');

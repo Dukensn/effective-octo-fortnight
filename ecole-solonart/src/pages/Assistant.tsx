@@ -7,6 +7,7 @@ import { ruleBasedCommand, type ErpCommand } from '../ai/erpCommand';
 import { db } from '../data/store';
 import { actionLabel, executeCommand, type ChatReply } from '../ai/erpActions';
 import { useSession } from '../lib/session';
+import { NS } from '../data/mode';
 
 type Msg =
   | { id: number; who: 'me'; text: string }
@@ -14,7 +15,7 @@ type Msg =
   | { id: number; who: 'status'; text: string };
 
 type NewMsg = Msg extends infer M ? (M extends Msg ? Omit<M, 'id'> : never) : never;
-const KEY = 'solonart:assistant-chat';
+const KEY = `${NS}:assistant-chat`;
 const load = (): Msg[] => { try { return JSON.parse(sessionStorage.getItem(KEY) ?? '[]'); } catch { return []; } };
 const SUGGESTIONS = ['Résultats de la S4-A', 'Qui n’a pas encore payé en 7e année ?', 'Rapport financier du mois d’avril', 'Présences de la S3-A', 'Quels cahiers de textes ne sont pas à jour ?', 'Jean Philippe Dorval a payé 15000 gourdes par MonCash'];
 

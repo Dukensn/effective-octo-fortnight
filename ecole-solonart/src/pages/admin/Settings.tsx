@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { approveRequest, findByEmail, googleAvailable, newSchoolCode, refuseRequest, resetLocalPassword } from '../../lib/auth';
+import { approveRequest, findByEmail, googleAvailable, newSchoolCode, putAccount, refuseRequest, resetLocalPassword } from '../../lib/auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Upload, Plus, Download, RotateCcw, Cloud, CloudOff, KeyRound, Trash2, ShieldCheck, Check, Share2 } from 'lucide-react';
-import { db, useCollection, useDoc } from '../../data/store';
+import { db, eraseDemo, useCollection, useDoc } from '../../data/store';
+import { enterDemo, isDemo, leaveDemo, onlineConfigured } from '../../data/mode';
 import type { Access, ModuleKey, Period, Role, School, Subject, User } from '../../data/types';
 import { PageHead, Tabs, Field, Card, Modal, toast, Avatar, Badge, Toggle, Confirm } from '../../components/ui';
 import { readFileAsDataURL, downloadBlob, timeAgo, civ, dateLong } from '../../lib/format';
@@ -285,7 +286,7 @@ function UsersTab() {
           if (!/^\S+@\S+\.\S+$/.test(edit.email ?? '')) return toast('Adresse e-mail requise : c’est avec elle que la personne se connecte', true);
           const other = findByEmail(edit.email!);
           if (other && other.id !== edit.id) return toast(`Cette adresse est déjà utilisée par ${other.nom}`, true);
-          db.put('users', { pin: '', ...edit, email: edit.email!.trim().toLowerCase() } as User);
+          putAccount({ pin: '', ...edit, email: edit.email! } as User);
           audit(edit.id ? 'Modification utilisateur' : 'Création utilisateur', edit.nom);
           toast('Utilisateur enregistré'); setEdit(null);
         }}>Enregistrer</button></>}>
@@ -352,6 +353,7 @@ function DataTab() {
   const canEdit = useCanEdit();
   const input = useRef<HTMLInputElement>(null);
   const [reset, setReset] = useState(false);
+  const [erase, setErase] = useState(false);
   const [, setTick] = useState(0);
   const [snaps, setSnaps] = useState<{ date: string; size: number }[]>([]);
   const [restore, setRestore] = useState<string | null>(null);
@@ -365,13 +367,19 @@ function DataTab() {
           <div className="row" style={{ gap: 14 }}>
             <span className={firebaseEnabled ? 'tint-green' : 'tint-orange'} style={{ width: 46, height: 46, borderRadius: 12, display: 'grid', placeItems: 'center' }}>{firebaseEnabled ? <Cloud /> : <CloudOff />}</span>
             <div className="grow">
-              <b style={{ color: 'var(--ink)' }}>{firebaseEnabled ? `Firebase connecté (école « ${SCHOOL_ID} »)` : 'Mode local (hors ligne)'}</b>
-              <div className="small muted">{firebaseEnabled ? `État : ${sync.status}${sync.lastSync ? ` · ${timeAgo(sync.lastSync)}` : ''}${sync.error ? ` · ${sync.error}` : ''}` : 'Les données sont enregistrées sur cet appareil.'}</div>
+              <b style={{ color: 'var(--ink)' }}>{firebaseEnabled ? `En ligne (école « ${SCHOOL_ID} »)` : 'Démonstration (sur cet appareil)'}</b>
+              <div className="small muted">{firebaseEnabled ? `État : ${({ offline: 'hors ligne', syncing: 'envoi en cours', synced: 'à jour', error: 'problème', local: '' } as const)[sync.status]}${sync.lastSync ? ` · ${timeAgo(sync.lastSync)}` : ''}${sync.error ? ` · ${sync.error}` : ''}` : 'Une école fictive pour essayer. Rien n’est envoyé en ligne.'}</div>
             </div>
             {firebaseEnabled && <button className="btn btn-sm" onClick={() => pushOutbox()}>Synchroniser</button>}
           </div>
           <div className="small mt-12">Modifications en attente d’envoi : <b>{db.pendingCount()}</b></div>
-          {!firebaseEnabled && <p className="tiny muted mt-12">Pour synchroniser professeurs et administration sur plusieurs appareils, créez un projet Firebase, copiez <code>.env.example</code> en <code>.env.local</code>, remplissez la configuration puis reconstruisez l’application. Voir le fichier <code>FIREBASE.md</code>.</p>}
+          {onlineConfigured && (
+            <div className="row wrap mt-12">
+              {isDemo ? <button className="btn" onClick={leaveDemo}>Revenir à l’école en ligne</button> : <button className="btn" onClick={enterDemo}>Ouvrir la démonstration</button>}
+              <button className="btn btn-danger" onClick={() => setErase(true)}><Trash2 />Effacer la démonstration</button>
+            </div>
+          )}
+          {!onlineConfigured && <p className="tiny muted mt-12">Pour synchroniser professeurs et administration sur plusieurs appareils, créez un projet Firebase, copiez <code>.env.example</code> en <code>.env.local</code>, remplissez la configuration puis reconstruisez l’application. Voir le fichier <code>FIREBASE.md</code>.</p>}
         </Card>
         <Card title="Sauvegarde">
           <p className="small muted mb-12">Envoyez toutes les données hors de cet appareil (WhatsApp, Google Drive, email, clé USB) : si le téléphone est perdu, ce fichier permet de tout récupérer sur un autre appareil.{lastExport() ? ` Dernier envoi : ${timeAgo(lastExport())}.` : ' Aucun envoi pour l’instant.'}</p>
@@ -379,7 +387,7 @@ function DataTab() {
             <button className="btn btn-primary" onClick={async () => { try { if (await shareBackup()) { toast('Sauvegarde envoyée'); setTick((x) => x + 1); } } catch (e) { toast((e as Error).message, true); } }}><Share2 />Envoyer la sauvegarde</button>
             <button className="btn" onClick={() => downloadBlob(`solonart-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`, new Blob([db.exportJSON()], { type: 'application/json' }))}><Download />Télécharger</button>
             {canEdit && <button className="btn" onClick={() => input.current?.click()}><Upload />Importer</button>}
-            {canEdit && <button className="btn btn-danger" onClick={() => setReset(true)}><RotateCcw />Réinitialiser la démo</button>}
+            {canEdit && isDemo && <button className="btn btn-danger" onClick={() => setReset(true)}><RotateCcw />Réinitialiser la démo</button>}
           </div>
           <input ref={input} type="file" accept="application/json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; try { await db.importJSON(await f.text()); toast('Données importées'); } catch (err) { toast((err as Error).message, true); } }} />
         </Card>
@@ -399,6 +407,7 @@ function DataTab() {
         ))}</div>
       </Card>
       <Confirm open={!!restore} onClose={() => setRestore(null)} danger title="Restaurer une copie" confirmLabel="Restaurer" message={`Toutes les données de cet appareil seront remplacées par la copie du ${restore ? dateLong(restore) : ''}. Les modifications faites depuis seront perdues.`} onConfirm={async () => { if (!restore) return; try { await restoreSnapshot(restore); audit('Restauration copie', restore, { domaine: 'autre' }); toast('Copie restaurée'); } catch (e) { toast((e as Error).message, true); } }} />
+      <Confirm open={erase} onClose={() => setErase(false)} danger title="Effacer la démonstration" confirmLabel="Effacer" message="L’école fictive est supprimée de ce téléphone. Les données de votre vraie école ne sont pas touchées. Vous pourrez rouvrir une démonstration neuve depuis l’écran de connexion." onConfirm={async () => { if (isDemo) { await db.reset(); await eraseDemo(); leaveDemo(); } else { await eraseDemo(); toast('Démonstration effacée de ce téléphone'); } }} />
       <Confirm open={reset} onClose={() => setReset(false)} danger title="Réinitialiser la démonstration" confirmLabel="Réinitialiser" message="Toutes les données de cet appareil seront remplacées par les données de démonstration." onConfirm={async () => { await db.reset(); location.reload(); }} />
     </div>
   );

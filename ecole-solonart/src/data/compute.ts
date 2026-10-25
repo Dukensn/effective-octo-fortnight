@@ -331,3 +331,10 @@ export function autoCouncilPreschool(r: StudentReport, scope: ID | 'annuel') {
     comportement: { conduite: 'Bonne', collaboration: lv?.code === 'A' ? 'Excellent' : 'Bon', respect: 'Très bon', participation: lv?.code === 'NA' ? 'Moyenne' : 'Active' },
   };
 }
+
+/** Classe choisie par défaut dans les listes : celle de la démonstration si elle existe, sinon la première. */
+export function defaultClassId(): string {
+  const classes = db.list('classes');
+  if (classes.some((c) => c.id === 'c-s4-a')) return 'c-s4-a';
+  return classes.slice().sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }))[0]?.id ?? '';
+}

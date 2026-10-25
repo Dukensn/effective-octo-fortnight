@@ -6,13 +6,14 @@
 import { get, set, del } from 'idb-keyval';
 import { useSyncExternalStore } from 'react';
 import { COLLECTIONS, type CollectionName, type Collections, type ID } from './types';
+import { DEMO_NS, NS } from './mode';
 
 type Table<K extends CollectionName> = Record<ID, Collections[K]>;
 type Data = { [K in CollectionName]: Table<K> };
 
-const DB_KEY = (c: string) => `solonart:${c}`;
-const OUTBOX_KEY = 'solonart:outbox';
-const SCHEMA_KEY = 'solonart:schema';
+const DB_KEY = (c: string, ns = NS) => `${ns}:${c}`;
+const OUTBOX_KEY = `${NS}:outbox`;
+const SCHEMA_KEY = `${NS}:schema`;
 export const SCHEMA_VERSION = 15;
 
 const data = Object.fromEntries(COLLECTIONS.map((c) => [c, {}])) as unknown as Data;
@@ -151,9 +152,17 @@ export const db = {
   },
 };
 
-export async function loadDatabase(seed: () => void) {
+/** Efface la démonstration de cet appareil (elle n'existe nulle part ailleurs). */
+export async function eraseDemo() {
+  await Promise.all([...COLLECTIONS.map((c) => del(DB_KEY(c, DEMO_NS))), del(`${DEMO_NS}:outbox`), del(`${DEMO_NS}:schema`)]);
+  try { localStorage.removeItem(`${DEMO_NS}:session`); } catch { /* ignore */ }
+}
+
+/** Charge la base de l'appareil. `seed` (démonstration seulement) la remplit si elle est vide.
+ *  L'école en ligne n'est jamais remplie ici : ses données viennent du serveur. */
+export async function loadDatabase(seed?: () => void) {
   const schema = await get(SCHEMA_KEY);
-  if (schema === SCHEMA_VERSION) {
+  if (schema === SCHEMA_VERSION || !seed) {
     const tables = await Promise.all(COLLECTIONS.map((c) => get(DB_KEY(c))));
     COLLECTIONS.forEach((c, i) => {
       (data as Record<string, unknown>)[c] = tables[i] ?? {};
@@ -161,11 +170,11 @@ export async function loadDatabase(seed: () => void) {
     });
     outbox = (await get(OUTBOX_KEY)) ?? {};
   }
-  if (Object.keys(data.school).length === 0) {
+  if (seed && Object.keys(data.school).length === 0) {
     seed();
     await flush();
-    await set(SCHEMA_KEY, SCHEMA_VERSION);
   }
+  await set(SCHEMA_KEY, SCHEMA_VERSION);
   emit();
 }
 

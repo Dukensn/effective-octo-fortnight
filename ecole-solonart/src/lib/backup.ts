@@ -3,8 +3,9 @@
 import { del, get, keys, set } from 'idb-keyval';
 import { db } from '../data/store';
 import { downloadBlob, todayISO } from './format';
+import { NS } from '../data/mode';
 
-const PREFIX = 'solonart:copie:';
+const PREFIX = `${NS}:copie:`;
 const KEEP = 5;
 const LAST_EXPORT = 'solonart:dernier-envoi';
 

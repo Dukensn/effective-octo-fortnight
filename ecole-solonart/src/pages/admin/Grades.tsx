@@ -6,7 +6,7 @@ import { Lock, Unlock, Pencil, Trophy, Plus, Wand2, Save, FileText } from 'lucid
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Evaluation, ReportCardEntry } from '../../data/types';
 import { PageHead, Tabs, Field, StatusBadge, Badge, Menu, Modal, toast, Card, Avatar, Toggle, Empty, useIsMobile } from '../../components/ui';
-import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, autoCouncil, isPreschool } from '../../data/compute';
+import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, autoCouncil, isPreschool, defaultClassId } from '../../data/compute';
 import { LevelPill } from '../../components/Level';
 import { civ, dateShort, fullName } from '../../lib/format';
 import { useSession, audit } from '../../lib/session';
@@ -40,7 +40,7 @@ function Evaluations() {
   useCollection('grades');
   const periods = sortedPeriods();
   const [periode, setPeriode] = useState(periods.find((p) => !p.verrouillee)?.id ?? periods[0]?.id);
-  const [classe, setClasse] = useState('c-s4-a');
+  const [classe, setClasse] = useState(defaultClassId() || 'all');
   const [statut, setStatut] = useState('all');
   const [create, setCreate] = useState(false);
   const list = useMemo(() => evaluations.filter((e) => e.periodeId === periode && (classe === 'all' || e.classeId === classe) && (statut === 'all' || e.statut === statut)), [evaluations, periode, classe, statut]);
@@ -190,7 +190,7 @@ function Council() {
   useCollection('grades');
   const periods = sortedPeriods();
   const school = useDoc('school', 'main');
-  const [classe, setClasse] = useState('c-s4-a');
+  const [classe, setClasse] = useState(defaultClassId());
   const [scope, setScope] = useState<string>('annuel');
   const report = classReport(classe, scope);
   const pre = isPreschool(report?.classe);
