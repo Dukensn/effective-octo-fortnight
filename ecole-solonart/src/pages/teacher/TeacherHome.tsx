@@ -2,6 +2,7 @@
 // 1. ce qui compte maintenant (cours en cours ou prochain, avec l'action « Cours donné » sous le pouce) ;
 // 2. la journée en frise ; 3. les raccourcis ; 4. ce qui reste à corriger.
 import { useNavigate } from 'react-router-dom';
+import { SetupCard } from '../../components/Guide';
 import { Users, PenSquare, ClipboardCheck, ChevronRight, Wallet, NotebookPen, Bell, Check, PartyPopper, Coffee, ArrowRight, Repeat } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import { Avatar } from '../../components/ui';
@@ -117,6 +118,8 @@ export default function TeacherHome() {
           <ChevronRight size={18} />
         </button>
       )}
+
+      <SetupCard />
 
       {/* 2. Raccourcis */}
       <nav className="qa-row" aria-label="Raccourcis">

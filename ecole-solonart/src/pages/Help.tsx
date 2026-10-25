@@ -1,4 +1,6 @@
-import { PageHead, Card } from '../components/ui';
+import { PlayCircle } from 'lucide-react';
+import { PageHead, Card, toast } from '../components/ui';
+import { resetGuide } from '../lib/guide';
 import { useSession } from '../lib/session';
 
 const ADMIN: [string, string][] = [
@@ -42,7 +44,7 @@ export default function Help() {
   const items = session.isParent ? PARENT : session.isTeacher ? PROF : ADMIN;
   return (
     <div style={{ maxWidth: 820, margin: '0 auto' }}>
-      <PageHead title="Centre d’aide" sub="Les réponses aux questions les plus fréquentes." />
+      <PageHead title="Centre d’aide" sub="Les réponses aux questions les plus fréquentes." actions={<button className="btn btn-primary" onClick={() => { resetGuide(session.user); toast('Le tutoriel va s’afficher'); }}><PlayCircle />Revoir le tutoriel</button>} />
       <div className="stack" style={{ gap: 10 }}>
         {items.map(([q, a]) => (
           <details key={q} className="card card-pad">

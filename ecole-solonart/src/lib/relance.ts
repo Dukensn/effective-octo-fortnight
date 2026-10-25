@@ -3,6 +3,8 @@ import { db } from '../data/store';
 import type { Guardian, ID, Message, Student } from '../data/types';
 import { civ, fullName, money } from './format';
 import { audit } from './session';
+import { balances } from './finance';
+import { notifyParent } from './chat';
 
 export const MODELE_DEFAUT = 'Bonjour {parent}, {ecole} vous rappelle qu’il reste {reste} à payer pour la scolarité de {eleve} ({classe}). Paiement possible par MonCash ou au secrétariat. Merci.';
 export const CHAMPS = ['{parent}', '{eleve}', '{classe}', '{reste}', '{ecole}'];
@@ -57,4 +59,35 @@ export function relancesByStudent(messages: Message[]) {
     m.set(x.relance.eleveId, { last: Math.max(cur?.last ?? 0, x.date), count: (cur?.count ?? 0) + 1 });
   }
   return m;
+}
+
+/** Réglage des relances automatiques (par défaut : actives, toutes les 2 semaines, à partir de 1 000 G). */
+export const relanceAutoOf = () => db.get('school', 'main')?.relanceAuto ?? { actif: true, jours: 14, minimum: 1000 };
+
+/**
+ * Relances automatiques : un message dans le fil « École » du parent, avec le reste à payer.
+ * Pas plus d'une relance tous les N jours par élève (manuelle ou automatique), jamais pour un élève exclu par la direction.
+ * Tourne sur l'appareil de la direction ; avec la base en ligne, ce sera une tâche du serveur.
+ */
+export function runAutoRelances(auteurId?: ID): number {
+  const cfg = relanceAutoOf();
+  if (!cfg.actif) return 0;
+  const bal = balances();
+  const sent = relancesByStudent(db.list('messages'));
+  const modele = loadModele();
+  const day = Math.floor(Date.now() / 86400000);
+  let n = 0;
+  for (const s of db.list('students')) {
+    if (s.statut !== 'Actif' || s.relanceAutoOff) continue;
+    const reste = bal.get(s.id)?.rest ?? 0;
+    if (reste < cfg.minimum) continue;
+    if (Date.now() - (sent.get(s.id)?.last ?? 0) < cfg.jours * 86400000) continue;
+    const g = contactOf(s);
+    const texte = fillModele(modele, s, g, reste);
+    notifyParent(`notif-pay-${s.id}-${day}`, s, 'paiement', `Rappel de paiement : ${texte}`);
+    db.put('messages', { date: Date.now(), canal: 'Annonce', objet: 'Relance automatique', contenu: texte, cible: 'Parent', classeId: s.classeId, destinataires: 1, auteurId, relance: { eleveId: s.id, tuteurId: g?.id, reste } });
+    n++;
+  }
+  if (n) audit('Relances automatiques', `${n} parent(s) prévenu(s) dans l’application`, { domaine: 'finance' });
+  return n;
 }

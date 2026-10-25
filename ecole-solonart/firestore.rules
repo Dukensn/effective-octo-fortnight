@@ -43,6 +43,10 @@ service cloud.firestore {
 
       allow write: if collection != 'audit' && collection in ['grades', 'evaluations', 'attendance'] && (isTeacher(ecole) || canWrite(ecole, 'notes') || canWrite(ecole, 'presences'));
       allow write: if collection in ['students', 'guardians'] && (canWrite(ecole, 'eleves') || canWrite(ecole, 'inscriptions') || canWrite(ecole, 'parents'));
+      // Le parent complète l'inscription de SON enfant (champs du dossier seulement), quand l'école l'a demandé.
+      allow update: if collection == 'students' && isParent(ecole) && resource.data.tuteurIds.hasAny([userDoc(ecole).guardianId])
+        && resource.data.dossierParent.statut == 'a_completer'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'dateNaissance', 'lieuNaissance', 'adresse', 'commune', 'medical', 'contactUrgence', 'documents', 'dossierParent', 'updatedAt']);
       allow write: if collection in ['payments', 'expenses', 'salaries', 'projects'] && canWrite(ecole, 'finance');
       allow write: if collection == 'remplacements' && canWrite(ecole, 'presences');
       // Cours donnés : le professeur valide ses propres cours (jamais un refus) ; la direction valide ou refuse ; on ne supprime pas.

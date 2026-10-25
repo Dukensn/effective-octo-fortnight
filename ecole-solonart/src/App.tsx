@@ -1,4 +1,8 @@
+import { useEffect } from 'react';
+import ParentEnroll from './pages/parent/ParentEnroll';
+import { toast } from './components/ui';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { runAutoRelances } from './lib/relance';
 import {
   Home, Users, PenSquare, Map, UsersRound, Contact, CalendarDays, FileText, ClipboardCheck, BadgeDollarSign, FolderOpen,
   Mail, BarChart3, Settings, CalendarHeart, BookOpenCheck, Trophy, CalendarClock, UserPlus, Receipt, TrendingDown, IdCard, ShieldAlert, NotebookPen, Sparkles, History, MessagesSquare, TrendingUp, Wallet, BookOpen, Building2,
@@ -102,8 +106,20 @@ function Guard({ m, children }: { m: ModuleKey; children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/** Une fois par jour, sur l'appareil de la direction : relances automatiques des parents en retard. */
+function useDailyAutoRelances(on: boolean, userId: string) {
+  useEffect(() => {
+    if (!on) return;
+    const key = `solonart:relance-auto:${new Date().toISOString().slice(0, 10)}`;
+    try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch { return; }
+    const t = setTimeout(() => { const n = runAutoRelances(userId); if (n) toast(`${n} parent${n > 1 ? 's' : ''} en retard relancé${n > 1 ? 's' : ''} automatiquement`); }, 4000);
+    return () => clearTimeout(t);
+  }, [on, userId]);
+}
+
 function AdminApp() {
   const session = useSession()!;
+  useDailyAutoRelances(session.can('finance', 'write'), session.user.id);
   const items = ADMIN_NAV.filter((n) => session.can(n.m));
   // Barre du bas : les 3 écrans les plus utilisés auxquels ce rôle a accès, le bouton « ＋ » et le menu.
   const tabs = ([
@@ -236,6 +252,7 @@ function ParentApp() {
         <Route path="/p/progres" element={<ParentProgres />} />
         <Route path="/p/vie" element={<ParentVie />} />
         <Route path="/p/paiements" element={<ParentPaiements />} />
+        <Route path="/p/inscription/:id" element={<ParentEnroll />} />
         <Route path="/evenements" element={<Events />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/aide" element={<Help />} />

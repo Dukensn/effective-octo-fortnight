@@ -18,7 +18,7 @@ export async function enablePush(on: boolean) {
   return true;
 }
 
-async function show(title: string, body: string, to: string) {
+export async function show(title: string, body: string, to: string) {
   const reg = await navigator.serviceWorker.getRegistration();
   const opts = { body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: title, data: { url: `${location.pathname}#${to}` } };
   if (reg) await reg.showNotification(title, opts);

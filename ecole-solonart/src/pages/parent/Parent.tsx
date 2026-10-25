@@ -1,6 +1,7 @@
 // Espace parent : uniquement les enfants liés au compte, en lecture seule.
 // Bulletins et progrès : seulement les périodes validées (verrouillées) par la direction.
 import { useState } from 'react';
+import { SetupCard } from '../../components/Guide';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ClipboardCheck, Wallet, Printer, Lock, ShieldAlert, MessagesSquare, TrendingUp, TrendingDown, Trophy } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
@@ -72,6 +73,7 @@ export function ParentHome() {
   return (
     <>
       <PageHead title={`Bonjour ${session.user.nom.replace(/^(M\.|Mme)\s+/, '').split(' ')[0]}`} sub="Le suivi de vos enfants à l’école, mis à jour par l’établissement." />
+      <SetupCard />
       {kids.length === 0 ? <NoChild /> : (
         <div className="stack">
           {kids.map((k) => {
@@ -88,6 +90,14 @@ export function ParentHome() {
                   <Avatar src={k.photo} name={fullName(k)} size={52} />
                   <div className="grow"><b style={{ color: 'var(--ink)', fontSize: 16 }}>{fullName(k)}</b><div className="small muted">{classe?.nom}</div></div>
                 </div>
+                {k.dossierParent?.statut === 'a_completer' && (
+                  <button className="pe-banner" onClick={() => nav(`/p/inscription/${k.id}`)}>
+                    <span className="row-ic tint-orange"><ClipboardCheck /></span>
+                    <span className="grow"><b>Inscription à compléter</b><small>Photo, informations et documents · 3 minutes</small></span>
+                    <span className="btn btn-sm btn-primary">Compléter</span>
+                  </button>
+                )}
+                {k.dossierParent?.statut === 'soumis' && <div className="tiny muted mb-12">Dossier d’inscription envoyé · en cours de vérification par l’école</div>}
                 {lastAlert && (
                   <button className={`bubble sys t-${lastAlert.type} parent-alert`} onClick={() => go(k.id, '/p/messages')}>
                     <div className="bubble-from">Dernière alerte · {timeAgo(lastAlert.date)}</div>{lastAlert.texte}

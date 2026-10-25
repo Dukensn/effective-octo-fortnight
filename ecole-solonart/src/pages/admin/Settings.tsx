@@ -64,6 +64,19 @@ function SchoolTab() {
         <ImageSlot title="Logo de l’école" hint="Apparaît sur les bulletins, badges, reçus et l’application. PNG transparent conseillé." preview={<SchoolLogo size={80} />} onFile={(f) => upload('logo', f)} onClear={school.logo ? () => db.patch('school', 'main', { logo: undefined }) : undefined} canEdit={canEdit} />
         <ImageSlot title="Signature du directeur" hint="Photo de la signature sur fond blanc." preview={<Signature image={school.signatureDirecteur} w={160} />} onFile={(f) => upload('signatureDirecteur', f)} onClear={school.signatureDirecteur ? () => db.patch('school', 'main', { signatureDirecteur: undefined }) : undefined} canEdit={canEdit} />
         <ImageSlot title="Cachet de l’école" hint="Utilisé au dos du livret." preview={school.cachet ? <img src={school.cachet} alt="" style={{ width: 90, height: 90, objectFit: 'contain' }} /> : <Seal name={school.nom} size={90} />} onFile={(f) => upload('cachet', f)} onClear={school.cachet ? () => db.patch('school', 'main', { cachet: undefined }) : undefined} canEdit={canEdit} />
+        <Card title="Fonctionnement">
+          <label className="row between mb-12" style={{ gap: 12 }}>
+            <span className="small"><b style={{ color: 'var(--ink)' }}>Les parents complètent l’inscription</b><br /><span className="muted">L’école fait une inscription courte ; le parent ajoute la photo, les informations et les documents depuis son compte. L’école vérifie ensuite.</span></span>
+            <Toggle on={!!school.parentsCompletent} label="Les parents complètent l’inscription" onChange={(v) => { if (!canEdit) return; db.patch('school', 'main', { parentsCompletent: v }); audit('Réglage inscriptions', v ? 'Les parents complètent l’inscription' : 'L’école remplit tout'); }} />
+          </label>
+          <label className="row between" style={{ gap: 12 }}>
+            <span className="small"><b style={{ color: 'var(--ink)' }}>Rappels « pas encore fait »</b><br /><span className="muted">De temps en temps, un rappel de ce qui reste à mettre en place.</span></span>
+            <Toggle on={school.rappels?.actif ?? true} label="Rappels de mise en route" onChange={(v) => { if (!canEdit) return; db.patch('school', 'main', { rappels: { jours: school.rappels?.jours ?? 1, actif: v } }); }} />
+          </label>
+          {(school.rappels?.actif ?? true) && (
+            <div className="row wrap mt-8" style={{ gap: 8 }}>{[[1, 'Chaque jour'], [3, 'Tous les 3 jours'], [7, 'Chaque semaine']].map(([j, l]) => <button key={j} className={`chip ${(school.rappels?.jours ?? 1) === j ? 'active' : ''}`} disabled={!canEdit} onClick={() => db.patch('school', 'main', { rappels: { actif: true, jours: j as number } })}>{l}</button>)}</div>
+          )}
+        </Card>
       </div>
     </div>
   );

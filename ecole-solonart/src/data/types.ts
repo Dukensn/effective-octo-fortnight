@@ -21,6 +21,12 @@ export interface School extends Meta {
   telephone: string;
   email: string;
   siteWeb: string;
+  /** Les parents peuvent compléter eux-mêmes l'inscription (photo, informations, documents). */
+  parentsCompletent?: boolean;
+  /** Relances automatiques aux parents en retard de paiement (message dans l'application). */
+  relanceAuto?: { actif: boolean; jours: number; minimum: number };
+  /** Rappels « pas encore fait » pour la mise en route (au plus un par jour). */
+  rappels?: { actif: boolean; jours: number };
   /** Code à donner aux professeurs et au personnel pour rejoindre l'école depuis leur compte. */
   codeEtablissement?: string;
   /** Modèles de badges personnalisés par l'école. */
@@ -168,6 +174,10 @@ export interface Student extends Meta {
   documents: { type: string; nom: string; fourni: boolean; fichier?: string }[];
   langue: string;
   notesParticulieres?: string;
+  /** Inscription à compléter par le parent depuis son espace, puis vérifiée par l'école. */
+  dossierParent?: { statut: 'a_completer' | 'soumis' | 'valide'; soumisLe?: number; valideLe?: number };
+  /** La direction a arrêté les relances automatiques pour cet élève. */
+  relanceAutoOff?: boolean;
 }
 
 export type StaffType = 'Professeur' | 'Direction' | 'Administration' | 'Soutien';
@@ -408,7 +418,7 @@ export interface ChatMessage extends Meta {
   auteur: 'parent' | 'ecole' | 'professeur' | 'systeme';
   auteurId?: ID; // utilisateur
   texte: string;
-  type?: 'message' | 'absence' | 'retard' | 'conduite' | 'felicitations';
+  type?: 'message' | 'absence' | 'retard' | 'conduite' | 'felicitations' | 'paiement';
   date: number;
   lu: { parent?: boolean; ecole?: boolean; prof?: boolean };
 }
@@ -450,6 +460,10 @@ export interface User extends Meta {
   mdp?: string;
   /** Demande pour rejoindre l'établissement (compte créé par la personne elle-même). */
   demande?: { code: string; le: number; refusee?: boolean; motif?: string };
+  /** Tutoriel et astuces déjà vus (« tour », « tip:/eleves »…). */
+  vus?: string[];
+  /** Dernier rappel « pas encore fait » montré. */
+  dernierRappel?: number;
   actif: boolean;
   dernierAcces?: number;
   photo?: string;

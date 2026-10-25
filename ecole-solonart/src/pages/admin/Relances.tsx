@@ -1,13 +1,13 @@
 // Relances de paiement : élèves en retard, message personnalisé, envoi WhatsApp / SMS un par un et suivi.
 import { useMemo, useState } from 'react';
-import { MessageCircle, Smartphone, Copy, PenLine, Send, SkipForward } from 'lucide-react';
-import { useCollection, useDoc } from '../../data/store';
+import { MessageCircle, Smartphone, Copy, PenLine, Send, SkipForward, BellRing } from 'lucide-react';
+import { db, useCollection, useDoc } from '../../data/store';
 import type { Student } from '../../data/types';
-import { Avatar, Empty, Modal, Pills, toast } from '../../components/ui';
+import { Avatar, Empty, Modal, Pills, Toggle, toast } from '../../components/ui';
 import { fullName, money, norm, timeAgo } from '../../lib/format';
 import { balances } from '../../lib/finance';
-import { useSession } from '../../lib/session';
-import { CHAMPS, MODELE_DEFAUT, contactOf, fillModele, loadModele, recordRelance, relanceLink, relancesByStudent, saveModele } from '../../lib/relance';
+import { useSession, audit } from '../../lib/session';
+import { CHAMPS, MODELE_DEFAUT, relanceAutoOf, runAutoRelances, contactOf, fillModele, loadModele, recordRelance, relanceLink, relancesByStudent, saveModele } from '../../lib/relance';
 
 type Filtre = 'tous' | 'jamais' | 'semaine';
 const DAY = 86400000;
@@ -54,8 +54,26 @@ export default function Relances({ classe, q, canWrite }: { classe: string; q: s
     try { await navigator.clipboard.writeText(textFor(s)); toast('Message copié'); } catch { toast('Copie impossible sur cet appareil', true); }
   };
 
+  const auto = relanceAutoOf();
+  const setAuto = (p: Partial<typeof auto>) => db.patch('school', 'main', { relanceAuto: { ...auto, ...p } });
   return (
     <>
+      <div className="card card-pad mb-16 auto-relance">
+        <div className="row" style={{ gap: 12 }}>
+          <span className="row-ic tint-green"><BellRing /></span>
+          <span className="grow"><b style={{ color: 'var(--ink)' }}>Relances automatiques</b><div className="small muted">{auto.actif ? `Le parent reçoit un rappel dans l’application tous les ${auto.jours} jours tant qu’il reste au moins ${money(auto.minimum)} à payer.` : 'Arrêtées : aucun rappel automatique n’est envoyé.'}</div></span>
+          {canWrite && <Toggle on={auto.actif} label="Relances automatiques" onChange={(v) => { setAuto({ actif: v }); toast(v ? 'Relances automatiques activées' : 'Relances automatiques arrêtées'); }} />}
+        </div>
+        {canWrite && auto.actif && (
+          <div className="row wrap mt-12" style={{ gap: 8 }}>
+            <span className="small muted">Fréquence :</span>
+            {[7, 14, 30].map((j) => <button key={j} className={`chip ${auto.jours === j ? 'active' : ''}`} onClick={() => setAuto({ jours: j })}>{j === 7 ? 'Chaque semaine' : j === 14 ? 'Toutes les 2 semaines' : 'Chaque mois'}</button>)}
+            <span className="small muted" style={{ marginLeft: 8 }}>À partir de</span>
+            <select className="select" style={{ width: 120 }} value={auto.minimum} onChange={(e) => setAuto({ minimum: Number(e.target.value) })}>{[500, 1000, 5000, 10000].map((m) => <option key={m} value={m}>{money(m)}</option>)}</select>
+            <button className="btn btn-sm" onClick={() => { const n = runAutoRelances(session.user.id); toast(n ? `${n} parent(s) relancé(s)` : 'Personne à relancer aujourd’hui'); }}><Send size={14} />Envoyer maintenant</button>
+          </div>
+        )}
+      </div>
       <div className="card card-pad mb-16 stack" style={{ gap: 12 }}>
         <div className="row wrap between" style={{ gap: 10 }}>
           <div className="small"><b style={{ color: 'var(--ink)' }}>{debtors.length}</b> élève(s) · <b style={{ color: 'var(--red)' }}>{money(total, school?.monnaie)}</b> à recouvrer</div>
@@ -75,7 +93,7 @@ export default function Relances({ classe, q, canWrite }: { classe: string; q: s
 
       <div className="card">
         <div className="table-wrap"><table className="t">
-          <thead><tr>{canWrite && <th style={{ width: 36 }} />}<th>Élève</th><th className="num">Restant</th><th>Parent</th><th>Dernière relance</th><th /></tr></thead>
+          <thead><tr>{canWrite && <th style={{ width: 36 }} />}<th>Élève</th><th className="num">Restant</th><th>Parent</th><th>Dernière relance</th>{canWrite && <th title="Relance automatique">Auto</th>}<th /></tr></thead>
           <tbody>{debtors.slice(0, 150).map((s) => {
             const g = contactOf(s);
             const r = sent.get(s.id);
@@ -86,6 +104,7 @@ export default function Relances({ classe, q, canWrite }: { classe: string; q: s
                 <td className="num bold" style={{ color: 'var(--red)' }}>{money(b.get(s.id)!.rest)}</td>
                 <td className="small">{g ? <>{g.prenom} {g.nom}<br /><span className="muted">{g.whatsapp ?? g.telephone}</span></> : <span className="muted">Aucun parent</span>}</td>
                 <td className="small">{r ? <>{timeAgo(r.last)}<br /><span className="muted">{r.count} relance(s)</span></> : <span className="muted">Jamais</span>}</td>
+                {canWrite && <td><Toggle on={!s.relanceAutoOff} label={`Relance automatique pour ${fullName(s)}`} onChange={(v) => { db.patch('students', s.id, { relanceAutoOff: !v }); audit(v ? 'Relances automatiques reprises' : 'Relances automatiques arrêtées', fullName(s), { domaine: 'finance' }); }} /></td>}
                 <td>{canWrite && g && <div className="row" style={{ gap: 6 }}>
                   <button className="btn btn-sm btn-soft" onClick={() => send(s, 'WhatsApp')}><MessageCircle size={14} />WhatsApp</button>
                   <button className="btn btn-sm" onClick={() => send(s, 'SMS')} aria-label="SMS"><Smartphone size={14} />SMS</button>

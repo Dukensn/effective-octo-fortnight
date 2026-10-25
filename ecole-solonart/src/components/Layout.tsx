@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { RouteTip, SetupReminder, WelcomeTour } from './Guide';
 import { logoutEverywhere } from '../lib/auth';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell, ChevronDown, ChevronRight, HelpCircle, LayoutGrid, LogOut, Plus, Search, UserCircle2, WifiOff, Cloud, CloudOff, RefreshCw, type LucideIcon } from 'lucide-react';
@@ -106,7 +107,7 @@ export interface QuickAction { label: string; sub?: string; icon: LucideIcon; to
 
 // Titres des écrans secondaires (les écrans principaux prennent le libellé du menu).
 const SUB_TITLES: [RegExp, string][] = [
-  [/^\/inscriptions\/rapide/, 'Inscription rapide'], [/^\/inscriptions\/nouvelle/, 'Nouvelle inscription'], [/^\/eleves\/import/, 'Importer des élèves'],
+  [/^\/p\/inscription/, 'Inscription'], [/^\/inscriptions\/rapide/, 'Inscription rapide'], [/^\/inscriptions\/nouvelle/, 'Nouvelle inscription'], [/^\/eleves\/import/, 'Importer des élèves'],
   [/^\/eleves\/photos/, 'Séance photo'], [/^\/eleves\//, 'Fiche élève'], [/^\/classes\//, 'Classe'], [/^\/notes\/saisie/, 'Saisie des notes'],
   [/^\/notes\/palmares/, 'Palmarès'], [/^\/documents\/bulletins/, 'Bulletins'], [/^\/documents\/badges/, 'Badges'], [/^\/prof\/evaluation\/.+\/saisie/, 'Saisie des notes'],
   [/^\/prof\/evaluation/, 'Palmarès'], [/^\/prof\/classes\//, 'Contrôles'], [/^\/profil/, 'Mon profil'], [/^\/aide/, 'Aide'], [/^\/evenements/, 'Événements'], [/^\/gestion/, 'Gestion'], [/^\/prof\/cours/, 'Détail du cours'], [/^\/prof\/finance/, 'Finance'], [/^\/prof\/emploi/, 'Emploi du temps'], [/^\/prof\/matieres/, 'Mes matières'], [/^\/prof\/ecoles/, 'Mes écoles'],
@@ -179,7 +180,9 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
           </header>
         )}
         {searchOpen && !desktop && <div className="mobile-search-bar"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>}
-        <main className="content" key={desktop ? 'd' : path} ref={setContentEl}>{children}</main>
+        <main className="content" key={desktop ? 'd' : path} ref={setContentEl}><RouteTip path={path} />{children}</main>
+        <WelcomeTour />
+        <SetupReminder />
         <nav className="bottom-nav">
           {tabs.slice(0, half).map((it) => <NavLink key={it.to} to={it.to} end={it.end}><it.icon />{it.label}</NavLink>)}
           {quick.length > 0 && <button className="tab-plus" aria-label="Nouveau" onClick={() => setPlus(true)}><span><Plus /></span></button>}

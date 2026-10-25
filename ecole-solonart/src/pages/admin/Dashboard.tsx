@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { SetupCard } from '../../components/Guide';
 import { useNavigate } from 'react-router-dom';
 import { Users, GraduationCap, ClipboardCheck, Wallet, UserPlus, FileText, Receipt, CalendarDays, ChevronRight, Camera, FileWarning, PenSquare, Smartphone, BadgeDollarSign, IdCard, ShieldAlert } from 'lucide-react';
 import { useCollection, useDoc } from '../../data/store';
@@ -57,6 +58,7 @@ export default function Dashboard() {
     const photos = actifs.filter((s) => !s.photo).length;
     const incOuverts = incidents.filter((i) => i.statut === 'Ouvert').length;
     const docs = actifs.filter((s) => s.documents.some((d) => !d.fourni && d.type !== 'Certificat médical' && d.type !== 'Photo des parents')).length;
+    const parentDossiers = students.filter((s) => s.dossierParent?.statut === 'soumis');
     const lastMonth = [...new Set(salaries.map((s) => s.periode))].sort().pop();
     const sal = salaries.filter((s) => s.periode === lastMonth && s.statut === 'En attente').length;
     const items: { n: number; label: string; sub: string; to: string; icon: typeof Users; tint: string; m: ModuleKey }[] = [
@@ -66,11 +68,12 @@ export default function Dashboard() {
       { n: finance.late, label: 'Élèves en retard de paiement', sub: 'Relances WhatsApp ou SMS', to: '/finance?tab=paiements', icon: BadgeDollarSign, tint: 'red', m: 'finance' },
       { n: sal, label: 'Salaires du mois à payer', sub: 'Personnel en attente', to: '/finance?tab=salaires', icon: Wallet, tint: 'green', m: 'finance' },
       { n: photos, label: 'Élèves sans photo', sub: 'Séance photo avec le téléphone', to: '/eleves/photos', icon: Camera, tint: 'blue', m: 'eleves' },
+      { n: parentDossiers.length, label: 'Dossiers complétés par les parents', sub: 'À vérifier puis valider', to: parentDossiers[0] ? `/eleves/${parentDossiers[0].id}` : '/eleves', icon: ClipboardCheck, tint: 'green', m: 'eleves' },
       { n: incOuverts, label: 'Incidents à traiter', sub: 'Registre de discipline', to: '/discipline', icon: ShieldAlert, tint: 'red', m: 'discipline' },
       { n: docs, label: 'Dossiers incomplets', sub: 'Acte de naissance ou bulletin manquant', to: '/eleves', icon: FileWarning, tint: 'orange', m: 'eleves' },
     ];
     return items.filter((i) => i.n > 0 && session.can(i.m));
-  }, [attendance, evaluations, payments, actifs, salaries, incidents, current, finance.late, sortedClasses, session]); // eslint-disable-line
+  }, [attendance, evaluations, payments, actifs, students, salaries, incidents, current, finance.late, sortedClasses, session]); // eslint-disable-line
 
   // Le préscolaire est évalué par compétences : il n'entre pas dans les moyennes.
   const gradedClasses = sortedClasses.filter((c) => c.niveau !== 'Préscolaire');
@@ -102,6 +105,7 @@ export default function Dashboard() {
         <div className="hero-logo"><SchoolLogo size={110} /></div>
       </section>
 
+      <SetupCard />
       <div className="grid g-stats mini mb-16">
         <StatCard tint="blue" icon={<Users />} value={actifs.length} label="Élèves" sub={`${actifs.filter((s) => s.sexe === 'F').length} filles · ${actifs.filter((s) => s.sexe === 'M').length} garçons`} />
         <StatCard tint="green" icon={<GraduationCap />} value={profs.length} label="Professeurs" sub={`${staff.filter((s) => s.statut === 'Actif').length} membres du personnel`} />

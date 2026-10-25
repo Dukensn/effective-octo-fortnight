@@ -38,6 +38,15 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Prise en main, relances automatiques, inscription par le parent (version 17)
+
+- **Tutoriel du premier jour** : à la première connexion, quelques écrans expliquent l’espace (direction, professeur ou parent). « Passer » ou « Suivant ». On peut le revoir : Aide → « Revoir le tutoriel ».
+- **Astuces par écran** : la première fois qu’on ouvre un écran important (Élèves, Finance, Présences, Notes, Documents, Paramètres, horaire et notes du professeur…), une astuce jaune explique quoi faire ; « Compris » la fait disparaître pour toujours.
+- **Mise en route** : sur l’accueil, une carte liste ce qui n’est pas encore fait (logo et signature, classes et frais, professeurs, élèves, emploi du temps, code donné aux professeurs, accès parents, sauvegarde, base en ligne), avec la progression. Elle disparaît quand tout est prêt.
+- **Rappels « pas encore fait »** : de temps en temps (chaque jour, tous les 3 jours ou chaque semaine — Paramètres → École → Fonctionnement), une petite fenêtre rappelle une étape non faite, une différente à chaque fois. Notification du téléphone si elle est activée.
+- **Relances automatiques** : une fois par jour, les parents en retard reçoivent un rappel dans l’application avec le reste à payer (pas plus souvent que la fréquence choisie : chaque semaine, 2 semaines ou mois ; à partir d’un montant minimum). La direction les **arrête** pour toute l’école (Finance → Relances) ou **pour un élève** (interrupteur « Auto », ou fiche élève → Plus).
+- **Inscription complétée par le parent** (option dans Paramètres → École → Fonctionnement) : l’école fait l’inscription rapide avec l’e-mail du parent et lui envoie l’invitation par WhatsApp ; le parent ajoute la photo, les informations, la santé, le contact d’urgence et les documents (photos ou PDF) depuis son téléphone ; l’école voit « Dossiers complétés par les parents » dans « À faire » et **valide** sur la fiche de l’élève.
+
 ## Connexion par Google ou mot de passe, administration mobile (version 16)
 
 - **Connexion** : uniquement « Continuer avec Google » ou e-mail + mot de passe (plus de code à 4 chiffres). « Créer un compte » au même endroit ; « Mot de passe oublié ».

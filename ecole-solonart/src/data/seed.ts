@@ -581,7 +581,14 @@ export function seedDatabase() {
     ...[jeanDorval, marieDorval].map((g) => ({ id: `u-par-${g.id}`, nom: `${g.sexe === 'F' ? 'Mme' : 'M.'} ${g.prenom} ${g.nom}`, email: g.email || `${slug(g.prenom)}.${slug(g.nom)}@parent.solonart.edu`, telephone: g.telephone, roleId: 'r-par', guardianId: g.id, pin: '', actif: true, photo: g.photo })),
   ];
   db.bulkPut('users', users as User[]);
-  db.patch('school', 'main', { codeEtablissement: 'SOLONART-2025' });
+  db.patch('school', 'main', { codeEtablissement: 'SOLONART-2025', parentsCompletent: true, relanceAuto: { actif: true, jours: 14, minimum: 1000 }, rappels: { actif: true, jours: 1 } });
+  // Démonstration : un dossier à compléter par le parent Dorval, un autre complété et à vérifier par l'école.
+  {
+    const naomiD = students.find((x) => x.nom === 'Dorval' && x.prenom === 'Naomi');
+    if (naomiD) db.patch('students', naomiD.id, { dossierParent: { statut: 'a_completer' } });
+    const other = students.find((x) => x.statut === 'Actif' && x.nom !== 'Dorval' && x.classeId === 'c-7af');
+    if (other) db.patch('students', other.id, { dossierParent: { statut: 'soumis', soumisLe: Date.now() - 5 * 3600000 } });
+  }
 
   // ---------- Taux horaires (par matière et niveau) ----------
   const TAUX: Record<string, [number, number]> = { ma: [400, 300], pc: [400, 300], inf: [350, 300], svt: [350, 300] };

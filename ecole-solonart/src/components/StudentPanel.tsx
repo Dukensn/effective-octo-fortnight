@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
+import { notifyParent } from '../lib/chat';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle, ShieldAlert, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle, ShieldAlert, MessageCircle, MoreHorizontal, BellOff } from 'lucide-react';
 import { db, useCollection, useDoc } from '../data/store';
 import type { Student } from '../data/types';
 import { Avatar, Badge, Menu, StatusBadge, Confirm, toast, Modal, Field, useIsMobile } from './ui';
@@ -61,6 +62,7 @@ export function StudentPanel({ student }: { student: Student }) {
               { label: 'Générer le badge', icon: <IdCard />, onClick: () => nav(`/documents/badges?type=eleve&eleve=${student.id}`) },
               ...(session.can('discipline', 'write') ? [{ label: 'Signaler un incident', icon: <ShieldAlert />, onClick: () => nav(`/discipline?new=1&eleve=${student.id}`) }] : []),
               { label: 'Imprimer la fiche', icon: <Printer />, onClick: printSheet },
+              ...(session.can('finance', 'write') ? [{ label: student.relanceAutoOff ? 'Reprendre les relances automatiques' : 'Arrêter les relances automatiques', icon: <BellOff />, onClick: () => { db.patch('students', student.id, { relanceAutoOff: !student.relanceAutoOff }); audit(student.relanceAutoOff ? 'Relances automatiques reprises' : 'Relances automatiques arrêtées', fullName(student), { domaine: 'finance' }); toast(student.relanceAutoOff ? 'Relances reprises' : 'Relances arrêtées pour cet élève'); } }] : []),
               ...(canEdit ? ['sep' as const, { label: 'Changer de classe', icon: <ArrowRightLeft />, onClick: () => setTransfer(true) }, { label: 'Archiver l’élève', icon: <Archive />, onClick: () => setArchive(true), danger: true }] : []),
             ];
   const phone = useIsMobile();
@@ -90,8 +92,16 @@ export function StudentPanel({ student }: { student: Student }) {
     </div>
   );
 
+  const dossier = student.dossierParent;
+  const validate = () => { db.patch('students', student.id, { dossierParent: { ...dossier!, statut: 'valide', valideLe: Date.now() } }); notifyParent(`notif-dossier-ok-${student.id}`, student, 'message', `Le dossier d’inscription de ${student.prenom} est validé. Bienvenue !`); audit('Dossier parent validé', fullName(student), { domaine: 'eleves' }); toast('Dossier validé, le parent est prévenu'); };
   return (
     <div className="stack">
+      {dossier && dossier.statut !== 'valide' && (
+        <div className={`dossier-banner ${dossier.statut}`}>
+          <span className="grow small">{dossier.statut === 'soumis' ? <><b>Dossier complété par le parent</b> le {dateShort(new Date(dossier.soumisLe ?? Date.now()).toISOString().slice(0, 10))} : vérifiez la photo, les informations et les documents.</> : <><b>En attente du parent</b> : il doit compléter la photo, les informations et les documents.</>}</span>
+          {dossier.statut === 'soumis' && canEdit && <button className="btn btn-sm btn-success" onClick={validate}><CheckCircle2 size={14} />Valider le dossier</button>}
+        </div>
+      )}
       {phone ? mobileHead : <div className="card card-pad">
         <div className="row" style={{ alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
           {canEdit ? (
@@ -117,6 +127,7 @@ export function StudentPanel({ student }: { student: Student }) {
               { label: 'Générer le badge', icon: <IdCard />, onClick: () => nav(`/documents/badges?type=eleve&eleve=${student.id}`) },
               ...(session.can('discipline', 'write') ? [{ label: 'Signaler un incident', icon: <ShieldAlert />, onClick: () => nav(`/discipline?new=1&eleve=${student.id}`) }] : []),
               { label: 'Imprimer la fiche', icon: <Printer />, onClick: printSheet },
+              ...(session.can('finance', 'write') ? [{ label: student.relanceAutoOff ? 'Reprendre les relances automatiques' : 'Arrêter les relances automatiques', icon: <BellOff />, onClick: () => { db.patch('students', student.id, { relanceAutoOff: !student.relanceAutoOff }); audit(student.relanceAutoOff ? 'Relances automatiques reprises' : 'Relances automatiques arrêtées', fullName(student), { domaine: 'finance' }); toast(student.relanceAutoOff ? 'Relances reprises' : 'Relances arrêtées pour cet élève'); } }] : []),
               ...(canEdit ? ['sep' as const, { label: 'Changer de classe', icon: <ArrowRightLeft />, onClick: () => setTransfer(true) }, { label: 'Archiver l’élève', icon: <Archive />, onClick: () => setArchive(true), danger: true }] : []),
             ]} />
           </div>
