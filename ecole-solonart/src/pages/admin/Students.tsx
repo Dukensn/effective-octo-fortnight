@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, ChevronDown, FileSpreadsheet, Printer, Eye, Pencil, IdCard, FileText, ChevronRight, Upload, Camera } from 'lucide-react';
 import { useCollection } from '../../data/store';
-import { PageHead, Tabs, Field, SearchInput, Avatar, StatusBadge, Menu, Pager, usePaged, Empty, useIsDesktop, Card } from '../../components/ui';
+import { PageHead, Tabs, Field, SearchInput, Avatar, StatusBadge, Menu, Pager, usePaged, Empty, useIsDesktop, useIsMobile, Card } from '../../components/ui';
+import { balances } from '../../lib/finance';
+import { MChoices, MToolbar } from '../../components/Mobile';
+import { money } from '../../lib/format';
 import { StudentPanel } from '../../components/StudentPanel';
 import { downloadCSV, fullName, norm, dateShort, age } from '../../lib/format';
 import { useSession } from '../../lib/session';
@@ -13,6 +16,58 @@ import { Donut, BarChart } from '../../components/charts';
 type Tab = 'liste' | 'stats' | 'attente';
 
 export default function Students() {
+  if (useIsMobile()) return <StudentsMobile />;
+  return <StudentsDesktop />;
+}
+
+/** Téléphone : une liste simple — recherche, filtre par classe, une ligne par élève. */
+function StudentsMobile() {
+  const nav = useNavigate();
+  const session = useSession()!;
+  const [params] = useSearchParams();
+  const students = useCollection('students');
+  useCollection('payments');
+  const classes = useCollection('classes').slice().sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
+  const [classe, setClasse] = useState(params.get('classe') ?? 'all');
+  const [statut, setStatut] = useState('Actif');
+  const [q, setQ] = useState('');
+  const [max, setMax] = useState(60);
+  const bal = session.can('finance') ? balances() : null;
+  const list = useMemo(() => {
+    const n = norm(q);
+    return students
+      .filter((s) => (statut === 'all' ? s.statut !== 'Archivé' : s.statut === statut) && (classe === 'all' || s.classeId === classe) && (!n || norm(`${s.prenom} ${s.nom} ${s.matricule}`).includes(n)))
+      .sort((a, b) => (a.nom + a.prenom).localeCompare(b.nom + b.prenom, 'fr'));
+  }, [students, classe, statut, q]);
+  const code = (id: string) => classes.find((c) => c.id === id)?.code;
+  return (
+    <div className="mob" style={{ gap: 4 }}>
+      <MToolbar q={q} onQ={setQ} placeholder="Rechercher un élève" active={classe !== 'all' || statut !== 'Actif'} filters={<>
+        <MChoices title="Classe" value={classe} onChange={setClasse} options={[['all', 'Toutes'], ...classes.map((c) => [c.id, c.code] as [string, string])]} />
+        <MChoices title="Statut" value={statut} onChange={setStatut} options={[['Actif', 'Actifs'], ['En attente', 'En attente'], ['all', 'Tous']]} />
+      </>} />
+      <div className="m-count"><span>{list.length} élève{list.length > 1 ? 's' : ''}{classe !== 'all' ? ` · ${code(classe)}` : ''}</span>{(classe !== 'all' || statut !== 'Actif') && <button onClick={() => { setClasse('all'); setStatut('Actif'); }}>Effacer les filtres</button>}</div>
+      <div className="rows">
+        {list.slice(0, max).map((s) => {
+          const rest = bal?.get(s.id)?.rest;
+          return (
+            <button key={s.id} className="row-item" onClick={() => nav(`/eleves/${s.id}`)}>
+              <Avatar src={s.photo} name={fullName(s)} size={44} />
+              <span className="grow"><b>{s.prenom} {s.nom}</b><small>{code(s.classeId)} · {s.matricule}</small></span>
+              {s.statut !== 'Actif' ? <span className="row-end"><small className="wait">{s.statut}</small></span>
+                : rest != null && <span className="row-end">{rest > 0 ? <><b>{money(rest)}</b><small className="late">à payer</small></> : <small className="ok">À jour</small>}</span>}
+            </button>
+          );
+        })}
+      </div>
+      {list.length > max && <button className="btn btn-block mt-8" onClick={() => setMax(max + 60)}>Afficher plus</button>}
+      {list.length === 0 && <Empty title="Aucun élève" />}
+      {session.can('inscriptions', 'write') && <button className="fab fab-label" onClick={() => nav('/inscriptions/rapide')}><Plus size={20} />Inscrire</button>}
+    </div>
+  );
+}
+
+function StudentsDesktop() {
   const nav = useNavigate();
   const session = useSession()!;
   const [params, setParams] = useSearchParams();

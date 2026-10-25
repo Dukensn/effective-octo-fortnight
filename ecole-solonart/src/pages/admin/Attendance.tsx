@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { FiltersFold } from '../../components/Mobile';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Circle, UserCheck, UserX, Clock, Percent, LogIn, LogOut, CalendarDays } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
@@ -55,10 +56,12 @@ function Students() {
       </div>
       <div className="split split-side">
         <div>
+          <FiltersFold summary={`${classes.find((c) => c.id === classe)?.nom ?? ''} · ${date === todayISO() ? 'aujourd’hui' : date}`}>
           <div className="form-grid mb-16">
             <Field label="Classe"><select className="select" value={classe} onChange={(e) => setClasse(e.target.value)}>{classes.map((c) => <option key={c.id} value={c.id}>{c.nom}</option>)}</select></Field>
             <Field label="Date"><input type="date" className="input" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value)} /></Field>
           </div>
+          </FiltersFold>
           <RollCall classeId={classe} date={date} readOnly={!session.can('presences', 'write')} />
         </div>
         <Card title="Appels du jour" pad={false}>

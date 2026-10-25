@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
+import { MIcon, MRow } from '../../components/Mobile';
+import { FiltersFold } from '../../components/Mobile';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, Unlock, Pencil, Trophy, Plus, Wand2, Save, FileText } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Evaluation, ReportCardEntry } from '../../data/types';
-import { PageHead, Tabs, Field, StatusBadge, Badge, Menu, Modal, toast, Card, Avatar, Toggle, Empty } from '../../components/ui';
+import { PageHead, Tabs, Field, StatusBadge, Badge, Menu, Modal, toast, Card, Avatar, Toggle, Empty, useIsMobile } from '../../components/ui';
 import { classReport, classStudents, fmtNote, gradesForEvaluation, sortedPeriods, appreciation, autoCouncil, isPreschool } from '../../data/compute';
 import { LevelPill } from '../../components/Level';
 import { civ, dateShort, fullName } from '../../lib/format';
@@ -27,6 +29,7 @@ export default function Grades() {
 
 function Evaluations() {
   const nav = useNavigate();
+  const phone = useIsMobile();
   const session = useSession()!;
   const canWrite = session.can('notes', 'write');
   const evaluations = useCollection('evaluations');
@@ -49,15 +52,31 @@ function Evaluations() {
 
   return (
     <>
-      <div className="card card-pad row wrap mb-16" style={{ gap: 12, alignItems: 'flex-end' }}>
+      <div className="card card-pad row wrap mb-16 m-plain" style={{ gap: 12, alignItems: 'flex-end' }}>
+        <FiltersFold active={classe !== 'all' || statut !== 'all'} summary={`${period?.libelle ?? ''}${classe !== 'all' ? ` · ${classes.find((c) => c.id === classe)?.code}` : ''}${statut !== 'all' ? ` · ${statut}` : ''}`}>
         <Field label="Période"><select className="select" value={periode} onChange={(e) => setPeriode(e.target.value)}>{periods.map((p) => <option key={p.id} value={p.id}>{p.libelle}{p.verrouillee ? ' 🔒' : ''}</option>)}</select></Field>
         <Field label="Classe"><select className="select" value={classe} onChange={(e) => setClasse(e.target.value)}><option value="all">Toutes les classes</option>{classes.map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></Field>
         <Field label="Statut"><select className="select" value={statut} onChange={(e) => setStatut(e.target.value)}><option value="all">Tous</option><option>À venir</option><option>En cours</option><option>Clôturé</option></select></Field>
+        </FiltersFold>
         <span className="grow" />
         {canWrite && <button className="btn btn-primary" onClick={() => setCreate(true)}><Plus />Nouvelle évaluation</button>}
       </div>
       {period?.verrouillee && <div className="card card-pad mb-16 row" style={{ background: 'var(--orange-50)', border: 0 }}><Lock size={18} color="var(--orange)" /><span className="small">Cette période est verrouillée : les professeurs ne peuvent plus modifier les notes. Déverrouillez-la dans « Périodes & verrouillage ».</span></div>}
-      <div className="card">
+      {phone ? (
+        <div className="rows">{list.map((ev) => {
+          const g = gradesForEvaluation(ev.id);
+          const t = classStudents(ev.classeId).length;
+          const notes = [...g.values()].map((x) => x.note).filter((n): n is number => n !== null);
+          const done = g.size >= t;
+          return (
+            <MRow key={ev.id} onClick={() => nav(canWrite && !done ? `/notes/saisie/${ev.id}` : `/notes/palmares/${ev.id}`)}
+              lead={<MIcon tint={done ? 'green' : g.size ? 'blue' : 'orange'}><FileText /></MIcon>}
+              title={`${subjects.find((x) => x.id === ev.matiereId)?.nom.split(' (')[0]} · ${classes.find((c) => c.id === ev.classeId)?.code}`}
+              sub={`${g.size}/${t} notes${notes.length ? ` · moyenne ${fmtNote(notes.reduce((a, b) => a + b, 0) / notes.length)}` : ''} · ${dateShort(ev.date)}`}
+              end={<StatusBadge s={ev.statut} />} />
+          );
+        })}{list.length === 0 && <Empty title="Aucune évaluation pour ces filtres" />}</div>
+      ) : <div className="card">
         <div className="table-wrap"><table className="t">
           <thead><tr><th>Matière</th><th>Classe</th><th className="only-desktop">Professeur</th><th className="only-desktop">Date</th><th className="c">Saisie</th><th className="c">Moyenne</th><th>Statut</th><th /></tr></thead>
           <tbody>{list.map((ev) => {
@@ -87,7 +106,7 @@ function Evaluations() {
           })}</tbody>
         </table></div>
         {list.length === 0 && <Empty title="Aucune évaluation pour ces filtres" />}
-      </div>
+      </div>}
       {create && <NewEvaluation onClose={() => setCreate(false)} periodeId={periode!} classeId={classe === 'all' ? classes[0].id : classe} />}
     </>
   );

@@ -578,9 +578,10 @@ export function seedDatabase() {
       id: s.id === robert.id ? 'u-prof' : `u-${s.id}`, nom: `${s.sexe === 'F' ? 'Mme' : 'M.'} ${s.prenom} ${s.nom}`, email: s.email, roleId: 'r-prof', staffId: s.id, pin: '1234', actif: true, photo: s.photo,
     })),
     // Espace parent (démonstration) : connexion avec le numéro de téléphone et le code 1234
-    ...[jeanDorval, marieDorval].map((g) => ({ id: `u-par-${g.id}`, nom: `${g.sexe === 'F' ? 'Mme' : 'M.'} ${g.prenom} ${g.nom}`, email: g.email ?? '', telephone: g.telephone, roleId: 'r-par', guardianId: g.id, pin: '1234', actif: true, photo: g.photo })),
+    ...[jeanDorval, marieDorval].map((g) => ({ id: `u-par-${g.id}`, nom: `${g.sexe === 'F' ? 'Mme' : 'M.'} ${g.prenom} ${g.nom}`, email: g.email || `${slug(g.prenom)}.${slug(g.nom)}@parent.solonart.edu`, telephone: g.telephone, roleId: 'r-par', guardianId: g.id, pin: '', actif: true, photo: g.photo })),
   ];
   db.bulkPut('users', users as User[]);
+  db.patch('school', 'main', { codeEtablissement: 'SOLONART-2025' });
 
   // ---------- Taux horaires (par matière et niveau) ----------
   const TAUX: Record<string, [number, number]> = { ma: [400, 300], pc: [400, 300], inf: [350, 300], svt: [350, 300] };

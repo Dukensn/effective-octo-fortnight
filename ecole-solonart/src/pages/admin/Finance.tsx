@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, ChevronDown, DollarSign, TrendingUp, TrendingDown, BarChart3, PieChart, FileSpreadsheet, Receipt, CheckCircle2, Printer, FolderKanban, FileText, Wallet, BadgeCheck, CircleDollarSign, MessageCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
 import type { Expense, Payment, PaymentMode, Project, Salary } from '../../data/types';
-import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, toast, SearchInput, usePaged, Pager, scrollIntoRow, useIsMobile } from '../../components/ui';
+import { PageHead, Tabs, Field, Card, Avatar, StatusBadge, Menu, Modal, Sheet, toast, SearchInput, usePaged, Pager, scrollIntoRow, useIsMobile } from '../../components/ui';
 import { BarChart, Donut } from '../../components/charts';
 import { money, moneyShort, dateShort, fullName, monthLabel, monthShort, todayISO, downloadCSV, norm, civ } from '../../lib/format';
 import { activeMonths, balances, monthlyReport, nextReceipt } from '../../lib/finance';
@@ -64,6 +64,38 @@ export default function Finance() {
     if (t && t !== tab) setTab(t);
   }, [params]); // eslint-disable-line
   const actions = { pay: () => setPayForm(''), exp: () => setExpForm({}), proj: () => setProjForm({}) };
+  const mobile = useIsMobile();
+  const forms = (
+    <>
+      {payForm !== null && <PaymentForm eleveId={payForm} prefill={payPrefill} onClose={() => { setPayForm(null); setPayPrefill(undefined); }} />}
+      {expForm && <ExpenseForm value={expForm} onClose={() => setExpForm(null)} />}
+      {projForm && <ProjectForm value={projForm} onClose={() => setProjForm(null)} />}
+    </>
+  );
+  if (mobile) {
+    // Téléphone : des filtres simples en haut, une liste, et l'action principale en bas.
+    const mtab = tab === 'apercu' ? 'paiements' : tab;
+    const go = (t: Tab) => { setTab(t); setParams({ tab: t }, { replace: true }); };
+    return (
+      <div className="mob" style={{ gap: 8 }}>
+        <div className="chips-scroll" style={{ paddingTop: 4 }}>
+          {([['paiements', 'Paiements'], ['relances', 'Relances'], ['salaires', 'Salaires'], ['depenses', 'Dépenses'], ['rapports', 'Rapport du mois'], ['comptabilite', 'Comptabilité'], ['projets', 'Projets']] as [Tab | 'relances', string][]).map(([k, l]) => (
+            <button key={k} className={`chip ${mtab === k ? 'active' : ''}`} onClick={() => go(k as Tab)}>{l}</button>
+          ))}
+        </div>
+        {mtab === 'paiements' && <PaymentsMobile canWrite={canWrite} />}
+        {(mtab as string) === 'relances' && <Relances classe="all" q="" canWrite={canWrite} />}
+        {mtab === 'salaires' && <Salaries canWrite={canWrite} />}
+        {mtab === 'depenses' && <Expenses onNew={actions.exp} canWrite={canWrite} />}
+        {mtab === 'comptabilite' && <Journal />}
+        {mtab === 'projets' && <Projects onEdit={setProjForm} canWrite={canWrite} />}
+        {mtab === 'rapports' && <Reports />}
+        {canWrite && mtab === 'paiements' && <button className="fab fab-label" onClick={actions.pay}><Plus size={20} />Encaisser</button>}
+        {canWrite && mtab === 'depenses' && <button className="fab fab-label" onClick={actions.exp}><Plus size={20} />Dépense</button>}
+        {forms}
+      </div>
+    );
+  }
   return (
     <>
       <PageHead title="Finance" sub="Gérez les paiements, les dépenses, la comptabilité et les projets de l'établissement."
@@ -88,9 +120,62 @@ export default function Finance() {
       {tab === 'comptabilite' && <Journal />}
       {tab === 'projets' && <Projects onEdit={setProjForm} canWrite={canWrite} />}
       {tab === 'rapports' && <Reports />}
-      {payForm !== null && <PaymentForm eleveId={payForm} prefill={payPrefill} onClose={() => { setPayForm(null); setPayPrefill(undefined); }} />}
-      {expForm && <ExpenseForm value={expForm} onClose={() => setExpForm(null)} />}
-      {projForm && <ProjectForm value={projForm} onClose={() => setProjForm(null)} />}
+      {forms}
+    </>
+  );
+}
+
+/** Paiements sur téléphone : où on en est, puis la liste ; toucher un paiement ouvre son reçu. */
+function PaymentsMobile({ canWrite }: { canWrite: boolean }) {
+  const payments = useCollection('payments');
+  const students = useCollection('students');
+  const school = useDoc('school', 'main');
+  const [q, setQ] = useState('');
+  const [max, setMax] = useState(40);
+  const [open, setOpen] = useState<Payment | null>(null);
+  const [cancel, setCancel] = useState<Payment | null>(null);
+  const sMap = new Map(students.map((x) => [x.id, x]));
+  const b = balances();
+  let due = 0, paid = 0;
+  b.forEach((v) => { due += v.due; paid += v.paid; });
+  const waiting = payments.filter((p) => p.statut === 'En attente').length;
+  const list = payments.filter((p) => !q || norm(`${fullName(sMap.get(p.eleveId))} ${p.recu} ${p.reference ?? ''}`).includes(norm(q))).sort((a, c) => c.date.localeCompare(a.date));
+  const confirm = (p: Payment) => { db.patch('payments', p.id, { statut: 'Payé' }); audit('Confirmation paiement', `${p.recu} ${fullName(sMap.get(p.eleveId))} ${money(p.montant)}`, { domaine: 'finance', changements: [{ libelle: 'Statut', avant: 'En attente', apres: 'Payé' }] }); toast('Paiement confirmé'); setOpen(null); };
+  const st = open ? sMap.get(open.eleveId) : undefined;
+  return (
+    <>
+      <div className="kpi-line">
+        <div className="kpi-cell"><b>{money(paid, school?.monnaie)}</b><span>encaissé cette année</span></div>
+        <div className="kpi-cell"><b>{money(Math.max(0, due - paid))}</b><span>reste à recouvrer</span></div>
+      </div>
+      {waiting > 0 && <div className="m-count" style={{ color: '#d97706' }}>{waiting} paiement{waiting > 1 ? 's' : ''} MonCash / NatCash à confirmer</div>}
+      <div className="m-search"><SearchInput value={q} onChange={setQ} placeholder="Élève, n° de reçu, référence" /></div>
+      <div className="rows">{list.slice(0, max).map((p) => { const x = sMap.get(p.eleveId); return (
+        <button key={p.id} className="row-item" onClick={() => setOpen(p)}>
+          <Avatar src={x?.photo} name={fullName(x)} size={44} />
+          <span className="grow"><b>{fullName(x)}</b><small>{p.motif} · {p.mode} · {dateShort(p.date)}</small></span>
+          <span className="row-end"><b>{money(p.montant)}</b><small className={p.statut === 'Payé' ? 'ok' : p.statut === 'En attente' ? 'wait' : 'late'}>{p.statut}</small></span>
+        </button>
+      ); })}</div>
+      {list.length > max && <button className="btn btn-block mt-8" onClick={() => setMax(max + 40)}>Afficher plus</button>}
+      <Sheet open={!!open} onClose={() => setOpen(null)} title={open?.recu}>
+        {open && (
+          <div className="stack" style={{ gap: 16 }}>
+            <div className="row" style={{ gap: 12 }}><Avatar src={st?.photo} name={fullName(st)} size={48} /><span><b style={{ color: 'var(--ink)', fontSize: 16 }}>{fullName(st)}</b><div className="small muted">{db.get('classes', open.classeId)?.code} · {st?.matricule}</div></span></div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em' }}>{money(open.montant, school?.monnaie)}</div>
+            <div className="info small">
+              <div>Motif</div><div>{open.motif}{open.versement ? ` · ${open.versement}` : ''}</div>
+              <div>Mode</div><div>{open.mode}{open.reference ? ` · ${open.reference}` : ''}</div>
+              <div>Date</div><div>{dateShort(open.date)}</div>
+              <div>Statut</div><div>{open.statut}</div>
+            </div>
+            <button className="btn btn-primary btn-lg btn-block" onClick={() => printDocument(<ReceiptSheet payment={open} />, 'A4 portrait', open.recu)}><Printer />Imprimer le reçu</button>
+            {canWrite && open.statut === 'En attente' && <button className="btn btn-success btn-lg btn-block" onClick={() => confirm(open)}><CheckCircle2 />Confirmer le paiement</button>}
+            {canWrite && open.statut !== 'Annulé' && <button className="btn btn-ghost btn-block" style={{ color: 'var(--red)' }} onClick={() => { setCancel(open); setOpen(null); }}>Annuler ce paiement</button>}
+          </div>
+        )}
+      </Sheet>
+      {cancel && <CancelPayment payment={cancel} onClose={() => setCancel(null)} />}
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { approveRequest, findByEmail, googleAvailable, newSchoolCode, refuseRequest, resetLocalPassword } from '../../lib/auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Upload, Plus, Download, RotateCcw, Cloud, CloudOff, KeyRound, Trash2, ShieldCheck, Check, Share2 } from 'lucide-react';
 import { db, useCollection, useDoc } from '../../data/store';
@@ -216,13 +217,43 @@ function SubjectsTab() {
 function UsersTab() {
   const session = useSession()!;
   const canEdit = session.can('utilisateurs', 'write');
-  const users = useCollection('users').slice().sort((a, b) => a.roleId.localeCompare(b.roleId));
+  const all = useCollection('users');
+  const users = all.filter((u) => u.roleId).sort((a, b) => a.roleId.localeCompare(b.roleId));
+  const requests = all.filter((u) => !u.roleId && u.demande && !u.demande.refusee).sort((a, b) => b.demande!.le - a.demande!.le);
   const roles = useCollection('roles');
   const staff = useCollection('staff');
+  const school = useDoc('school', 'main');
   const [edit, setEdit] = useState<Partial<User> | null>(null);
+  const [pick, setPick] = useState<Record<string, { roleId: string; staffId?: string }>>({});
   return (
     <>
-      <div className="row mb-16"><p className="small muted grow">Chaque membre peut recevoir un compte avec un rôle. Le rôle définit les menus visibles et ce qu’il peut modifier.</p>{canEdit && <button className="btn btn-primary" onClick={() => setEdit({ actif: true, roleId: 'r-sec', pin: '' })}><Plus />Nouvel utilisateur</button>}</div>
+      <div className="card card-pad mb-16">
+        <div className="row wrap" style={{ gap: 12 }}>
+          <span className="grow"><b style={{ color: 'var(--ink)' }}>Code d’établissement</b><div className="small muted">Donnez-le aux professeurs et au personnel : après avoir créé leur compte (Google ou e-mail), ils l’entrent pour demander l’accès. Vous validez ensuite ici.</div></span>
+          <code className="school-code">{school?.codeEtablissement ?? '—'}</code>
+          {canEdit && <button className="btn btn-sm" onClick={() => { if (!window.confirm('Créer un nouveau code ? L’ancien ne marchera plus.')) return; db.patch('school', 'main', { codeEtablissement: newSchoolCode(school?.nom) }); audit('Nouveau code d’établissement', '', { domaine: 'acces' }); toast('Nouveau code créé'); }}>Changer</button>}
+        </div>
+      </div>
+      {requests.length > 0 && (
+        <Card title={`Demandes d’accès (${requests.length})`} className="mb-16" pad={false}>
+          {requests.map((u) => {
+            const p = pick[u.id] ?? { roleId: 'r-prof', staffId: staff.find((x) => x.email?.toLowerCase() === u.email.toLowerCase())?.id };
+            return (
+              <div key={u.id} className="list-item" style={{ flexWrap: 'wrap', gap: 12 }}>
+                <Avatar src={u.photo} name={u.nom} size={40} />
+                <span className="grow" style={{ minWidth: 160 }}><b style={{ color: 'var(--ink)' }}>{u.nom}</b><div className="small muted">{u.email} · {timeAgo(u.demande!.le)}</div></span>
+                {canEdit && <>
+                  <select className="select" style={{ width: 150 }} value={p.roleId} onChange={(e) => setPick({ ...pick, [u.id]: { ...p, roleId: e.target.value } })}>{roles.filter((r) => r.espace !== 'parent').map((r) => <option key={r.id} value={r.id}>{r.nom}</option>)}</select>
+                  <select className="select" style={{ width: 190 }} value={p.staffId ?? ''} onChange={(e) => setPick({ ...pick, [u.id]: { ...p, staffId: e.target.value || undefined } })}><option value="">Fiche du personnel…</option>{staff.filter((x) => x.statut === 'Actif').map((x) => <option key={x.id} value={x.id}>{civ(x)} · {x.poste}</option>)}</select>
+                  <button className="btn btn-sm btn-primary" onClick={() => { if (roles.find((r) => r.id === p.roleId)?.espace === 'professeur' && !p.staffId) return toast('Choisissez sa fiche du personnel', true); approveRequest(u.id, p.roleId, p.staffId); toast('Accès accordé'); }}>Accepter</button>
+                  <button className="btn btn-sm" onClick={() => { refuseRequest(u.id, window.prompt('Motif du refus (facultatif)') ?? undefined); toast('Demande refusée'); }}>Refuser</button>
+                </>}
+              </div>
+            );
+          })}
+        </Card>
+      )}
+      <div className="row mb-16"><p className="small muted grow">Chaque compte a un rôle : il définit les menus visibles et ce que la personne peut modifier. On se connecte avec Google ou avec son e-mail et son mot de passe.</p>{canEdit && <button className="btn btn-primary" onClick={() => setEdit({ actif: true, roleId: 'r-sec', pin: '' })}><Plus />Nouvel utilisateur</button>}</div>
       <div className="card"><div className="table-wrap"><table className="t">
         <thead><tr><th>Utilisateur</th><th>Rôle</th><th className="only-desktop">Dernier accès</th><th>Actif</th><th /></tr></thead>
         <tbody>{users.map((u) => (
@@ -238,9 +269,10 @@ function UsersTab() {
       {edit && (
         <Modal open onClose={() => setEdit(null)} title={edit.id ? 'Modifier l’utilisateur' : 'Nouvel utilisateur'} footer={<><button className="btn" onClick={() => setEdit(null)}>Annuler</button><button className="btn btn-primary" onClick={() => {
           if (!edit.nom || !edit.roleId) return toast('Nom et rôle requis', true);
-          if (!edit.id && !/^\d{4}$/.test(edit.pin ?? '')) return toast('Code à 4 chiffres requis', true);
-          if (edit.pin && !/^\d{4}$/.test(edit.pin)) return toast('Le code doit contenir 4 chiffres', true);
-          db.put('users', { email: '', ...edit } as User);
+          if (!/^\S+@\S+\.\S+$/.test(edit.email ?? '')) return toast('Adresse e-mail requise : c’est avec elle que la personne se connecte', true);
+          const other = findByEmail(edit.email!);
+          if (other && other.id !== edit.id) return toast(`Cette adresse est déjà utilisée par ${other.nom}`, true);
+          db.put('users', { pin: '', ...edit, email: edit.email!.trim().toLowerCase() } as User);
           audit(edit.id ? 'Modification utilisateur' : 'Création utilisateur', edit.nom);
           toast('Utilisateur enregistré'); setEdit(null);
         }}>Enregistrer</button></>}>
@@ -249,8 +281,9 @@ function UsersTab() {
             <Field label="Nom affiché"><input className="input" value={edit.nom ?? ''} onChange={(e) => setEdit({ ...edit, nom: e.target.value })} /></Field>
             <Field label="Email"><input className="input" value={edit.email ?? ''} onChange={(e) => setEdit({ ...edit, email: e.target.value })} /></Field>
             <Field label="Rôle"><select className="select" value={edit.roleId} onChange={(e) => setEdit({ ...edit, roleId: e.target.value })}>{roles.map((r) => <option key={r.id} value={r.id}>{r.nom}</option>)}</select></Field>
-            <Field label={edit.id ? 'Nouveau code (4 chiffres)' : 'Code (4 chiffres)'}><input className="input" inputMode="numeric" maxLength={4} value={edit.pin ?? ''} onChange={(e) => setEdit({ ...edit, pin: e.target.value.replace(/\D/g, '') })} /></Field>
           </div>
+          <p className="tiny muted mt-12">La personne se connecte avec Google si cette adresse est un compte Google, ou touche « Créer un compte » avec cette adresse pour choisir son mot de passe.</p>
+          {edit.id && !googleAvailable && edit.mdp && <button className="btn btn-sm mt-8" onClick={() => { resetLocalPassword(edit.id!); db.patch('users', edit.id!, { dernierAcces: undefined }); setEdit(null); toast('La personne pourra choisir un nouveau mot de passe'); }}>Réinitialiser son mot de passe</button>}
         </Modal>
       )}
     </>

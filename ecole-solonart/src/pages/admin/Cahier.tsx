@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FiltersFold } from '../../components/Mobile';
 import { Plus, Printer, BookText, NotebookPen, AlertCircle } from 'lucide-react';
 import { useCollection } from '../../data/store';
 import type { Lesson } from '../../data/types';
@@ -87,6 +88,7 @@ export default function Cahier() {
         <StatCard tint="orange" icon={<AlertCircle />} value={late} label="Cours en retard" />
       </div>
       <Tabs tabs={[['seances', 'Séances'], ['devoirs', 'Devoirs'], ['suivi', `Suivi${late ? ` (${late})` : ''}`]]} value={tab} onChange={setTab} />
+      <FiltersFold active summary={`${classes.find((c) => c.id === classe)?.nom ?? 'Toutes les classes'}${tab === 'seances' && matiere !== 'all' ? ` · ${subj(matiere)}` : ''}`}>
       <div className="card card-pad stack filters mb-16" style={{ gap: 10 }}>
         <select className="select" value={classe} onChange={(e) => { setClasse(e.target.value); setMatiere('all'); }} aria-label="Classe">
           {tab === 'suivi' && <option value="all">Toutes les classes</option>}
@@ -99,6 +101,7 @@ export default function Cahier() {
           </select>
         )}
       </div>
+      </FiltersFold>
 
       {tab === 'seances' && <LessonList lessons={classLessons} onOpen={canWrite ? (l) => setForm(l) : undefined} />}
 

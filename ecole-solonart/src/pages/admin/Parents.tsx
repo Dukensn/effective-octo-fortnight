@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FiltersFold } from '../../components/Mobile';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, ChevronDown, Phone, MessageCircle, Mail, MapPin, Briefcase, Shield, Users, UserRound, HeartHandshake, Filter, Send, FileSpreadsheet, FileText, Printer, Pencil, Archive, AlertCircle, ChevronRight } from 'lucide-react';
 import { db, useCollection } from '../../data/store';
@@ -77,11 +78,13 @@ export default function Parents() {
       {tab === 'liste' && (
         <div className="split split-wide">
           <div className="stack filters">
-            <div className="card card-pad stack" style={{ gap: 14 }}>
+            <div className="card card-pad stack m-plain" style={{ gap: 14 }}>
+              <FiltersFold active={classe !== 'all' || statut !== 'all' || lien !== 'all'} summary={classe !== 'all' ? `Filtres · ${classes.find((c) => c.id === classe)?.code}` : 'Filtres'}>
               <div className="row between"><b className="row" style={{ color: 'var(--ink)' }}><Filter size={16} color="var(--primary)" />Filtres</b><button className="small" style={{ border: 0, background: 'none', color: 'var(--primary)' }} onClick={() => { setClasse('all'); setStatut('all'); setLien('all'); setQ(''); }}>Réinitialiser</button></div>
               <Field label="Classe"><select className="select" value={classe} onChange={(e) => setClasse(e.target.value)}><option value="all">Toutes les classes</option>{classes.map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></Field>
               <Field label="Statut"><select className="select" value={statut} onChange={(e) => setStatut(e.target.value)}><option value="all">Tous les statuts</option><option>Actif</option><option>Inactif</option></select></Field>
               <Field label="Type de lien"><select className="select" value={lien} onChange={(e) => setLien(e.target.value)}><option value="all">Tous (Parents, grands-parents...)</option><option value="parents">Parents</option><option value="grands">Grands-parents</option><option value="autres">Autres tuteurs</option></select></Field>
+              </FiltersFold>
               <Field label="Recherche"><SearchInput value={q} onChange={setQ} placeholder="Nom, téléphone, email..." /></Field>
             </div>
             <div className="card card-pad only-desktop qa-hide">

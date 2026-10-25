@@ -29,12 +29,11 @@ Paramètres → Données → « Réinitialiser », puis supprimer les données f
 Copier `firestore.rules` dans Firestore → Règles. Elles lisent le rôle de l’utilisateur dans
 `ecoles/{ecole}/users/{uid}` et les permissions dans `ecoles/{ecole}/roles/{roleId}`.
 
-## 4. Authentification réelle (recommandé en production)
-Aujourd’hui la connexion utilise un compte + code à 4 chiffres stocké localement (`src/lib/session.ts`).
-Pour passer à Firebase Auth :
-1. créer chaque utilisateur dans Authentication (email + mot de passe) ;
-2. utiliser son `uid` comme identifiant du document `users/{uid}` ;
-3. dans `login()`, appeler `signInWithEmailAndPassword(auth, email, motDePasse)` puis charger `users/{uid}`.
+## 4. Authentification
+Dans Firebase → Authentication → Méthodes de connexion, activer **Google** et **E-mail/Mot de passe**,
+puis ajouter le domaine de l’application (ex. `effective-octo-fortnight.vercel.app`) dans « Domaines autorisés ».
+`src/lib/auth.ts` utilise alors Firebase Auth ; la fiche `users/{uid}` d’un nouveau compte porte l’identifiant Firebase,
+et les règles (`firestore.rules`) permettent à la personne de créer sa fiche sans rôle puis d’envoyer sa demande avec le code.
 
 ## Structure des collections
 `school, years, periods, classes, subjects, courses, guardians, students, staff, evaluations, grades,

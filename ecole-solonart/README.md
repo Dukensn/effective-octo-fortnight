@@ -38,6 +38,14 @@ Les profils sont fictifs (photos tirées des maquettes). Paramètres → Donnée
 - **Accueil** avec liste « À faire » (appels, notes, paiements à confirmer, retards de paiement, salaires, photos, dossiers incomplets).
 - Professeur : brouillon des notes conservé si la page se ferme ; recherche des comptes à la connexion ; recherche sur mobile.
 
+## Connexion par Google ou mot de passe, administration mobile (version 16)
+
+- **Connexion** : uniquement « Continuer avec Google » ou e-mail + mot de passe (plus de code à 4 chiffres). « Créer un compte » au même endroit ; « Mot de passe oublié ».
+- **Rejoindre l’école** : un compte créé par la personne elle-même n’a pas d’école. Elle entre le **code d’établissement** (Paramètres → Utilisateurs, ex. `SOLONART-2025`) ; la direction voit la **demande d’accès**, choisit le rôle et la fiche du personnel, puis accepte ou refuse.
+- **Comptes enregistrés par la direction** (personnel, parents) : la direction saisit l’adresse e-mail ; la personne se connecte avec Google, ou touche « Créer un compte » avec cette adresse pour choisir son mot de passe. Les parents reçoivent l’invitation par WhatsApp.
+- **Sans Firebase** (démonstration) : les mots de passe sont vérifiés sur l’appareil ; Google s’active dès que Firebase est configuré (`.env`, voir FIREBASE.md). Comptes de démonstration : mot de passe `solonart`.
+- **Administration sur téléphone** : liste des élèves en vraie liste (photo, classe, reste à payer), **filtres repliables** (bouton « Filtres » avec un point quand un filtre est actif) sur Élèves, Notes, Présences, Parents, Discipline et Cahier ; compteurs en une ligne qui défile ; **fiche élève** façon profil (photo, actions Appeler · WhatsApp · Encaisser) ; **paiements** en liste avec le reçu en panneau ; évaluations en liste.
+
 ## Nouveau design mobile (version 15)
 
 Refait selon le guide *mobile-app-ui-design* (github.com/Dukensn/mobile-app-ui-design) :

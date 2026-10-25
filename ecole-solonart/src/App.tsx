@@ -6,12 +6,13 @@ import {
 import { Shell, type NavItem, type QuickAction } from './components/Layout';
 import { Toasts } from './components/ui';
 import { PrintRoot } from './lib/print';
-import { useSession } from './lib/session';
+import { useAccount, useSession } from './lib/session';
 import { useCollection } from './data/store';
 import { canTeacherCall, canTeacherMessage } from './lib/regles';
 import { canMultiSchool } from './lib/prof';
 import type { ModuleKey } from './data/types';
 import Login from './pages/Login';
+import Join from './pages/Join';
 import Verify from './pages/Verify';
 import Dashboard from './pages/admin/Dashboard';
 import Gestion from './pages/admin/Gestion';
@@ -246,12 +247,13 @@ function ParentApp() {
 
 export default function App() {
   const session = useSession();
+  const account = useAccount();
   return (
     <HashRouter>
       <Routes>
         {/* Vérification d'un badge (QR) : ouverte même sans connexion */}
         <Route path="/verifier/:code?" element={<Verify />} />
-        <Route path="*" element={!session ? <Login /> : session.isParent ? <ParentApp /> : session.isTeacher ? <TeacherApp /> : <AdminApp />} />
+        <Route path="*" element={!account ? <Login /> : !session ? <Join user={account} /> : session.isParent ? <ParentApp /> : session.isTeacher ? <TeacherApp /> : <AdminApp />} />
       </Routes>
       <Toasts />
       <PrintRoot />

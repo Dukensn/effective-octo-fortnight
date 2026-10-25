@@ -21,6 +21,8 @@ export interface School extends Meta {
   telephone: string;
   email: string;
   siteWeb: string;
+  /** Code à donner aux professeurs et au personnel pour rejoindre l'école depuis leur compte. */
+  codeEtablissement?: string;
   /** Modèles de badges personnalisés par l'école. */
   badgeModeles?: BadgeModel[];
   logo?: string; // dataURL (ou URL Storage)
@@ -443,7 +445,11 @@ export interface User extends Meta {
   roleId: ID;
   staffId?: ID; // lien vers la fiche personnel (pour les professeurs)
   guardianId?: ID; // lien vers la fiche parent (espace parent)
-  pin: string; // code de connexion local (remplacé par Firebase Auth en production)
+  pin: string; // ancien code à 4 chiffres (plus utilisé pour se connecter)
+  /** Empreinte du mot de passe (mode local, sans Firebase). Avec Firebase, le mot de passe est chez Firebase Auth. */
+  mdp?: string;
+  /** Demande pour rejoindre l'établissement (compte créé par la personne elle-même). */
+  demande?: { code: string; le: number; refusee?: boolean; motif?: string };
   actif: boolean;
   dernierAcces?: number;
   photo?: string;

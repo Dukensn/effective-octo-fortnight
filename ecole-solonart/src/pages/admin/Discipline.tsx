@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FiltersFold } from '../../components/Mobile';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Printer, AlertTriangle, Award, ShieldAlert, Users } from 'lucide-react';
 import { useCollection } from '../../data/store';
@@ -62,10 +63,12 @@ export default function Discipline() {
 
       {tab === 'registre' && (
         <div className="stack">
+          <FiltersFold active={classe !== 'all' || type !== 'all'} summary={[classe !== 'all' ? classes.find((c) => c.id === classe)?.code : 'Toutes les classes', type !== 'all' ? type : 'tous les types'].join(' · ')}>
           <div className="card card-pad stack filters" style={{ gap: 10 }}>
             <select className="select" value={classe} onChange={(e) => setClasse(e.target.value)} aria-label="Classe"><option value="all">Toutes les classes</option>{classes.map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select>
             <select className="select" value={type} onChange={(e) => setType(e.target.value)} aria-label="Type"><option value="all">Tous les types</option>{INCIDENT_TYPES.map((t) => <option key={t}>{t}</option>)}</select>
           </div>
+          </FiltersFold>
           <div className="row wrap" style={{ gap: 10 }}>
             <Pills items={['Tous', 'Ouverts'] as const} value={statut} onChange={setStatut} />
             <div className="grow" style={{ minWidth: 200 }}><SearchInput value={q} onChange={setQ} placeholder="Élève ou mot-clé…" /></div>

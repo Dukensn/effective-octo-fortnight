@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { logoutEverywhere } from '../lib/auth';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell, ChevronDown, ChevronRight, HelpCircle, LayoutGrid, LogOut, Plus, Search, UserCircle2, WifiOff, Cloud, CloudOff, RefreshCw, type LucideIcon } from 'lucide-react';
 import { SchoolLogo } from './Logo';
@@ -221,7 +222,7 @@ export function Shell({ items, tabs, quick = [], children }: { items: NavItem[];
           ))}
           <button onClick={() => { setMore(false); navigate('/aide'); }}><span><HelpCircle /></span>Aide</button>
         </div>
-        <button className="sheet-row danger" onClick={() => { setMore(false); logout(); navigate('/'); }}><LogOut />Se déconnecter</button>
+        <button className="sheet-row danger" onClick={() => { setMore(false); logoutEverywhere(); logout(); navigate('/'); }}><LogOut />Se déconnecter</button>
       </Sheet>
     </div>
     </AppBarCtx.Provider>

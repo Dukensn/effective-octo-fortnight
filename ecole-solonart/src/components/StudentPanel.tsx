@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle, ShieldAlert } from 'lucide-react';
+import { Camera, Phone, Mail, Home, Users, Pencil, FileText, Wallet, CalendarCheck, Printer, Archive, ArrowUp, ArrowDown, ArrowRightLeft, IdCard, CheckCircle2, Circle, ShieldAlert, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { db, useCollection, useDoc } from '../data/store';
 import type { Student } from '../data/types';
-import { Avatar, Badge, Menu, StatusBadge, Confirm, toast, Modal, Field } from './ui';
+import { Avatar, Badge, Menu, StatusBadge, Confirm, toast, Modal, Field, useIsMobile } from './ui';
+import { phoneDigits } from '../lib/relance';
 import { appreciation, classReport, fmtNote, isPreschool, levelOf, sortedPeriods } from '../data/compute';
 import { LevelPill } from './Level';
 import { money, dateLong, dateShort, age, fullName } from '../lib/format';
@@ -55,9 +56,43 @@ export function StudentPanel({ student }: { student: Student }) {
 
   const printSheet = () => printDocument(<StudentSheet student={student} />, 'A4 portrait', `Fiche ${fullName(student)}`);
 
+  const MENU_ITEMS: Parameters<typeof Menu>[0]['items'] = [
+              { label: 'Voir le bulletin', icon: <FileText />, onClick: () => nav(`/documents/bulletins?classe=${student.classeId}&eleve=${student.id}`) },
+              { label: 'Générer le badge', icon: <IdCard />, onClick: () => nav(`/documents/badges?type=eleve&eleve=${student.id}`) },
+              ...(session.can('discipline', 'write') ? [{ label: 'Signaler un incident', icon: <ShieldAlert />, onClick: () => nav(`/discipline?new=1&eleve=${student.id}`) }] : []),
+              { label: 'Imprimer la fiche', icon: <Printer />, onClick: printSheet },
+              ...(canEdit ? ['sep' as const, { label: 'Changer de classe', icon: <ArrowRightLeft />, onClick: () => setTransfer(true) }, { label: 'Archiver l’élève', icon: <Archive />, onClick: () => setArchive(true), danger: true }] : []),
+            ];
+  const phone = useIsMobile();
+  const tel = student.telephone ?? principal?.telephone;
+  const parentTel = principal?.whatsapp ?? principal?.telephone ?? tel;
+  // Téléphone : un en-tête de profil comme dans une application (photo, nom, actions rapides), puis les infos en liste.
+  const mobileHead = (
+    <div className="pf">
+      {canEdit ? (
+        <button className="avatar-edit pf-photo" onClick={() => setPhotoOpen(true)} aria-label="Changer la photo"><Avatar src={student.photo} name={fullName(student)} size={104} /><span className="cam"><Camera size={15} /></span></button>
+      ) : <span className="pf-photo"><Avatar src={student.photo} name={fullName(student)} size={104} /></span>}
+      <h2 className="pf-name">{fullName(student)}</h2>
+      <div className="pf-tags"><span className="badge b-blue">{classe?.code}</span><StatusBadge s={student.statut} />{studentRoles(student.id).map((r) => <span key={r} className="badge b-violet">{r}</span>)}</div>
+      <div className="pf-sub">{student.matricule} · {age(student.dateNaissance)} ans</div>
+      <div className="pf-actions">
+        {tel && <a href={`tel:${tel.replace(/\s/g, '')}`}><span className="qa-ic qa-blue"><Phone /></span>Appeler</a>}
+        {parentTel && <a href={`https://wa.me/${phoneDigits(parentTel)}`} target="_blank" rel="noreferrer"><span className="qa-ic qa-green"><MessageCircle /></span>WhatsApp</a>}
+        {session.can('finance', 'write') && <button onClick={() => nav(`/finance?new=1&eleve=${student.id}`)}><span className="qa-ic qa-amber"><Wallet /></span>Encaisser</button>}
+        <Menu trigger={<button><span className="qa-ic qa-violet"><MoreHorizontal /></span>Plus</button>} items={[...(canEdit ? [{ label: 'Modifier la fiche', icon: <Pencil />, onClick: () => nav(`/inscriptions/${student.id}`) }] : []), ...MENU_ITEMS]} />
+      </div>
+      <div className="rows pf-info">
+        <div className="row-item"><span className="row-ic"><Users /></span><span className="grow"><b>{principal ? `${principal.sexe === 'F' ? 'Mme' : 'M.'} ${principal.prenom} ${principal.nom}` : 'Aucun parent'}</b><small>{principal ? `${principal.lien} · ${principal.telephone}` : 'Parent / tuteur'}</small></span></div>
+        <div className="row-item"><span className="row-ic tint-green"><Wallet /></span><span className="grow"><b>{bal && bal.rest > 0 ? `${money(bal.rest)} à payer` : 'Scolarité à jour'}</b><small>{bal ? `${money(bal.paid)} payés sur ${money(bal.due)}` : yearDoc?.libelle}</small></span></div>
+        <div className="row-item"><span className="row-ic tint-violet"><CalendarCheck /></span><span className="grow"><b>{Math.round(att.rate * 100)} % de présence</b><small>{att.present} / {att.total} jours</small></span></div>
+        <div className="row-item"><span className="row-ic tint-orange"><Home /></span><span className="grow"><b>{student.adresse}</b><small>{student.commune} · né{student.sexe === 'F' ? 'e' : ''} le {dateShort(student.dateNaissance)}</small></span></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="stack">
-      <div className="card card-pad">
+      {phone ? mobileHead : <div className="card card-pad">
         <div className="row" style={{ alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
           {canEdit ? (
             <button className="avatar-edit" onClick={() => setPhotoOpen(true)} aria-label="Changer la photo"><Avatar src={student.photo} name={fullName(student)} size={112} square /><span className="cam"><Camera size={15} /></span></button>
@@ -92,7 +127,7 @@ export function StudentPanel({ student }: { student: Student }) {
           <div className="row"><Home size={17} color="var(--primary)" />{student.adresse}, {student.commune}</div>
           <div className="row"><Users size={17} color="var(--primary)" /><span className="ellipsis">Parent : {principal ? `${principal.sexe === 'F' ? 'Mme' : 'M.'} ${principal.nom} ${principal.prenom} (${principal.telephone})` : '-'}</span></div>
         </div>
-      </div>
+      </div>}
 
       <div className="pills" style={{ width: '100%', overflowX: 'auto', flexWrap: 'nowrap' }}>
         {(['Aperçu', 'Notes', 'Finance', 'Présences', 'Documents', 'Historique'] as Tab[]).map((t) => <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>{t}</button>)}

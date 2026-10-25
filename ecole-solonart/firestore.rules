@@ -50,6 +50,13 @@ service cloud.firestore {
         && request.resource.data.statut == 'valide' && request.resource.data.source in ['prof', 'cahier', 'appel'];
       allow create, update: if collection == 'pointages' && (canWrite(ecole, 'presences') || canWrite(ecole, 'finance'));
       allow write: if collection in ['users', 'roles'] && canWrite(ecole, 'utilisateurs');
+      // Nouveau compte (Google ou e-mail) : la personne crée sa propre fiche, sans rôle, puis envoie sa demande avec le code.
+      allow create: if collection == 'users' && signedIn() && id == request.auth.uid && request.resource.data.roleId == ''
+        && request.resource.data.email == request.auth.token.email;
+      allow update: if collection == 'users' && signedIn() && id == request.auth.uid && resource.data.roleId == ''
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['demande', 'nom', 'photo', 'dernierAcces', 'updatedAt']);
+      allow read: if collection == 'users' && signedIn() && id == request.auth.uid;
+      allow read: if collection == 'school' && signedIn();
       // Le secrétariat (module Parents) crée les accès parent, uniquement avec le rôle « Parent ».
       allow write: if collection == 'users' && canWrite(ecole, 'parents') && request.resource.data.roleId == 'r-par';
       // Un parent ne modifie que son code et sa date de visite.
